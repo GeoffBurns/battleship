@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>No-Touch Battleship – 18×7</title>
 
-    <meta name="description"
-        content="Play a challenging version of Battleship with no-touch placement rules and special ships." />
+    <meta
+      name="description"
+      content="Play a challenging version of Battleship with no-touch placement rules and special ships."
+    />
 
-      <link rel="stylesheet" href="battleseek.css">
-</head>
-<body>
-   <div class="battleship" style="width: 536px">
+    <link rel="stylesheet" href="battleseek.css" />
+  </head>
+  <body>
+    <div class="battleship" style="width: 536px">
       <div style="margin-bottom: 30px; margin-top: 30px">
         <label for="chooseMap" style="font-size: 130%; font-weight: 900"
           >Choose a Map:
@@ -25,40 +26,78 @@
       <div class="container">
         <h2 style="text-align: center">Friendly Waters</h2>
         <div class="board-wrap" style="width: 520px">
-                <div aria-label="friendly waters" class="board" id="friend-board" style="margin-bottom: 8px;"></div>
-            </div>
-            <div class="ships-wrap">
-                <div aria-label="Ships" id="shipTray"
-                    style="display: flex; flex-direction: row; gap: 8px; margin-bottom: 8px;"></div>
-                <div aria-label="Planes" id="PlaneTray"
-                    style="display: flex; flex-direction: row; gap: 8px; margin-bottom: 8px;"></div>
-                <div aria-label="Buildings" id="buildingTray"
-                    style="display: flex; flex-direction: row; gap: 8px; margin-bottom: 8px;"></div>
-
-            </div>
-            <div class="panel" style="display: flex; gap: 16px;">
-                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;">
-                    <button id="newGame"><span class="shortcut">R</span>estart</button>
-    
-                </div>
-                <div>
-                    <h4 style="color: white; margin-bottom: 12px;">Tally Boxes</h4>
-                    <div id="friend-tallyBox"></div>
-                </div>
-                <div>
-                    <div class="info">Placed: <span id="friend-placed">0 </span></div>
-                    <div class="info" style="display: none">
-              Endured: <span id="friend-endured">0 </span>
-                </div>
-                    <div class="info" style="display: none">Shots: <span id="friend-shots">0 </span></div>
-                      <div class="info" style="display: none">Hits: <span id="friend-hits">0 </span></div>
-                      <div class="info" style="display: none">Sunk: <span id="friend-sunk">0 / 8</span></div>
-       
-        
-            </div>
+          <div
+            aria-label="friendly waters"
+            class="board"
+            id="friend-board" 
+          ></div>
         </div>
+        
+        <div class="board-wrap"  style="width: 520px">
+          <div
+            aria-label="Ships"
+            id="shipTray"
+            style="
+              display: flex;
+              flex-direction: row;
+              gap: 8px;
+              margin-bottom: 8px;
+            "
+          ></div>
+          <div
+            aria-label="Planes"
+            id="planeTray"
+            style="
+              display: flex;
+              flex-direction: row;
+              gap: 8px;
+              margin-bottom: 8px;
+            "
+          ></div>
+          <div
+            aria-label="Buildings"
+            id="buildingTray"
+            style="
+              display: flex;
+              flex-direction: row;
+              gap: 8px;
+              margin-bottom: 8px;
+            "
+          ></div>
+        </div>
+        <div class="panel" style="display: flex; gap: 16px">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+              margin-bottom: 8px;
+            "
+          >
+            <button id="newGame"><span class="shortcut">R</span>estart</button>
+          </div>
+          <div>
+            <h4 style="color: white; margin-bottom: 12px">Tally Boxes</h4>
+            <div id="friend-tallyBox"></div>
+          </div>
+          <div>
+            <div class="info">Placed: <span id="friend-placed">0 </span></div>
+            <div class="info" style="display: none">
+              Endured: <span id="friend-endured">0 </span>
+            </div>
+            <div class="info" style="display: none">
+              Shots: <span id="friend-shots">0 </span>
+            </div>
+            <div class="info" style="display: none">
+              Hits: <span id="friend-hits">0 </span>
+            </div>
+            <div class="info" style="display: none">
+              Sunk: <span id="friend-sunk">0 / 8</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
 
     <script type="module" src="./map.js"></script>
     <script type="module" src="./mapUI.js"></script>
@@ -68,5 +107,5 @@
     <script type="module" src="./friendUI.js"></script>
     <script type="module" src="./friend.js"></script>
     <script type="module" src="./battlehide.js"></script>
-</body>
+  </body>
 </html>

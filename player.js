@@ -1,14 +1,12 @@
-import { gameMaps  } from './map.js'
- 
+import { gameMaps } from './map.js'
 
-
-const score = { 
+const score = {
   shot: new Set(),
   autoMisses: 0,
-  reset: function() {
+  reset: function () {
     this.shot.clear()
     this.autoMisses = 0
-  }, 
+  },
   newShotKey: function (r, c) {
     const key = `${r},${c}`
     if (this.shot.has(key)) return null
@@ -21,20 +19,46 @@ const score = {
     }
     return key
   },
- noOfShots: function() {
-  return (this.shot.size - this.autoMisses)
- },
- addAutoMiss: function (r, c) {
+  noOfShots: function () {
+    return this.shot.size - this.autoMisses
+  },
+  addAutoMiss: function (r, c) {
     const key = this.createShotKey(r, c)
     if (!key) return key // already shot here
     this.autoMisses++
     return key
-  },
+  }
 }
 
-export const player = { 
-  ships: [], 
+export class Ship {
+  constructor (id, symmetry, letter) {
+    this.id = id
+    this.symmetry = symmetry
+    this.letter = letter
+    this.cells = []
+    this.hits = new Set()
+    this.sunk = false
+  }
+  place (placed) {
+    this.cells = placed
+    this.hits = new Set()
+    this.sunk = false
+  }
+  shape () {
+    return gameMaps.shapesByLetter[this.letter]
+  }
+   sunkDescription () {
+    return gameMaps.sunkDescription(this.letter)
+  }
+  type () {
+    return gameMaps.shipTypes[this.letter]
+  }
+}
+
+export const player = {
+  ships: [],
   score: score,
+
   createShips: function () {
     const ships = []
     let id = 1
@@ -43,18 +67,10 @@ export const player = {
       const symmetry = base.symmetry
       const num = gameMaps.current.shipNum[letter]
       for (let i = 0; i < num; i++) {
-        ships.push({
-          id,
-          symmetry,
-          letter,
-          cells: [],
-          hits: new Set(),
-          sunk: false
-        })
+        ships.push(new Ship(id, symmetry, letter))
         id++
       }
     }
     return ships
-  },
-
+  }
 }

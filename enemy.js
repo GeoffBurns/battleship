@@ -1,4 +1,4 @@
-import { randomPlaceShape, sunkDescription, inBounds } from './utils.js'
+import { randomPlaceShape } from './utils.js'
 import { gameMaps } from './map.js'
 import { enemyUI } from './enemyUI.js'
 import { player } from './player.js'
@@ -6,30 +6,30 @@ import { gameStatus } from './playerUI.js'
 
 export const enemy = {
   __proto__: player,
-  grid: [],
+  shipCellGrid: [],
   carpetBombsUsed: 0,
   carpetMode: false,
   isRevealed: false,
   boardDestroyed: false,
   UI: enemyUI,
-
+  resetShipCells: function () {
+    this.shipCellGrid = Array.from({ length: gameMaps.current.rows }, () =>
+      Array(gameMaps.current.cols).fill(null)
+    )
+  },
   placeAll: function (ships) {
     ships = ships || this.ships
 
     // attempt whole-board placement; retry if any shape fails
     for (let attempt = 0; attempt < 100; attempt++) {
-      this.grid = Array.from({ length: gameMaps.current.rows }, () =>
-        Array(gameMaps.current.cols).fill(null)
-      )
+      this.resetShipCells()
 
       let ok = true
 
       for (const ship of ships) {
-        const placed = randomPlaceShape(ship, this)
+        const placed = randomPlaceShape(ship, this.shipCellGrid)
         if (placed) {
-          ship.cells = placed
-          ship.hit = new Set()
-          ship.sunk = false
+          ship.place(placed)
         } else {
           ok = false
           break
@@ -56,7 +56,10 @@ export const enemy = {
     } else if (this.boardDestroyed) {
       /// this.UI.displayFleetSunk() // already done
     } else if (this.carpetMode) {
-      gameStatus.displayBombStatus(this.carpetBombsUsed, 'Click On Square To Drop Bomb')
+      gameStatus.displayBombStatus(
+        this.carpetBombsUsed,
+        'Click On Square To Drop Bomb'
+      )
       this.UI.carpetBtn.innerHTML = '<span class="shortcut">S</span>ingle Shot'
     } else {
       this.UI.carpetBtn.innerHTML = '<span class="shortcut">M</span>ega Bomb'
@@ -98,14 +101,14 @@ export const enemy = {
   },
   markSunk: function (ship) {
     ship.sunk = true
-    gameStatus.info(sunkDescription(ship.letter))
+    gameStatus.info(ship.sunkDescription())
     for (const [r, c] of ship.cells) {
       // surrounding water misses
       for (let dr = -1; dr <= 1; dr++)
         for (let dc = -1; dc <= 1; dc++) {
           const rr = r + dr
           const cc = c + dc
-          if (inBounds(rr, cc)) {
+          if (gameMaps.inBounds(rr, cc)) {
             this.recordAutoMiss(rr, cc)
           }
         }
@@ -123,8 +126,8 @@ export const enemy = {
     }
   },
   shipCellAt: function (r, c) {
-    return this.grid[r]?.[c]
-  }, 
+    return this.shipCellGrid[r]?.[c]
+  },
   fireShot: function (r, c, key) {
     const shipCell = this.shipCellAt(r, c)
     if (!shipCell) {
@@ -164,8 +167,6 @@ export const enemy = {
 
     this.updateUI(this.ships)
     return result
-
-    v
   },
   processCarpetBomb: function (r, c) {
     let hits = 0
@@ -175,7 +176,7 @@ export const enemy = {
       for (let dc = -1; dc <= 1; dc++) {
         const nr = r + dr
         const nc = c + dc
-        if (inBounds(nr, nc)) {
+        if (gameMaps.inBounds(nr, nc)) {
           const result = this.processShot(nr, nc)
           if (result && result.hit) hits++
           if (result && result.sunkLetter) sunks += result.sunkLetter
@@ -191,18 +192,20 @@ export const enemy = {
     } else if (sunks.length === 0) {
       gameStatus.info(hits.toString() + ' Hits')
     } else if (sunks.length === 1) {
-      gameStatus.info( hits.toString() + ' Hits and ' + sunkDescription(sunks))
+      gameStatus.info(
+        hits.toString() + ' Hits and ' + gameMaps.sunkDescription(sunks)
+      )
     } else {
       let message = hits.toString() + ' Hits,'
       for (let sunk of sunks) {
-        message += ' and ' + sunkDescription(sunk)
+        message += ' and ' + gameMaps.sunkDescription(sunk)
       }
       message += ' Destroyed'
       gameStatus.info(message)
     }
-    gameStatus.displayBombStatus(enemy.carpetBombsUsed)
-    if (enemy.carpetBombsUsed >= gameMaps.maxBombs) {
-      enemy.carpetMode = false
+    gameStatus.displayBombStatus(this.carpetBombsUsed)
+    if (this.carpetBombsUsed >= gameMaps.maxBombs) {
+      this.carpetMode = false
       gameStatus.display('Single Shot Mode')
     }
   },

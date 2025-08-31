@@ -1,5 +1,4 @@
-import { gameMaps, gameHost  } from './map.js'
-import { isLand } from './utils.js'
+import { gameMaps, gameHost } from './map.js'
 
 export class StatusUI {
   constructor () {
@@ -45,20 +44,20 @@ export class ScoreUI {
   resetTallyBox () {
     this.tallyBox.innerHTML = ''
   }
-  buildShipBox(ship) {
-      const box = document.createElement('div')
-      const letter = ship.letter
-      box.className = 'tally-box'
-      if (ship.sunk) {
-        box.textContent = 'X'
-        box.style.background = '#ff8080'
-        box.style.color = '#400'
-      } else {
-        box.textContent = letter
-        box.style.background = gameMaps.shipColors[letter] || '#333'
-        box.style.color = gameMaps.shipLetterColors[letter] || '#fff'
-      }
-      return box
+  buildShipBox (ship) {
+    const box = document.createElement('div')
+    const letter = ship.letter
+    box.className = 'tally-box'
+    if (ship.sunk) {
+      box.textContent = 'X'
+      box.style.background = '#ff8080'
+      box.style.color = '#400'
+    } else {
+      box.textContent = letter
+      box.style.background = gameMaps.shipColors[letter] || '#333'
+      box.style.color = gameMaps.shipLetterColors[letter] || '#fff'
+    }
+    return box
   }
   buildTallyRow (ships, letter, rowList, boxer) {
     boxer = boxer || this.buildShipBox
@@ -67,7 +66,7 @@ export class ScoreUI {
     const matching = ships.filter(s => s.letter === letter)
 
     matching.forEach(s => {
-      const box = boxer(s) 
+      const box = boxer(s)
       row.appendChild(box)
     })
     rowList.appendChild(row)
@@ -123,38 +122,38 @@ export const gameStatus = new StatusUI()
 export const playerUI = {
   board: {},
   containerWidth: gameHost.containerWidth,
+  cellSize: gameHost.containerWidth / gameMaps.current.cols,
   resetBoardSize: function () {
-    const cellSize = this.containerWidth / gameMaps.current.cols
     this.board.style.setProperty('--cols', gameMaps.current.cols)
     this.board.style.setProperty('--rows', gameMaps.current.rows)
-    this.board.style.setProperty('--boxSize', cellSize.toString() + 'px')
+    this.board.style.setProperty('--boxSize', this.cellSize.toString() + 'px')
     this.board.innerHTML = ''
   },
-    buildBoard: function (onClickCell) {
+  buildBoard: function (onClickCell) {
     this.board.innerHTML = ''
     for (let r = 0; r < gameMaps.current.rows; r++) {
       for (let c = 0; c < gameMaps.current.cols; c++) {
-        const el = document.createElement('div')
-        const land = isLand(r, c)
+        const cell = document.createElement('div')
+        const land = gameMaps.isLand(r, c)
         const c1 = c + 1
         const r1 = r + 1
-        el.className = 'cell'
-        el.classList.add(land ? 'land' : 'sea')
+        cell.className = 'cell'
+        cell.classList.add(land ? 'land' : 'sea')
         const checker = (r + c) % 2 === 0
-        el.classList.add(checker ? 'light' : 'dark')
-        if (!land && c1 < gameMaps.current.cols && isLand(r, c1)) {
-          el.classList.add('rightEdge')
+        cell.classList.add(checker ? 'light' : 'dark')
+        if (!land && c1 < gameMaps.current.cols && gameMaps.isLand(r, c1)) {
+          cell.classList.add('rightEdge')
         }
-        if (c !== 0 && !land && isLand(r, c - 1)) {
-          el.classList.add('leftEdge')
+        if (c !== 0 && !land && gameMaps.isLand(r, c - 1)) {
+          cell.classList.add('leftEdge')
         }
-        if (r1 < gameMaps.current.rows && land !== isLand(r1, c)) {
-          el.classList.add('bottomEdge')
+        if (r1 < gameMaps.current.rows && land !== gameMaps.isLand(r1, c)) {
+          cell.classList.add('bottomEdge')
         }
-        el.dataset.r = r
-        el.dataset.c = c
-        el.addEventListener('click', () => onClickCell(r, c))
-        this.board.appendChild(el)
+        cell.dataset.r = r
+        cell.dataset.c = c
+        cell.addEventListener('click', () => onClickCell(r, c))
+        this.board.appendChild(cell)
       }
     }
   }

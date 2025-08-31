@@ -1,8 +1,86 @@
-
 export const gameHost = {
-    containerWidth: 520,
+  containerWidth: 520
+}
+export let gameMaps = {}
+
+// variant helpers
+function rotate (cells) {
+  return cells.map(([r, c]) => [c, -r])
+}
+function flipV (cells) {
+  return cells.map(([r, c]) => [-r, c])
 }
 
+/* 
+ function normalize (cells) {
+    const minR = Math.min(...cells.map(s => s[0]))
+    const minC = Math.min(...cells.map(s => s[1]))
+    return cells.map(([r, c]) => [r - minR, c - minC])
+  } 
+    */
+
+function asymmetricVariantsOf (cells) {
+  let fliped = flipV(cells)
+  return [cells, rotate(cells), fliped, rotate(fliped)]
+}
+function symmetricVariantsOf (cells) {
+  let variants = [cells]
+  for (let i = 0; i < 3; i++) {
+    variants.push(rotate(variants[variants.length - 1]))
+  }
+  return variants
+}
+function straightVariantsOf (cells) {
+  return [cells, rotate(cells)]
+}
+
+export class Shape {
+  constructor (letter, symmetry, cells) {
+    this.letter = letter
+    this.symmetry = symmetry
+    this.cells = cells
+  }
+
+  variants () {
+    switch (this.symmetry) {
+      case 'A':
+        return asymmetricVariantsOf(this.cells)
+      case 'S':
+        return [this.cells]
+      case 'H':
+        return symmetricVariantsOf(this.cells)
+      case 'L':
+        return straightVariantsOf(this.cells)
+      default:
+        throw new Error(
+          'Unknown symmetry type for ' + JSON.stringify(shapeElement, null, 2)
+        ) // The 'null, 2' adds indentation for readability);
+    }
+  }
+  type () {
+    return gameMaps.shipTypes[this.letter]
+  }
+  noOf () {
+    return gameMaps.current.shipNum[this.letter]
+  }
+  color () {
+    return gameMaps.shipColors[this.letter]
+  }
+  sunkDescription () {
+    return gameMaps.sunkDescription(this.letter)
+  }
+  letterColors () {
+    return gameMaps.shipLetterColors[this.letter]
+  }
+  description () {
+    return gameMaps.shipDescription[this.letter]
+  }
+}
+// geometry helper
+const inRange = (r, c) => element =>
+  element[0] == r && element[1] <= c && element[2] >= c
+
+// gameMapTypes
 const seaAndLand = {
   list: [
     {
@@ -215,139 +293,120 @@ const seaAndLand = {
     ]
   },
   baseShapes: [
-    {
-      letter: 'U',
-      symmetry: 'H',
-      cells: [
-        [0, 0],
-        [1, 0],
-        [1, 1],
-        [1, 2],
-        [1, 3],
-        [1, 4],
-        [0, 4]
-      ]
-    },
-    {
-      letter: 'G',
-      symmetry: 'S',
-      cells: [
-        [0, 0],
-        [1, 1],
-        [0, 2],
-        [2, 0],
-        [2, 2]
-      ]
-    },
-    {
-      letter: 'A',
-      symmetry: 'A',
-      cells: [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [1, 1],
-        [1, 2],
-        [1, 3],
-        [1, 4]
-      ]
-    },
-    {
-      letter: 'P',
-      symmetry: 'H',
-      cells: [
-        [0, 0],
-        [1, 0],
-        [2, 0],
-        [1, 1]
-      ]
-    },
-    {
-      letter: 'B',
-      symmetry: 'L',
-      cells: [
-        [0, 0],
-        [1, 0],
-        [2, 0],
-        [3, 0],
-        [4, 0]
-      ]
-    },
-    {
-      letter: 'C',
-      symmetry: 'L',
-      cells: [
-        [0, 0],
-        [1, 0],
-        [2, 0],
-        [3, 0]
-      ]
-    },
-    {
-      letter: 'D',
-      symmetry: 'L',
-      cells: [
-        [0, 0],
-        [0, 1],
-        [0, 2]
-      ]
-    }
+    new Shape('U', 'H', [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [1, 2],
+      [1, 3],
+      [1, 4],
+      [0, 4]
+    ]),
+    new Shape('G', 'S', [
+      [0, 0],
+      [1, 1],
+      [0, 2],
+      [2, 0],
+      [2, 2]
+    ]),
+    new Shape('A', 'A', [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 1],
+      [1, 2],
+      [1, 3],
+      [1, 4]
+    ]),
+    new Shape('P', 'H', [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+      [1, 1]
+    ]),
+    new Shape('B', 'L', [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [0, 4]
+    ]),
+    new Shape('C', 'L', [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+      [0, 3]
+    ]),
+    new Shape('D', 'L', [
+      [0, 0],
+      [0, 1],
+      [0, 2]
+    ])
   ],
   shapesByLetter: {},
   setTo: function (index) {
     this.current = this.list[index]
   },
-  shipSunkDescriptions : {
-  A: 'Shot Down',
-  G: 'Destroyed',
-  S: 'Sunk'
-},
-
-shipLetterColors: {
-  A: '#ff6666',
-  B: '#66ccff',
-  C: '#66ff66',
-  D: '#ffcc66',
-  P: '#cc99ff',
-  G: '#ff99cc',
-  U: '#ffff66',
-  M: '#ffd166'
-},
-shipDescription: {
-  A: 'Aircraft Carrier',
-  B: 'Battleship',
-  C: 'Cruiser',
-  D: 'Destroyer',
-  P: 'Airplane',
-  G: 'Anti-Aircraft Gun',
-  U: 'Underground Bunker'
-},
-shipTypes: {
-  A: 'S',
-  B: 'S',
-  C: 'S',
-  D: 'S',
-  P: 'A',
-  G: 'G',
-  U: 'G'
-},
-maxBombs: 3,
-shipColors: {
-  A: 'rgba(255,102,102,0.3)',
-  B: 'rgba(102,204,255,0.3)',
-  C: 'rgba(102,255,102,0.3)',
-  D: 'rgba(255,204,102,0.3)',
-  P: 'rgba(204,153,255,0.3)',
-  G: 'rgba(255,153,204,0.3)',
-  U: 'rgba(255,255,102,0.3)'
-}
-
+  shipSunkDescriptions: {
+    A: 'Shot Down',
+    G: 'Destroyed',
+    S: 'Sunk'
+  },
+  shipLetterColors: {
+    A: '#ff6666',
+    B: '#66ccff',
+    C: '#66ff66',
+    D: '#ffcc66',
+    P: '#cc99ff',
+    G: '#ff99cc',
+    U: '#ffff66',
+    M: '#ffd166'
+  },
+  shipDescription: {
+    A: 'Aircraft Carrier',
+    B: 'Battleship',
+    C: 'Cruiser',
+    D: 'Destroyer',
+    P: 'Airplane',
+    G: 'Anti-Aircraft Gun',
+    U: 'Underground Bunker'
+  },
+  shipTypes: {
+    A: 'S',
+    B: 'S',
+    C: 'S',
+    D: 'S',
+    P: 'A',
+    G: 'G',
+    U: 'G'
+  },
+  maxBombs: 3,
+  shipColors: {
+    A: 'rgba(255,102,102,0.3)',
+    B: 'rgba(102,204,255,0.3)',
+    C: 'rgba(102,255,102,0.3)',
+    D: 'rgba(255,204,102,0.3)',
+    P: 'rgba(204,153,255,0.3)',
+    G: 'rgba(255,153,204,0.3)',
+    U: 'rgba(255,255,102,0.3)'
+  },
+  sunkDescription: function (letter) {
+    return (
+      this.shipDescription[letter] +
+      ' ' +
+      this.shipSunkDescriptions[gameMaps.shipTypes[letter]]
+    )
+  },
+  inBounds: function (r, c) {
+    return r >= 0 && r < this.current.rows && c >= 0 && c < this.current.cols
+  },
+  isLand: function (r, c) {
+    return this.current.landArea.some(inRange(r, c))
+  }
 }
 seaAndLand.shapesByLetter = Object.fromEntries(
   seaAndLand.baseShapes.map(base => [base.letter, base])
 )
 
-export const gameMaps = seaAndLand
-
-
+gameMaps = seaAndLand

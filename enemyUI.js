@@ -6,11 +6,11 @@ export const enemyUI = {
   board: document.getElementById('enemy-board'),
   score: new ScoreUI('enemy'),
   carpetBtn: document.getElementById('carpetBtn'),
-  revealBtn: document.getElementById('revealBtn'), 
+  revealBtn: document.getElementById('revealBtn'),
   displayFleetSunk: function () {
     gameStatus.display('Fleet Destroyed', 'All  - Well Done!')
     this.board.classList.add('destroyed')
-  }, 
+  },
   gridCellAt: function (r, c) {
     const result = this.board.children[r * gameMaps.current.cols + c]
     if (result && result.classList) return result
@@ -20,7 +20,8 @@ export const enemyUI = {
   },
   displayAsRevealed: function (cell, letter) {
     if (cell) {
-      cell.style.background = gameMaps.shipColors[letter] || 'rgba(255, 209, 102, 0.3)'
+      cell.style.background =
+        gameMaps.shipColors[letter] || 'rgba(255, 209, 102, 0.3)'
       cell.style.color = gameMaps.shipLetterColors[letter] || '#ffd166'
       cell.textContent = letter
     }
@@ -39,24 +40,25 @@ export const enemyUI = {
     gameStatus.display('Enemy Fleet Revealed', 'You Gave Up')
     this.board.classList.add('destroyed')
   },
-  displayAs: function (cell, what) { 
+  displayAs: function (cell, what) {
     cell.classList.add(what)
     what[0].toUpperCase()
-    gameStatus.info(what[0].toUpperCase()+what.slice(1)+'!')
-  }, 
+    gameStatus.info(what[0].toUpperCase() + what.slice(1) + '!')
+  },
   cellHit: function (r, c) {
     const cell = this.gridCellAt(r, c)
-    this.displayAs(cell,'hit')
-  }, 
+    this.displayAs(cell, 'hit')
+  },
   cellMiss: function (r, c) {
     const cell = this.gridCellAt(r, c)
 
-    this.displayAs(cell,'miss')
+    this.displayAs(cell, 'miss')
   },
   displayAsSunk: function (cell, letter) {
     cell.textContent = letter
     cell.style.color = gameMaps.shipLetterColors[letter] || '#fff'
-    cell.style.background = gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
+    cell.style.background =
+      gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
     cell.classList.remove('hit')
     cell.classList.remove('miss')
   },
@@ -76,5 +78,5 @@ export const enemyUI = {
     this.board.innerHTML = ''
     this.board.classList.remove('destroyed')
     gameStatus.display('Single Shot Mode', 'Click On Square To Fire')
-  },
+  }
 }

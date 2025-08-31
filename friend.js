@@ -1,13 +1,17 @@
-import { randomPlaceShape, sunkDescription, inBounds, isLand } from './utils.js'
 import { gameMaps } from './map.js'
 import { friendUI } from './friendUI.js'
 import { player } from './player.js'
 
 export const friend = {
   __proto__: player,
-  grid: [],
+  shipCellGrid: [],
   occupied: new Set(),
   UI: friendUI,
+  resetShipCells: function () {
+    this.shipCellGrid = Array.from({ length: gameMaps.current.rows }, () =>
+      Array(gameMaps.current.cols).fill(null)
+    )
+  },
 
   updateUI: function (ships) {
     ships = ships || this.ships
@@ -25,9 +29,12 @@ export const friend = {
     this.UI.buildBoard(friend.onClickCell)
   },
   resetUI: function (ships) {
+    ships = ships || this.ships
     this.UI.reset()
     // this.UI.clearVisuals()
+
     this.buildBoard()
+    this.UI.buildTrays(ships)
     this.updateUI(ships)
   }
 }
