@@ -37,9 +37,10 @@ class Ghost {
 }
 
 class SelectedShip {
-  constructor (ship, offsetX, offsetY, cellSize) {
+  constructor (ship, offsetX, offsetY, cellSize, source) {
     const row = Math.floor(offsetY / cellSize)
     const col = Math.floor(offsetX / cellSize)
+    this.source = source
     this.cursor = [row, col]
     this.offset = [offsetX, offsetY]
     this.ship = ship
@@ -143,9 +144,6 @@ class SelectedShip {
   }
   canPlace (r, c, shipCellGrid) {
     const variant = this.variant()
-
-    //  console.log("vs - " + JSON.stringify(this.variants))
-    //    console.log("v - " + JSON.stringify(variant))
     if (this.ghost && this.inAllBounds(r, c, variant)) {
       return canPlace(variant, r, c, this.letter, shipCellGrid)
     }
@@ -153,9 +151,9 @@ class SelectedShip {
   }
   addToShipCell (r, c, shipCellGrid) {
     return placeVariant(
+      this.variant(),
       r,
       c,
-      this.variant(),
       this.letter,
       this.id,
       shipCellGrid
@@ -167,27 +165,30 @@ class SelectedShip {
     return [r0, c0]
   }
   canPlaceCells (r, c, shipCellGrid) {
-    const r0 = r - this.cursor[0] - 1
-    const c0 = c - this.cursor[1] - 1
-    return canPlace(r0, c0, shipCellGrid)
+    const r0 = r - this.cursor[0]
+    const c0 = c - this.cursor[1]
+    return this.canPlace(r0, c0, shipCellGrid)
   }
   placeCells (r, c, shipCellGrid) {
-    const r0 = r - this.cursor[0] - 1
-    const c0 = c - this.cursor[1] - 1
-    if (canPlace(r0, c0, shipCellGrid)) {
-      return addToShipCell(r0, c0, shipCellGrid)
+    const r0 = r - this.cursor[0]
+    const c0 = c - this.cursor[1]
+    if (this.canPlace(r0, c0, shipCellGrid)) {
+      return this.addToShipCell(r0, c0, shipCellGrid)
     }
     return null
   }
 
   place (r, c, shipCellGrid) {
-    const placed = placeCells(r, c, shipCellGrid)
-    if (placed) return this.ship.place()
+    const placed = this.placeCells(r, c, shipCellGrid) 
+    if (placed) {
+      return this.ship.place(placed)
+    }
+    return null
   }
 }
 
-setSelectionBuilder((ship, offsetX, offsetY, cellSize) => {
-  return new SelectedShip(ship, offsetX, offsetY, cellSize)
+setSelectionBuilder((ship, offsetX, offsetY, cellSize, source) => {
+  return new SelectedShip(ship, offsetX, offsetY, cellSize, source)
 })
 
 document.addEventListener('dragend', () => {

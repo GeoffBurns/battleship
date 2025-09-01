@@ -26,8 +26,7 @@
         }
         .ship-ghost {
               position: fixed;
-              pointer-events: none;
-              opacity: 0.92; 
+              pointer-events: none; 
               background: transparent ; 
           }
         /* destroyed (desaturated) board */

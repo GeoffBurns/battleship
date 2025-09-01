@@ -23,18 +23,47 @@ export const friendUI = {
       //    + ' index ' + index + ' cols ' + cols + ' in array ' + JSON.stringify(this.board.children)
     )
   },
-  makeDroppable: function (shipCellGrid) {
+  markPlaced: function (cells, letter) {
+    for (const [r, c] of cells) {
+      // surrounding water misses
+      for (let dr = -1; dr <= 1; dr++)
+        for (let dc = -1; dc <= 1; dc++) {
+          const rr = r + dr
+          const cc = c + dc
+          if (gameMaps.inBounds(rr, cc)) {
+            this.cellMiss(rr, cc)
+          }
+        }
+      this.cellPlacedAt(r, c, letter)
+    }
+  },
+  makeDroppable: function (shipCellGrid, ships) {
     for (const cell of this.board.children) {
       cell.textContent = ''
       cell.classList.remove('hit', 'miss')
-      this.drop(cell)
+      this.drop(cell, shipCellGrid, ships)
       this.dragEnter(cell, shipCellGrid)
-      //  this.dragLeave(cell)
     }
   },
-  drop: function (cell) {
+  drop: function (cell, shipCellGrid, ships) {
     cell.addEventListener('drop', e => {
       e.preventDefault()
+
+      if (!selection) return
+
+      const el = e.target
+      const r = parseInt(el.dataset.r)
+      const c = parseInt(el.dataset.c)
+
+      const placed = selection.place(r, c, shipCellGrid)
+      if (placed) {
+        this.markPlaced(placed, selection.letter)
+        this.placeTally(ships)
+        if (selection) {
+          selection.remove()
+          selection.source.remove()
+        }
+      }
     })
   },
   dragEnter: function (cell, shipCellGrid) {
@@ -59,7 +88,6 @@ export const friendUI = {
         el.classList.remove('good', 'bad')
       }
       for (const [dr, dc] of variant) {
-        //    const [rr, cc] = selection.offsetCell(dr,dc)
         const rr = dr + r0
         const cc = dc + c0
 
@@ -71,13 +99,27 @@ export const friendUI = {
     })
   },
   dragEnd: function (div) {
-    div.addEventListener('dragend', e => {
-      e.preventDefault()
+    div.addEventListener('dragend', e => { 
+     e.target.style.opacity = ''; 
       for (const el of this.board.children) {
         el.classList.remove('good', 'bad')
       }
-      if (selection) selectionremove()
-      selection = null
+
+     /*
+  if (e.dataTransfer.dropEffect === 'none') {
+     //   console.log('Drag was cancelled or no valid drop target.');
+    } else {
+      //  console.log('Drag was successful with drop effect:', event.dataTransfer.dropEffect);
+    }*/
+      if (selection) {
+     /*   const source = selection.source
+        if (source) {
+          source.style.opacity = 1
+          console.log(JSON.stringify(source))
+        }*/
+        selection.remove()
+        setSelection(null)
+      }
     })
   },
   dragLeave: function (div) {
@@ -105,8 +147,11 @@ export const friendUI = {
       e.dataTransfer.setDragImage(new Image(), 0, 0)
 
       //   const select =
-      setSelection(ship, offsetX, offsetY, friendUI.cellSize)
+      setSelection(ship, offsetX, offsetY, friendUI.cellSize, e.target)
       selection.moveTo(e.clientX, e.clientY)
+      // e.target.style.display = 'none'
+      e.target.style.opacity = 0.6
+
       this.rotateBtn.setAttribute(
         'disabled',
         selection.canRotate() ? 'false' : 'true'
@@ -145,6 +190,31 @@ export const friendUI = {
         dragShip.appendChild(cell)
       }
     }
+  },
+  /*
+  displayAs: function (cell, what) {
+    cell.classList.add(what)
+    //  what[0].toUpperCase()
+    //    gameStatus.info(what[0].toUpperCase() + what.slice(1) + '!')
+  },*/
+  cellMiss: function (r, c) {
+    const cell = this.gridCellAt(r, c)
+    if (cell.classList.contains('placed')) return
+    cell.classList.add('miss')
+    //  this.displayAs(cell, 'miss')
+  },
+  displayAsPlaced: function (cell, letter) {
+    cell.textContent = letter
+    cell.style.color = gameMaps.shipLetterColors[letter] || '#fff'
+    cell.style.background =
+      gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
+
+    cell.classList.add('placed')
+    cell.classList.remove('miss')
+  },
+  cellPlacedAt: function (r, c, letter) {
+    const cell = this.gridCellAt(r, c)
+    this.displayAsPlaced(cell, letter)
   },
   buildTrayItem: function (ship, tray) {
     const shape = ship.shape()

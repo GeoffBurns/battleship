@@ -13,13 +13,13 @@ export const friend = {
       Array(gameMaps.current.cols).fill(null)
     )
   },
-
   updateUI: function (ships) {
     ships = ships || this.ships
 
     this.UI.placeTally(ships)
   },
 
+ 
   onClickCell: function (r, c) {},
 
   onClickRotate: function () {
@@ -47,7 +47,7 @@ export const friend = {
   wireupButtons: function () {
     this.UI.rotateBtn.addEventListener('click', friend.onClickRotate)
     this.UI.flipBtn.addEventListener('click', friend.onClickFlip)
-    this.UI.flipBtn.addEventListener('click', friend.onClickTest)
+    this.UI.testBtn.addEventListener('click', friend.onClickTest)
   },
   resetModel: function () {
     this.score.reset()
@@ -56,7 +56,7 @@ export const friend = {
   buildBoard: function () {
     this.UI.buildBoard(friend.onClickCell)
     this.resetShipCells()
-    this.UI.makeDroppable(this.shipCellGrid)
+    this.UI.makeDroppable(this.shipCellGrid, this.ships)
   //  this.UI.dragLeave(this.UI.board)
   },
   resetUI: function (ships) {

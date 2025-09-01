@@ -1,9 +1,9 @@
 import { gameMaps } from './map.js'
 
 const score = {
-  shot: new Set(),
+  shot: new Set(),  
   autoMisses: 0,
-  reset: function () {
+  reset: function () { 
     this.shot.clear()
     this.autoMisses = 0
   },
@@ -22,12 +22,16 @@ const score = {
   noOfShots: function () {
     return this.shot.size - this.autoMisses
   },
+ 
+  noOfShots: function () {
+    return this.shot.size - this.autoMisses
+  },
   addAutoMiss: function (r, c) {
     const key = this.createShotKey(r, c)
     if (!key) return key // already shot here
     this.autoMisses++
     return key
-  }
+  }, 
 }
 
 export class Ship {
@@ -43,6 +47,7 @@ export class Ship {
     this.cells = placed
     this.hits = new Set()
     this.sunk = false
+    return placed
   }
   shape () {
     return gameMaps.shapesByLetter[this.letter]

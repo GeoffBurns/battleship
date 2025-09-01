@@ -8,7 +8,6 @@ export function canPlace (variant, r0, c0, letter, shipCellGrid) {
     if (!gameMaps.inBounds(rr, cc)) return false
     const shipType = gameMaps.shipTypes[letter]
     const isLand = gameMaps.isLand(rr, cc)
-    console.log(letter + '  -  ' + shipType + '  -  ' + isLand)
     // area rules
     if (shipType === 'G' && !isLand)
       return false
@@ -69,11 +68,17 @@ export function randomPlaceShape (ship, shipCellGrid) {
 
 export let selection = null
 
-let createSelection = (ship, offsetX, offsetY, cellSize) => {
+let createSelection = (ship, offsetX, offsetY, cellSize, source) => {
   return null
 }
-export function setSelection (ship, offsetX, offsetY, cellSize) {
-  selection = createSelection(ship, offsetX, offsetY, cellSize)
+export function setSelection (ship, offsetX, offsetY, cellSize, source) {
+  if(!ship)
+  {
+    selection = null
+    return null
+  }
+
+  selection = createSelection(ship, offsetX, offsetY, cellSize, source)
   return selection
 }
 export function removeSelection () {
