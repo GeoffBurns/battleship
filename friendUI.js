@@ -1,6 +1,6 @@
 import { gameMaps } from './map.js'
 import { playerUI, ScoreUI } from './playerUI.js'
-import { selection, setSelection } from './utils.js'
+import { selection, setSelection, removeSelection } from './utils.js'
 
 let lastEntered = [-1, -1]
 export const friendUI = {
@@ -47,8 +47,7 @@ export const friendUI = {
   },
   drop: function (cell, shipCellGrid, ships) {
     cell.addEventListener('drop', e => {
-      e.preventDefault()
-
+      e.preventDefault() 
       if (!selection) return
 
       const el = e.target
@@ -59,6 +58,7 @@ export const friendUI = {
       if (placed) {
         this.markPlaced(placed, selection.letter)
         this.placeTally(ships)
+        this.displayInfo(ships)
         if (selection) {
           selection.remove()
           selection.source.remove()
@@ -66,22 +66,13 @@ export const friendUI = {
       }
     })
   },
-  dragEnter: function (cell, shipCellGrid) {
-    cell.addEventListener('dragenter', e => {
-      e.preventDefault()
 
+  highlight: function (shipCellGrid, r, c) {
       if (!selection) return
-
-      const el = e.target
-      const r = parseInt(el.dataset.r)
-      const c = parseInt(el.dataset.c)
-      if (lastEntered[0] === r && lastEntered[1] === c) return
-
-      lastEntered = [r, c]
-      const [r0, c0] = selection.offsetCell(r, c)
-
-      if (!gameMaps.inBounds(r0, c0)) return
-
+      r = r || lastEntered[0]
+      c = c || lastEntered[1]
+      const [r0, c0] = selection.offsetCell(r, c) 
+      if (!gameMaps.inBounds(r0, c0)) return 
       const canPlace = selection.canPlace(r0, c0, shipCellGrid)
       const variant = selection.variant()
       for (const el of this.board.children) {
@@ -91,35 +82,34 @@ export const friendUI = {
         const rr = dr + r0
         const cc = dc + c0
 
-        if (gameMaps.inBounds(rr, cc)) {
+        if (gameMaps.inBounds(rr, cc)) { 
           const cell = this.gridCellAt(rr, cc)
           cell.classList.add(canPlace ? 'good' : 'bad')
         }
       }
+  },
+  dragEnter: function (cell, shipCellGrid) {
+    cell.addEventListener('dragenter', e => {
+      e.preventDefault() 
+
+      const el = e.target
+      const r = parseInt(el.dataset.r)
+      const c = parseInt(el.dataset.c)
+      if (lastEntered[0] === r && lastEntered[1] === c) return
+ 
+      lastEntered = [r, c]
+      this.highlight(shipCellGrid,r,c)
     })
   },
   dragEnd: function (div) {
-    div.addEventListener('dragend', e => { 
-     e.target.style.opacity = ''; 
+    div.addEventListener('dragend', e => {
+      e.target.style.opacity = ''
       for (const el of this.board.children) {
         el.classList.remove('good', 'bad')
       }
-
-     /*
-  if (e.dataTransfer.dropEffect === 'none') {
-     //   console.log('Drag was cancelled or no valid drop target.');
-    } else {
-      //  console.log('Drag was successful with drop effect:', event.dataTransfer.dropEffect);
-    }*/
-      if (selection) {
-     /*   const source = selection.source
-        if (source) {
-          source.style.opacity = 1
-          console.log(JSON.stringify(source))
-        }*/
-        selection.remove()
-        setSelection(null)
-      }
+      removeSelection()
+      this.rotateBtn.disabled = true
+      this.flipBtn.disabled = true
     })
   },
   dragLeave: function (div) {
@@ -141,35 +131,30 @@ export const friendUI = {
       const offsetY = e.clientY - rect.top
 
       //   e.dataTransfer.setData("application/offset", JSON.stringify({ offsetX, offsetY }));
-      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.effectAllowed = 'all'
       //   e.dataTransfer.setDragImage(draggable, offsetX, offsetY);
 
       e.dataTransfer.setDragImage(new Image(), 0, 0)
 
       //   const select =
-      setSelection(ship, offsetX, offsetY, friendUI.cellSize, e.target)
+      setSelection(ship, offsetX, offsetY, friendUI.cellSize(), e.target)
       selection.moveTo(e.clientX, e.clientY)
       // e.target.style.display = 'none'
       e.target.style.opacity = 0.6
 
-      this.rotateBtn.setAttribute(
-        'disabled',
-        selection.canRotate() ? 'false' : 'true'
-      )
-      this.flipBtn.setAttribute(
-        'disabled',
-        selection.canFlip() ? 'false' : 'true'
-      )
+      this.rotateBtn.disabled = !selection.canRotate()  
+      this.flipBtn.disabled = !selection.canFlip()  
+     
     })
   },
-  setDragShipContents (dragShip, cells, letter) {
+  setDragShipContents (dragShip, cells, letter) { 
     const maxR = Math.max(...cells.map(s => s[0])) + 1
     const maxC = Math.max(...cells.map(s => s[1])) + 1
 
     dragShip.setAttribute(
       'style',
       `display:grid;--boxSize:${
-        this.cellSize.toString() + 'px'
+        this.cellSize().toString() + 'px'
       };grid-template-rows:repeat(${maxR}, var(--boxSize));grid-template-columns:repeat(${maxC}, var(--boxSize));gap:0px;`
     )
 
@@ -191,17 +176,10 @@ export const friendUI = {
       }
     }
   },
-  /*
-  displayAs: function (cell, what) {
-    cell.classList.add(what)
-    //  what[0].toUpperCase()
-    //    gameStatus.info(what[0].toUpperCase() + what.slice(1) + '!')
-  },*/
   cellMiss: function (r, c) {
     const cell = this.gridCellAt(r, c)
     if (cell.classList.contains('placed')) return
     cell.classList.add('miss')
-    //  this.displayAs(cell, 'miss')
   },
   displayAsPlaced: function (cell, letter) {
     cell.textContent = letter
@@ -266,7 +244,16 @@ export const friendUI = {
       el.classList.remove('hit', 'miss')
     }
   },
-  reset: function () {
+  displayInfo: function (ships) {
+    const total = ships.length
+    const placed = ships.filter(s => s.cells.length > 0).length
+    this.score.placed.textContent = `${placed} / ${total}`
+  },
+  reset: function (ships) {
     this.board.innerHTML = ''
+    this.shipTray.innerHTML = ''
+    this.planeTray.innerHTML = ''
+    this.buildingTray.innerHTML = ''
+    this.displayInfo(ships)
   }
 }

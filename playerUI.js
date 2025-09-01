@@ -122,11 +122,14 @@ export const gameStatus = new StatusUI()
 export const playerUI = {
   board: {},
   containerWidth: gameHost.containerWidth,
-  cellSize: gameHost.containerWidth / gameMaps.current.cols,
+  cellSize: function() {
+    return gameHost.containerWidth / gameMaps.current.cols
+  },
   resetBoardSize: function () {
+    const cellSize = this.cellSize()
     this.board.style.setProperty('--cols', gameMaps.current.cols)
     this.board.style.setProperty('--rows', gameMaps.current.rows)
-    this.board.style.setProperty('--boxSize', this.cellSize.toString() + 'px')
+    this.board.style.setProperty('--boxSize', cellSize.toString() + 'px')
     this.board.innerHTML = ''
   },
   buildBoard: function (onClickCell) {

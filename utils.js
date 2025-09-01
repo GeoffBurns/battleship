@@ -89,3 +89,28 @@ export function removeSelection () {
 export function setSelectionBuilder (builder) {
   createSelection = builder
 }
+
+export function throttle(func, delay) {
+  let inThrottle;
+  let lastFn;
+  let lastTime;
+
+  return function() {
+    const context = this;
+    const args = arguments;
+
+    if (!inThrottle) {
+      func.apply(context, args);
+      lastTime = Date.now();
+      inThrottle = true;
+    } else {
+      clearTimeout(lastFn);
+      lastFn = setTimeout(function() {
+        if (Date.now() - lastTime >= delay) {
+          func.apply(context, args);
+          lastTime = Date.now();
+        }
+      }, Math.max(delay - (Date.now() - lastTime), 0));
+    }
+  };
+}

@@ -23,8 +23,9 @@ export const friend = {
   onClickCell: function (r, c) {},
 
   onClickRotate: function () {
+ 
      if(selection && selection.canRotate())
-     {
+     { 
       selection.rotate()
      }
   },
@@ -61,7 +62,7 @@ export const friend = {
   },
   resetUI: function (ships) {
     ships = ships || this.ships
-    this.UI.reset()
+    this.UI.reset(ships)
     // this.UI.clearVisuals()
 
     this.buildBoard()

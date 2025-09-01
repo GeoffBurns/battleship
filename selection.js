@@ -18,10 +18,11 @@ class Ghost {
     friend.UI.setDragShipContents(el, variant, letter)
     document.body.appendChild(el)
   }
-  setVariant (variant) {
+  setVariant (variant) { 
     if (this.element) {
       this.element.innerHTML = ''
       friend.UI.setDragShipContents(this.element, variant, this.letter)
+   
     }
   }
   remove () {
@@ -30,8 +31,11 @@ class Ghost {
   }
   moveTo (x, y) {
     if (this.element) {
-      this.element.style.left = x + 10 + 'px'
-      this.element.style.top = y + 10 + 'px'
+    //  this.element.style.left = x + 10 + 'px'
+   //   this.element.style.top = y + 10 + 'px'
+
+      this.element.style.left = x  + 'px'
+      this.element.style.top = y  + 'px'
     }
   }
 }
@@ -66,25 +70,26 @@ class SelectedShip {
   move (e) {
     this.moveTo(e.pageX - this.offset[0] - 13, e.pageY - this.offset[1] - 13)
   }
-  setVariant (index) {
+  setVariantByIndex (index) {
     this.index = index
-    const variant = this.variant[index]
+    const variant = this.variants[index]
     this.ghost.setVariant(variant)
   }
   variant () {
     return this.variants[this.index]
   }
   canFlip () {
-    const type = this.type
-    return type === 'H' || type === 'A'
+    const symmetry = this.shape.symmetry
+    return symmetry === 'H' || symmetry === 'A'
   }
-  canRotate () {
-    const type = this.type
-    return type === 'H' || type === 'A' || type === 'L'
+  canRotate () { 
+    const symmetry = this.shape.symmetry
+    return symmetry === 'H' || symmetry === 'A' || symmetry === 'L'
   }
   rotate () {
     let index = this.index
-    switch (this.type) {
+    const symmetry = this.shape.symmetry
+    switch (symmetry) {
       case 'L':
         index = index === 0 ? 1 : 0
         break
@@ -96,12 +101,21 @@ class SelectedShip {
         const rotated = index % 2
         index = flipped + (rotated === 0 ? 1 : 0)
         break
-    }
-    this.setVariant(index)
+    } 
+  //  const [x,y] = this.offset
+ //   this.offset = [-y,x]
+  //  const [r,c] = this.cursor
+  //  this.cursor = [r,-c]
+
+
+    this.offset = [0,0] 
+    this.cursor = [0,0]
+    this.setVariantByIndex(index)
   }
   leftRotate () {
     let index = this.index
-    switch (this.type) {
+    const symmetry = this.shape.symmetry
+    switch (symmetry) {
       case 'L':
         index = index === 0 ? 1 : 0
         break
@@ -114,11 +128,12 @@ class SelectedShip {
         index = flipped + (rotated === 0 ? 1 : 0)
         break
     }
-    this.setVariant(index)
+    this.setVariantByIndex(index)
   }
   flip () {
     let index = this.index
-    switch (this.type) {
+    const symmetry = this.shape.symmetry
+    switch (symmetry) {
       case 'H':
         index = (index + 2) % 4
         break
@@ -128,7 +143,7 @@ class SelectedShip {
         index = flipped + rotated
         break
     }
-    this.setVariant(index)
+    this.setVariantByIndex(index)
   }
   inAllBounds (r, c, variant) {
     variant = variant || this.variant()
@@ -189,17 +204,5 @@ class SelectedShip {
 
 setSelectionBuilder((ship, offsetX, offsetY, cellSize, source) => {
   return new SelectedShip(ship, offsetX, offsetY, cellSize, source)
-})
+}) 
 
-document.addEventListener('dragend', () => {
-  removeSelection()
-})
-
-document.addEventListener('dragover', e => {
-  e.preventDefault()
-
-  if (!selection) return
-
-  // position ghost under cursor
-  selection.move(e)
-})
