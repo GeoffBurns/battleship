@@ -401,6 +401,14 @@ const seaAndLand = {
   inBounds: function (r, c) {
     return r >= 0 && r < this.current.rows && c >= 0 && c < this.current.cols
   },
+  inAllBounds: function (r, c, height, width) {
+    return (
+      r >= 0 &&
+      r + height < this.current.rows &&
+      c + width >= 0 &&
+      c < this.current.cols
+    )
+  },
   isLand: function (r, c) {
     return this.current.landArea.some(inRange(r, c))
   }

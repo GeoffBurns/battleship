@@ -67,13 +67,14 @@ export const enemyUI = {
     this.displayAsSunk(cell, letter)
   },
   clearVisuals: function () {
-    for (const el of this.board.children) {
-      el.textContent = ''
-      el.style.background = ''
-      el.style.color = ''
-      el.classList.remove('hit', 'miss')
+    for (const cell of this.board.children) {
+      cell.textContent = ''
+      cell.style.background = ''
+      cell.style.color = ''
+      cell.classList.remove('hit', 'miss')
     }
   },
+
   reset: function () {
     this.board.innerHTML = ''
     this.board.classList.remove('destroyed')

@@ -82,8 +82,14 @@
               margin-bottom: 8px;
             "
           >
-            <button id="newGame"><span class="shortcut">R</span>estart</button>
-          </div>
+          <button id="newGame"><span class="shortcut">C</span>lear</button>
+            <button id="rotateBtn" disabled="true">
+              <span class="shortcut">R</span>otate
+            </button>
+            <button id="flipBtn" disabled="true"><span class="shortcut">F</span>lip</button>
+            <button id="testBtn" style="display: none"><span class="shortcut">T</span>est</button>
+       
+               </div>
           <div>
             <h4 style="color: white; margin-bottom: 12px">Tally Boxes</h4>
             <div id="friend-tallyBox"></div>
@@ -113,6 +119,7 @@
     <script type="module" src="./playerUI.js"></script>
     <script type="module" src="./player.js"></script>
     <script type="module" src="./friendUI.js"></script>
+    <script type="module" src="./selection.js"></script>
     <script type="module" src="./friend.js"></script>
     <script type="module" src="./battlehide.js"></script>
   </body>

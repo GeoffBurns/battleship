@@ -21,6 +21,15 @@
             grid-template-rows: repeat(var(--rows), var(--boxSize));
             gap: 0px;
         }
+        .board.selected {
+            background: transparent ; 
+        }
+        .ship-ghost {
+              position: fixed;
+              pointer-events: none;
+              opacity: 0.92; 
+              background: transparent ; 
+          }
         /* destroyed (desaturated) board */
         .board.destroyed .land.light,
         .board.destroyed .sea.light {
@@ -41,18 +50,52 @@
             cursor: pointer;
             box-sizing: border-box;
         }
+
+        .cell.bad {
+            border: 2px solid red;
+        } 
+
+        .cell.good {
+            border: 2px solid green;
+        } 
         .cell.land.light {
             background: #348239
         } 
         .cell.land.dark {
             background:  #296334
         }
-
         .cell.sea.light {
             background:  #1A78D6
         } 
         .cell.sea.dark {
             background:   #1761B0
+        }
+        .cell.land.light.bad {
+            background: #B48239
+        } 
+        .cell.land.dark.bad {
+            background:  #A96334
+        }
+        .cell.sea.light.bad {
+            background:  #BA78D6
+        } 
+        .cell.sea.dark.bad {
+            background:   #9761B0
+        }
+        .cell.land.light.good {
+            background: #34F239
+        } 
+        .cell.land.dark.good {
+            background:  #29C334
+        }
+        .cell.sea.light.good {
+            background:  #1AE8D6
+        } 
+        .cell.sea.dark.good {
+            background:   #17C1B0
+        }
+        .cell.empty {
+            background:   transparent
         }
         .cell.rightEdge.light {
             border-right: 2px solid #024 ;

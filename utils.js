@@ -1,15 +1,18 @@
 import { gameMaps } from './map.js'
 
 // placement rules: no-touch (including diagonals), and area restrictions
-function canPlace (variant, r0, c0, letter, shipCellGrid) {
+export function canPlace (variant, r0, c0, letter, shipCellGrid) {
   for (const [dr, dc] of variant) {
     const rr = r0 + dr,
       cc = c0 + dc
     if (!gameMaps.inBounds(rr, cc)) return false
+    const shipType = gameMaps.shipTypes[letter]
+    const isLand = gameMaps.isLand(rr, cc)
+    console.log(letter + '  -  ' + shipType + '  -  ' + isLand)
     // area rules
-    if (gameMaps.shipTypes[letter] === 'G' && !gameMaps.isLand(rr, cc))
+    if (shipType === 'G' && !isLand)
       return false
-    if (gameMaps.shipTypes[letter] === 'S' && gameMaps.isLand(rr, cc))
+    if (shipType === 'S' && isLand)
       return false
     // no-touch check neighbors
     for (let nr = rr - 1; nr <= rr + 1; nr++)
@@ -18,8 +21,8 @@ function canPlace (variant, r0, c0, letter, shipCellGrid) {
       }
   }
   return true
-}
-function placeVariant (variant, r0, c0, letter, id, shipCellGrid) {
+} 
+export function placeVariant (variant, r0, c0, letter, id, shipCellGrid) {
   const placedCells = []
   for (const [dr, dc] of variant) {
     const rr = r0 + dr,
@@ -29,6 +32,7 @@ function placeVariant (variant, r0, c0, letter, id, shipCellGrid) {
   }
   return placedCells
 }
+
 function shuffleArray (array) {
   for (var i = array.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1))
@@ -61,4 +65,22 @@ export function randomPlaceShape (ship, shipCellGrid) {
     }
   }
   return null
+}
+
+export let selection = null
+
+let createSelection = (ship, offsetX, offsetY, cellSize) => {
+  return null
+}
+export function setSelection (ship, offsetX, offsetY, cellSize) {
+  selection = createSelection(ship, offsetX, offsetY, cellSize)
+  return selection
+}
+export function removeSelection () {
+  if (selection) selection.remove()
+  selection = null
+}
+
+export function setSelectionBuilder (builder) {
+  createSelection = builder
 }
