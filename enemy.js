@@ -132,8 +132,7 @@ export const enemy = {
     const shipCell = this.shipCellAt(r, c)
     if (!shipCell) {
       this.UI.cellMiss(r, c)
-
-       
+      return { hit: false, sunk: '' }
     }
     // check for hit
     const hitShip = this.ships.find(s => s.id === shipCell.id)

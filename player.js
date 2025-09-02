@@ -8,12 +8,13 @@ const score = {
     this.autoMisses = 0
   },
   newShotKey: function (r, c) {
-    const key = `${r},${c}`
-    if (this.shot.has(key)) return null
-    return key
+  const key = `${r},${c}`
+   if (this.shot.has(key)) return null
+   return key
   },
   createShotKey: function (r, c) {
     const key = this.newShotKey(r, c)
+    console.log(`${r},${c} -- ` + key + JSON.stringify(this.shot))
     if (key) {
       this.shot.add(key)
     }

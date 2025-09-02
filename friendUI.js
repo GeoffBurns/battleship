@@ -16,14 +16,15 @@ export const friendUI = {
   rotateBtn: document.getElementById('rotateBtn'),
   flipBtn: document.getElementById('flipBtn'),
   testBtn: document.getElementById('testBtn'),
+  stopBtn: document.getElementById('stopBtn'),
   trays: document.getElementById('tray-container'),
   shipTray: document.getElementById('shipTray'),
   planeTray: document.getElementById('planeTray'),
   buildingTray: document.getElementById('buildingTray'),
   displayFleetSunk: function () {
-      this.gameStatus.display('Your Fleet is Destroyed', '')
-      this.board.classList.add('destroyed')
-    },
+    this.gameStatus.display('Your Fleet is Destroyed', '')
+    this.board.classList.add('destroyed')
+  },
   gridCellAt: function (r, c) {
     const cols = gameMaps.current.cols
     const index = r * cols + c
@@ -31,7 +32,7 @@ export const friendUI = {
     if (result && result.classList) return result
     throw new Error(
       'Invalid cell' + JSON.stringify(result) + 'at ' + r + ',' + c
-      //    + ' index ' + index + ' cols ' + cols + ' in array ' + JSON.stringify(this.board.children)
+          + ' index ' + index + ' cols ' + cols + ' in array ' + JSON.stringify(this.board.children)
     )
   },
   markPlaced: function (cells, letter) {
@@ -50,8 +51,8 @@ export const friendUI = {
   },
   makeDroppable: function (shipCellGrid, ships) {
     for (const cell of this.board.children) {
-      cell.textContent = ''
-      cell.classList.remove('hit', 'miss')
+      cell.textContent = '' 
+      cell.classList.remove('hit', 'miss','placed')
       this.drop(cell, shipCellGrid, ships)
       this.dragEnter(cell, shipCellGrid)
     }
@@ -75,11 +76,10 @@ export const friendUI = {
           selection.source.remove()
         }
         this.displayInfo(ships)
-  
       }
     })
   },
-  removeHighlight: function(){
+  removeHighlight: function () {
     for (const el of this.board.children) {
       el.classList.remove('good', 'bad')
     }
@@ -171,7 +171,7 @@ export const friendUI = {
   onClick: function (dragShip, ship) {
     dragShip.addEventListener('click', e => {
       const shipElement = e.currentTarget
-      this.assignClicked(ship,shipElement)
+      this.assignClicked(ship, shipElement)
     })
   },
   dragStart: function (dragShip, ship) {
@@ -310,37 +310,82 @@ export const friendUI = {
       el.classList.remove('hit', 'miss')
     }
   },
-   placeMode: function() {
-    const flexStyle ='display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
-     this.testBtn.style.display = 'none'
-      this.rotateBtn.style.display = 'block'
-      this.flipBtn.style.display = 'block'
-      this.trays.style.display = 'block'
-      this.shipTray.setAttribute('style',flexStyle )
-      this.planeTray.setAttribute('style',flexStyle  )
-      this.buildingTray.setAttribute('style',flexStyle )
-      gameStatus.game.style.display = 'none'
-      gameStatus.mode.style.display = 'none'
-      gameStatus.line.style.display = 'none'  
+  placeMode: function () {
+    const flexStyle =
+      'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
+    this.testBtn.style.display = 'none'
+    this.score.shotsLabel.style.display = 'none' 
+    this.score.hitsLabel.style.display = 'none' 
+    this.score.sunkLabel.style.display = 'none' 
+    this.score.placedLabel.style.display = 'block' 
+    this.rotateBtn.style.display = 'block'
+    this.flipBtn.style.display = 'block'
+    this.stopBtn.style.display = 'none'
+    this.trays.style.display = 'block'
+    this.shipTray.setAttribute('style', flexStyle)
+    this.planeTray.setAttribute('style', flexStyle)
+    this.buildingTray.setAttribute('style', flexStyle)
+    gameStatus.game.style.display = 'none'
+    gameStatus.mode.style.display = 'none'
+    gameStatus.line.style.display = 'none'
   },
-  readyMode: function() {
-     this.testBtn.style.display = 'block'
-      this.rotateBtn.style.display = 'none'
-      this.flipBtn.style.display = 'none'
-      this.shipTray.style.display = 'none'
-      this.planeTray.style.display = 'none'
-      this.buildingTray.style.display = 'none'
-      this.trays.style.display = 'none'
-      gameStatus.game.setAttribute('style','display:block;float: left; text-align: left; width: 65%;')
-      gameStatus.mode.setAttribute('style','display:block;float: right; text-align: right; width: 35%;')
-      gameStatus.line.setAttribute('style','display:block;font-weight: bold;height: 52px;margin-bottom: 30px;margin-top: 45px;')
+  readyMode: function () {
+    this.testBtn.style.display = 'block'
+    this.rotateBtn.style.display = 'none'
+    this.flipBtn.style.display = 'none'
+    this.stopBtn.style.display = 'none'
+    this.shipTray.style.display = 'none'
+    this.planeTray.style.display = 'none'
+    this.buildingTray.style.display = 'none'
+    this.trays.style.display = 'none'
+    for (const cell of this.board.children) { 
+      cell.classList.remove('hit', 'miss','placed')
+    }
+    gameStatus.game.setAttribute(
+      'style',
+      'display:block;float: left; text-align: left; width: 65%;'
+    )
+    gameStatus.mode.setAttribute(
+      'style',
+      'display:block;float: right; text-align: right; width: 35%;'
+    )
+    gameStatus.line.setAttribute(
+      'style',
+      'display:block;font-weight: bold;height: 52px;margin-bottom: 30px;margin-top: 45px;'
+    )
+  },
+   testMode: function () {
+    this.testBtn.style.display = 'block' 
+    this.stopBtn.style.display = 'block'
+    this.score.shotsLabel.style.display = 'block' 
+    this.score.hitsLabel.style.display = 'block' 
+    this.score.sunkLabel.style.display = 'block' 
+    this.score.placedLabel.style.display = 'none' 
+    this.rotateBtn.style.display = 'none'
+    this.flipBtn.style.display = 'none'
+    this.shipTray.style.display = 'none'
+    this.planeTray.style.display = 'none'
+    this.buildingTray.style.display = 'none'
+    this.trays.style.display = 'none' 
+    gameStatus.game.setAttribute(
+      'style',
+      'display:block;float: left; text-align: left; width: 65%;'
+    )
+    gameStatus.mode.setAttribute(
+      'style',
+      'display:block;float: right; text-align: right; width: 35%;'
+    )
+    gameStatus.line.setAttribute(
+      'style',
+      'display:block;font-weight: bold;height: 52px;margin-bottom: 30px;margin-top: 45px;'
+    )
   },
   displayInfo: function (ships) {
     const total = ships.length
     const placed = ships.filter(s => s.cells.length > 0).length
     this.score.placed.textContent = `${placed} / ${total}`
-    if (total===placed) {
-     this.readyMode()
+    if (total === placed) {
+      this.readyMode()
     }
   },
   reset: function (ships) {

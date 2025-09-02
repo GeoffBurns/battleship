@@ -71,7 +71,7 @@ export const enemyUI = {
       cell.textContent = ''
       cell.style.background = ''
       cell.style.color = ''
-      cell.classList.remove('hit', 'miss')
+      cell.classList.remove('hit', 'miss','placed')
     }
   },
 

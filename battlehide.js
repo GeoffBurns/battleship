@@ -7,6 +7,8 @@ const newGameBtn = document.getElementById('newGame')
 friend.UI.resetBoardSize()
 
 function newGame () {
+  friend.testContinue = false
+  friend.UI.testBtn.disabled = false
   friend.UI.placeMode()
   friend.resetModel()
   friend.resetUI(friend.ships)
@@ -40,6 +42,10 @@ document.addEventListener('keydown', function (event) {
     case 't':
     case 'T':
       friend.onClickTest()
+      break
+    case 's':
+    case 'S':
+      friend.onClickStop()
       break
   }
 })

@@ -30,8 +30,12 @@ export class ScoreUI {
     this.shots = document.getElementById(playerPrefix + '-shots')
     this.hits = document.getElementById(playerPrefix + '-hits')
     this.sunk = document.getElementById(playerPrefix + '-sunk')
-    this.placed = document.getElementById(playerPrefix + '-placed')
-    this.endured = document.getElementById(playerPrefix + '-endured')
+    this.placed = document.getElementById(playerPrefix + '-placed') 
+
+    this.shotsLabel = document.getElementById(playerPrefix + '-shots-label')
+    this.hitsLabel  = document.getElementById(playerPrefix + '-hits-label')
+    this.sunkLabel  = document.getElementById(playerPrefix + '-sunk-label')
+    this.placedLabel  = document.getElementById(playerPrefix + '-placed-label') 
     this.tallyBox = document.getElementById(playerPrefix + '-tallyBox')
   }
   display (ships, shots) {
