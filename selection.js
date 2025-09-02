@@ -103,7 +103,6 @@ class ClickedShip {
         index = flipped + (rotated === 0 ? 1 : 0)
         break
     }
-
     this.setVariantByIndex(index)
   }
   leftRotate () {
@@ -141,7 +140,7 @@ class ClickedShip {
   }
 }
 
-class SelectedShip {
+class DraggedShip {
   constructor (ship, offsetX, offsetY, cellSize, source, variantIndex) {
     const row = Math.floor(offsetY / cellSize)
     const col = Math.floor(offsetX / cellSize)
@@ -311,7 +310,7 @@ hide() {
 }
 
 setSelectionBuilder((ship, offsetX, offsetY, cellSize, source, index) => {
-  return new SelectedShip(ship, offsetX, offsetY, cellSize, source, index)
+  return new DraggedShip(ship, offsetX, offsetY, cellSize, source, index)
 })
 setClickedShipBuilder((ship,   source, index) => {
   return new ClickedShip(ship,  source, index)

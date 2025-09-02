@@ -55,34 +55,29 @@ export const friend = {
   fireShot: function (r, c, key) {
     const shipCell = this.shipCellAt(r, c)
     if (!shipCell) {
-      this.UI.cellMiss(r, c)
-      console.log(`miss 1 ${r} - ${c}`)
+      this.UI.cellMiss(r, c) 
     }
     // check for hit
     const hitShip = this.ships.find(s => s.id === shipCell.id)
     if (!hitShip) {
-      this.UI.cellMiss(r, c)
-      console.log(`miss 2 ${r} - ${c}`)
+      this.UI.cellMiss(r, c) 
       return { hit: false, sunk: '' }
     }
     // it's a hit
     hitShip.hits.add(key)
 
     this.UI.cellHit(r, c)
-
-    console.log(`hit 1 ${r} - ${c}`)
+ 
     if (hitShip.hits.size === hitShip.cells.length) {
       // ship sunk
       this.markSunk(hitShip)
-
-      console.log(`sunk 1 ${r} - ${c}`)
+ 
       return { hit: true, sunkLetter: hitShip.letter }
     }
 
     return { hit: true, sunkLetter: '' }
   },
-  processShot: function (r, c) {
-    console.log(`${r} - ${c}`)
+  processShot: function (r, c) { 
     const key = this.score.createShotKey(r, c)
     if (key === null) { 
       // if we are here, it is because of carpet bomb, so we can just
@@ -147,10 +142,8 @@ export const friend = {
       const r = Math.floor(Math.random() * gameMaps.current.rows)
       const c = Math.floor(Math.random() * gameMaps.current.cols)
       const key = this.score.createShotKey(r, c)
-      if (key === null) {
-        console.log(`no key ${r,c}`)
-        // if we are here, it is because of carpet bomb, so we can just
-        continue
+      if (key === null) { 
+         continue
       }
       return this.processShot(r, c)
     }

@@ -13,8 +13,7 @@ const score = {
    return key
   },
   createShotKey: function (r, c) {
-    const key = this.newShotKey(r, c)
-    console.log(`${r},${c} -- ` + key + JSON.stringify(this.shot))
+    const key = this.newShotKey(r, c) 
     if (key) {
       this.shot.add(key)
     }
