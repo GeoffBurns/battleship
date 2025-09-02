@@ -10,14 +10,7 @@ function rotate (cells) {
 function flipV (cells) {
   return cells.map(([r, c]) => [-r, c])
 }
-
-/* 
- function normalize (cells) {
-    const minR = Math.min(...cells.map(s => s[0]))
-    const minC = Math.min(...cells.map(s => s[1]))
-    return cells.map(([r, c]) => [r - minR, c - minC])
-  } 
-    */
+ 
 
 function asymmetricVariantsOf (cells) {
   let fliped = flipV(cells)

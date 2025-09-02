@@ -5,7 +5,9 @@ import { friendUI } from './friendUI.js'
 
 const newGameBtn = document.getElementById('newGame')
 friend.UI.resetBoardSize()
+
 function newGame () {
+  friend.UI.placeMode()
   friend.resetModel()
   friend.resetUI(friend.ships)
 }
@@ -24,7 +26,7 @@ document.addEventListener('keydown', function (event) {
       newGame()
       break
     case 'r':
-    case 'R': 
+    case 'R':
       friend.onClickRotate()
       break
     case 'l':
@@ -42,10 +44,33 @@ document.addEventListener('keydown', function (event) {
   }
 })
 
-friend.UI.dragEnd(document)
-
-
 let lastmodifier = ''
+let dragCounter = 0
+friend.UI.dragEnd(document, () => {
+  lastmodifier = ''
+  dragCounter = 0
+})
+
+friend.UI.board.addEventListener('dragenter', e => {
+  e.preventDefault()
+
+  dragCounter++
+
+  if (dragCounter > 1 || !selection) return
+
+  selection.hide()
+})
+
+friend.UI.board.addEventListener('dragleave', e => {
+  e.preventDefault()
+  dragCounter--
+  if (dragCounter > 0) return
+
+  friend.UI.removeHighlight()
+
+  if (!selection) return
+  selection.show()
+})
 
 document.addEventListener('dragover', e => {
   e.preventDefault()
@@ -54,25 +79,30 @@ document.addEventListener('dragover', e => {
   const effect = e.dataTransfer.dropEffect
   const allow = e.dataTransfer.effectAllowed
 
-  if (lastmodifier !== allow)
-  {
+  let changed = false
+  if (lastmodifier !== allow) {
     lastmodifier = allow
     if (allow === 'link') {
-      friend.onClickRotate()
-      friendUI.highlight(friend.shipCellGrid)
+      selection.rotate()
+      changed = true
     } else if (allow === 'copy') {
-      friend.onClickFlip()
-      friendUI.highlight(friend.shipCellGrid)
+      selection.flip()
+      changed = true
     } else if (allow === 'none') {
-      friend.onClickRotateLeft()
-      friendUI.highlight(friend.shipCellGrid)
+      changed = true
     }
   }
- 
-  // position ghost under cursor
-  selection.move(e)
-})
 
+  // position highlight under cursor
+  if (changed && selection && !selection.shown) {
+    friendUI.highlight(friend.shipCellGrid)
+  }
+
+  // position ghost under cursor
+  if (selection && selection.shown) {
+    selection.move(e)
+  }
+})
 
 // initial
 newGame()

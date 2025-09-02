@@ -131,6 +131,9 @@
             font-weight: 900;
             color: #ff3b3b
         }
+        .clicked {
+            border: 3px solid goldenrod
+        }
         .tally-row {
             display: flex;
             gap: 6px;

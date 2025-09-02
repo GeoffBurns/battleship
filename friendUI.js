@@ -1,6 +1,12 @@
 import { gameMaps } from './map.js'
-import { playerUI, ScoreUI } from './playerUI.js'
-import { selection, setSelection, removeSelection } from './utils.js'
+import { gameStatus, playerUI, ScoreUI } from './playerUI.js'
+import {
+  selection,
+  setSelection,
+  removeSelection,
+  clickedShip,
+  setClickedShip
+} from './utils.js'
 
 let lastEntered = [-1, -1]
 export const friendUI = {
@@ -10,9 +16,14 @@ export const friendUI = {
   rotateBtn: document.getElementById('rotateBtn'),
   flipBtn: document.getElementById('flipBtn'),
   testBtn: document.getElementById('testBtn'),
+  trays: document.getElementById('tray-container'),
   shipTray: document.getElementById('shipTray'),
   planeTray: document.getElementById('planeTray'),
   buildingTray: document.getElementById('buildingTray'),
+  displayFleetSunk: function () {
+      this.gameStatus.display('Your Fleet is Destroyed', '')
+      this.board.classList.add('destroyed')
+    },
   gridCellAt: function (r, c) {
     const cols = gameMaps.current.cols
     const index = r * cols + c
@@ -47,7 +58,8 @@ export const friendUI = {
   },
   drop: function (cell, shipCellGrid, ships) {
     cell.addEventListener('drop', e => {
-      e.preventDefault() 
+      e.preventDefault()
+      this.removeHighlight()
       if (!selection) return
 
       const el = e.target
@@ -58,58 +70,89 @@ export const friendUI = {
       if (placed) {
         this.markPlaced(placed, selection.letter)
         this.placeTally(ships)
-        this.displayInfo(ships)
         if (selection) {
           selection.remove()
           selection.source.remove()
         }
+        this.displayInfo(ships)
+  
       }
     })
   },
-
+  removeHighlight: function(){
+    for (const el of this.board.children) {
+      el.classList.remove('good', 'bad')
+    }
+  },
   highlight: function (shipCellGrid, r, c) {
-      if (!selection) return
-      r = r || lastEntered[0]
-      c = c || lastEntered[1]
-      const [r0, c0] = selection.offsetCell(r, c) 
-      if (!gameMaps.inBounds(r0, c0)) return 
-      const canPlace = selection.canPlace(r0, c0, shipCellGrid)
-      const variant = selection.variant()
-      for (const el of this.board.children) {
-        el.classList.remove('good', 'bad')
-      }
-      for (const [dr, dc] of variant) {
-        const rr = dr + r0
-        const cc = dc + c0
+    if (!selection) return
+    r = r || lastEntered[0]
+    c = c || lastEntered[1]
+    const [r0, c0] = selection.offsetCell(r, c)
+    if (!gameMaps.inBounds(r0, c0)) return
 
-        if (gameMaps.inBounds(rr, cc)) { 
-          const cell = this.gridCellAt(rr, cc)
-          cell.classList.add(canPlace ? 'good' : 'bad')
-        }
+    this.removeHighlight()
+    const canPlace = selection.canPlace(r0, c0, shipCellGrid)
+    const variant = selection.variant()
+    for (const [dr, dc] of variant) {
+      const rr = dr + r0
+      const cc = dc + c0
+
+      if (gameMaps.inBounds(rr, cc)) {
+        const cell = this.gridCellAt(rr, cc)
+        cell.classList.add(canPlace ? 'good' : 'bad')
       }
+    }
   },
   dragEnter: function (cell, shipCellGrid) {
     cell.addEventListener('dragenter', e => {
-      e.preventDefault() 
+      e.preventDefault()
 
       const el = e.target
       const r = parseInt(el.dataset.r)
       const c = parseInt(el.dataset.c)
       if (lastEntered[0] === r && lastEntered[1] === c) return
- 
+
       lastEntered = [r, c]
-      this.highlight(shipCellGrid,r,c)
+      this.highlight(shipCellGrid, r, c)
     })
   },
-  dragEnd: function (div) {
+  removeClicked: function () {
+    const elements = document.getElementsByClassName('clicked')
+    ;[...elements].forEach(element => {
+      // Perform actions on each element
+      element.classList.remove('clicked')
+    })
+
+    this.rotateBtn.disabled = true
+    this.flipBtn.disabled = true
+  },
+  assignClicked: function (ship, clicked) {
+    const variantIndex = parseInt(clicked.dataset.variant)
+    this.removeClicked()
+    setClickedShip(ship, clicked, variantIndex)
+    clicked.classList.add('clicked')
+    this.rotateBtn.disabled = !clickedShip.canRotate()
+    this.flipBtn.disabled = !clickedShip.canFlip()
+  },
+  dragEnd: function (div, callback) {
     div.addEventListener('dragend', e => {
-      e.target.style.opacity = ''
+      const shipElement = e.target
+      shipElement.style.opacity = ''
       for (const el of this.board.children) {
         el.classList.remove('good', 'bad')
       }
       removeSelection()
-      this.rotateBtn.disabled = true
-      this.flipBtn.disabled = true
+      if (event.dataTransfer.dropEffect !== 'none') {
+        // The item was successfully dropped on a valid drop target
+
+        this.rotateBtn.disabled = true
+        this.flipBtn.disabled = true
+      } else {
+        // The drag operation was canceled or dropped on an invalid target
+        this.assignClicked(ship, shipElement)
+      }
+      if (callback) callback()
     })
   },
   dragLeave: function (div) {
@@ -123,41 +166,51 @@ export const friendUI = {
   makeDraggable: function (dragShip, ship) {
     dragShip.setAttribute('draggable', 'true')
     this.dragStart(dragShip, ship)
+    this.onClick(dragShip, ship)
+  },
+  onClick: function (dragShip, ship) {
+    dragShip.addEventListener('click', e => {
+      const shipElement = e.currentTarget
+      this.assignClicked(ship,shipElement)
+    })
   },
   dragStart: function (dragShip, ship) {
     dragShip.addEventListener('dragstart', e => {
-      const rect = e.target.getBoundingClientRect()
+      const shipElement = e.currentTarget
+      const rect = shipElement.getBoundingClientRect()
       const offsetX = e.clientX - rect.left
       const offsetY = e.clientY - rect.top
+
+      this.removeClicked()
 
       //   e.dataTransfer.setData("application/offset", JSON.stringify({ offsetX, offsetY }));
       e.dataTransfer.effectAllowed = 'all'
       //   e.dataTransfer.setDragImage(draggable, offsetX, offsetY);
 
       e.dataTransfer.setDragImage(new Image(), 0, 0)
-
-      //   const select =
-      setSelection(ship, offsetX, offsetY, friendUI.cellSize(), e.target)
+      const variantIndex = parseInt(shipElement.dataset.variant)
+      setSelection(
+        ship,
+        offsetX,
+        offsetY,
+        friendUI.cellSize(),
+        shipElement,
+        variantIndex
+      )
       selection.moveTo(e.clientX, e.clientY)
-      // e.target.style.display = 'none'
       e.target.style.opacity = 0.6
-
-      this.rotateBtn.disabled = !selection.canRotate()  
-      this.flipBtn.disabled = !selection.canFlip()  
-     
     })
   },
-  setDragShipContents (dragShip, cells, letter) { 
+  setDragShipContents (dragShip, cells, letter) {
     const maxR = Math.max(...cells.map(s => s[0])) + 1
     const maxC = Math.max(...cells.map(s => s[1])) + 1
 
     dragShip.setAttribute(
       'style',
-      `display:grid;--boxSize:${
+      `display:grid;place-items: center;--boxSize:${
         this.cellSize().toString() + 'px'
       };grid-template-rows:repeat(${maxR}, var(--boxSize));grid-template-columns:repeat(${maxC}, var(--boxSize));gap:0px;`
     )
-
     for (let r = 0; r < maxR; r++) {
       for (let c = 0; c < maxC; c++) {
         const cell = document.createElement('div')
@@ -196,10 +249,23 @@ export const friendUI = {
   },
   buildTrayItem: function (ship, tray) {
     const shape = ship.shape()
+
+    const dragShipContainer = document.createElement('div')
+
+    dragShipContainer.className = 'drag-ship-container'
+    dragShipContainer.dataset.id = ship.id
+    dragShipContainer.setAttribute(
+      'style',
+      'display: flex;justify-content: center;align-items: center;'
+    )
     const dragShip = document.createElement('div')
+    dragShip.className = 'drag-ship'
+    dragShip.dataset.variant = 0
+    dragShip.dataset.id = ship.id
     this.setDragShipContents(dragShip, shape.cells, shape.letter)
     this.makeDraggable(dragShip, ship)
-    tray.appendChild(dragShip)
+    dragShipContainer.appendChild(dragShip)
+    tray.appendChild(dragShipContainer)
   },
   buildTrays: function (ships) {
     for (const ship of ships) {
@@ -244,10 +310,38 @@ export const friendUI = {
       el.classList.remove('hit', 'miss')
     }
   },
+   placeMode: function() {
+    const flexStyle ='display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
+     this.testBtn.style.display = 'none'
+      this.rotateBtn.style.display = 'block'
+      this.flipBtn.style.display = 'block'
+      this.trays.style.display = 'block'
+      this.shipTray.setAttribute('style',flexStyle )
+      this.planeTray.setAttribute('style',flexStyle  )
+      this.buildingTray.setAttribute('style',flexStyle )
+      gameStatus.game.style.display = 'none'
+      gameStatus.mode.style.display = 'none'
+      gameStatus.line.style.display = 'none'  
+  },
+  readyMode: function() {
+     this.testBtn.style.display = 'block'
+      this.rotateBtn.style.display = 'none'
+      this.flipBtn.style.display = 'none'
+      this.shipTray.style.display = 'none'
+      this.planeTray.style.display = 'none'
+      this.buildingTray.style.display = 'none'
+      this.trays.style.display = 'none'
+      gameStatus.game.setAttribute('style','display:block;float: left; text-align: left; width: 65%;')
+      gameStatus.mode.setAttribute('style','display:block;float: right; text-align: right; width: 35%;')
+      gameStatus.line.setAttribute('style','display:block;font-weight: bold;height: 52px;margin-bottom: 30px;margin-top: 45px;')
+  },
   displayInfo: function (ships) {
     const total = ships.length
     const placed = ships.filter(s => s.cells.length > 0).length
     this.score.placed.textContent = `${placed} / ${total}`
+    if (total===placed) {
+     this.readyMode()
+    }
   },
   reset: function (ships) {
     this.board.innerHTML = ''

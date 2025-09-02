@@ -1,10 +1,10 @@
 import { gameMaps, gameHost } from './map.js'
 
 export class StatusUI {
-  constructor () {
-    // Initialization logic
+  constructor () { 
     this.mode = document.getElementById('modeStatus')
     this.game = document.getElementById('gameStatus')
+    this.line = document.getElementById('statusLine')
   }
   display (mode, game) {
     this.mode.textContent = mode

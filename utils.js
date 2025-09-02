@@ -66,19 +66,37 @@ export function randomPlaceShape (ship, shipCellGrid) {
   return null
 }
 
-export let selection = null
+export let clickedShip = null
 
-let createSelection = (ship, offsetX, offsetY, cellSize, source) => {
+let createClickedShip = (ship,  source, variantIndex) => {
   return null
 }
-export function setSelection (ship, offsetX, offsetY, cellSize, source) {
+export function setClickedShip (ship,  source, variantIndex) {
+  if(!ship)
+  {
+    clickedShip = null
+    return null
+  }
+
+  clickedShip = createClickedShip(ship, source, variantIndex)
+  return clickedShip
+}
+export function setClickedShipBuilder (builder) {
+  createClickedShip = builder
+}
+export let selection = null
+
+let createSelection = (ship, offsetX, offsetY, cellSize, source, variantIndex) => {
+  return null
+}
+export function setSelection (ship, offsetX, offsetY, cellSize, source, variantIndex) {
   if(!ship)
   {
     selection = null
     return null
   }
 
-  selection = createSelection(ship, offsetX, offsetY, cellSize, source)
+  selection = createSelection(ship, offsetX, offsetY, cellSize, source, variantIndex)
   return selection
 }
 export function removeSelection () {

@@ -29,17 +29,17 @@
           <div
             aria-label="friendly waters"
             class="board"
-            id="friend-board" 
+            id="friend-board"
           ></div>
         </div>
 
-        <div class="board-wrap"  style="width: 520px">
+        <div class="board-wrap"id='tray-container' style="width: 520px">
           <div
             aria-label="Ships"
             id="shipTray"
             style="
               display: flex;
-              flex-flow: row wrap; 
+              flex-flow: row wrap;
               gap: 8px;
               margin-bottom: 8px;
             "
@@ -49,7 +49,7 @@
             id="planeTray"
             style="
               display: flex;
-              flex-flow: row wrap; 
+              flex-flow: row wrap;
               gap: 8px;
               margin-bottom: 8px;
             "
@@ -59,16 +59,30 @@
             id="buildingTray"
             style="
               display: flex;
-              flex-flow: row wrap; 
+              flex-flow: row wrap;
               gap: 8px;
               margin-bottom: 8px;
             "
           ></div>
         </div>
-         <div
+        <div
+          class="status"
+          id="statusLine"
+          style="display:none;"
+        >
+          <div
+            id="gameStatus"
+            style="display:none;float: left; text-align: left; width: 65%;"
+          ></div>
+          <div
+            id="modeStatus"
+            style="display:none;float: right; text-align: right; width: 35%;"
+          ></div>
+        </div>
+        <div
           class="panel"
           style="
-            display: flex; 
+            display: flex;
             justify-content: space-between;
             gap: 16px;
             width: 520px;
@@ -83,16 +97,21 @@
               margin-bottom: 8px;
             "
           >
-          <button id="newGame"><span class="shortcut">C</span>lear</button>
+            <button id="newGame"><span class="shortcut">C</span>lear</button>
             <button id="rotateBtn" disabled="true">
               <span class="shortcut">R</span>otate
             </button>
-            <button id="flipBtn" disabled="true"><span class="shortcut">F</span>lip</button>
-            <button id="testBtn" style="display: none"><span class="shortcut">T</span>est</button>
-       
-               </div>
+            <button id="flipBtn" disabled="true">
+              <span class="shortcut">F</span>lip
+            </button>
+            <button id="testBtn" style="display: none">
+              <span class="shortcut">T</span>est
+            </button>
+          </div>
           <div>
-            <h4 style="color: white; margin-bottom: 12px">Tally Boxes</h4>
+            <h4 style="color: white; margin-top: 0px; margin-bottom: 12px">
+              Tally Boxes
+            </h4>
             <div id="friend-tallyBox"></div>
           </div>
           <div>
