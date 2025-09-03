@@ -159,7 +159,10 @@ export const playerUI = {
         }
         cell.dataset.r = r
         cell.dataset.c = c
-        cell.addEventListener('click', () => onClickCell(r, c))
+
+        if (onClickCell) {
+          cell.addEventListener('click', () => onClickCell(r, c))
+        }
         this.board.appendChild(cell)
       }
     }

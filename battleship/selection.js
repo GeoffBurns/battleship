@@ -53,29 +53,23 @@ class Ghost {
     }
   }
 }
-class ClickedShip {
-  constructor (ship, source, variantIndex) {
-    this.source = source
+
+class SelectedShip {
+  constructor (ship, variantIndex) {
     this.ship = ship
     const shape = ship.shape()
+    this.shape = shape
     this.type = shape.type()
     this.id = ship.id
-    this.shape = shape
+    const letter = ship.letter
+    this.letter = letter
     this.index = variantIndex || 0
     this.letter = ship.letter
     this.variants = normalizeVariants(shape.variants())
   }
   setVariantByIndex (index) {
     this.index = index
-    const variant = this.variants[index]
-    if (this.source) {
-      this.source.innerHTML = ''
-      friend.UI.setDragShipContents(this.source, variant, this.letter)
-      this.source.dataset.variant = index
-    }
-  }
-  variant () {
-    return this.variants[this.index]
+    //const variant = this.variants[index]
   }
   canFlip () {
     const symmetry = this.shape.symmetry
@@ -84,6 +78,10 @@ class ClickedShip {
   canRotate () {
     const symmetry = this.shape.symmetry
     return symmetry === 'H' || symmetry === 'A' || symmetry === 'L'
+  }
+
+  variant () {
+    return this.variants[this.index]
   }
   rotate () {
     let index = this.index
@@ -95,15 +93,13 @@ class ClickedShip {
       case 'H':
         index = (index + 1) % 4
         break
-      case 'A': 
-        index = 
-                (index > 1 ? 2 : 0)
-                + 
-                ((index % 2) === 0 ? 1 : 0)
+      case 'A':
+        index = (index > 1 ? 2 : 0) + (index % 2 === 0 ? 1 : 0)
         break
     }
     this.setVariantByIndex(index)
   }
+
   leftRotate () {
     let index = this.index
     const symmetry = this.shape.symmetry
@@ -114,8 +110,8 @@ class ClickedShip {
       case 'H':
         index = (index - 1) % 4
         break
-      case 'A': 
-        index = (index > 1 ? 2 : 0) + ((index % 2) === 0 ? 1 : 0)
+      case 'A':
+        index = (index > 1 ? 2 : 0) + (index % 2 === 0 ? 1 : 0)
         break
     }
     this.setVariantByIndex(index)
@@ -127,7 +123,7 @@ class ClickedShip {
       case 'H':
         index = (index + 2) % 4
         break
-      case 'A': 
+      case 'A':
         index = (index > 1 ? 0 : 2) + (index % 2)
         break
     }
@@ -135,24 +131,33 @@ class ClickedShip {
   }
 }
 
-class DraggedShip {
+class ClickedShip extends SelectedShip {
+  constructor (ship, source, variantIndex) {
+    super(ship, variantIndex)
+    this.source = source
+  }
+  setVariantByIndex (index) {
+    this.index = index
+    const variant = this.variants[index]
+    if (this.source) {
+      this.source.innerHTML = ''
+      friend.UI.setDragShipContents(this.source, variant, this.letter)
+      this.source.dataset.variant = index
+    }
+  }
+}
+
+class DraggedShip extends SelectedShip {
   constructor (ship, offsetX, offsetY, cellSize, source, variantIndex) {
+
+      console.log('DraggedShip create')
+    super(ship, variantIndex)
     const row = Math.floor(offsetY / cellSize)
     const col = Math.floor(offsetX / cellSize)
     this.source = source
     this.cursor = [row, col]
     this.offset = [offsetX, offsetY]
-    this.ship = ship
-    const shape = ship.shape()
-    this.type = shape.type()
-    this.id = ship.id
-    this.shape = shape
-    this.index = variantIndex || 0
-    const letter = ship.letter
-    this.letter = letter
-    const variants = normalizeVariants(shape.variants())
-    this.variants = variants
-    this.ghost = new Ghost(variants[variantIndex], letter)
+    this.ghost = new Ghost(super.variant(), super.letter)
     this.shown = true
   }
   hide () {
@@ -178,68 +183,27 @@ class DraggedShip {
     const variant = this.variants[index]
     this.ghost.setVariant(variant)
   }
-  variant () {
-    return this.variants[this.index]
-  }
-  canFlip () {
-    const symmetry = this.shape.symmetry
-    return symmetry === 'H' || symmetry === 'A'
-  }
-  canRotate () {
-    const symmetry = this.shape.symmetry
-    return symmetry === 'H' || symmetry === 'A' || symmetry === 'L'
-  }
+
   rotate () {
-    let index = this.index
-    const symmetry = this.shape.symmetry
-    switch (symmetry) {
-      case 'L':
-        index = index === 0 ? 1 : 0
-        break
-      case 'H':
-        index = (index + 1) % 4
-        break
-      case 'A': 
-        index = (index > 1 ? 2 : 0) + ((index % 2) === 0 ? 1 : 0)
-        break
-    }
+    this.resetOffset()
+    super.rotate()
+  }
+  resetOffset () {
     //  const [x,y] = this.offset
     //   this.offset = [-y,x]
     //  const [r,c] = this.cursor
     //  this.cursor = [r,-c]
-
     this.offset = [0, 0]
     this.cursor = [0, 0]
-    this.setVariantByIndex(index)
   }
+
   leftRotate () {
-    let index = this.index
-    const symmetry = this.shape.symmetry
-    switch (symmetry) {
-      case 'L':
-        index = index === 0 ? 1 : 0
-        break
-      case 'H':
-        index = (index - 1) % 4
-        break
-      case 'A':  
-        index =  (index > 1 ? 2 : 0) + ((index % 2) === 0 ? 1 : 0)
-        break
-    }
-    this.setVariantByIndex(index)
+    this.resetOffset()
+    super.leftRotate()
   }
   flip () {
-    let index = this.index
-    const symmetry = this.shape.symmetry
-    switch (symmetry) {
-      case 'H':
-        index = (index + 2) % 4
-        break
-      case 'A': 
-        index = (index > 1 ? 0 : 2) +  (index % 2)
-        break
-    }
-    this.setVariantByIndex(index)
+    this.resetOffset()
+    super.flip()
   }
   inAllBounds (r, c, variant) {
     variant = variant || this.variant()
@@ -288,7 +252,6 @@ class DraggedShip {
     }
     return null
   }
-
   place (r, c, shipCellGrid) {
     const placed = this.placeCells(r, c, shipCellGrid)
     if (placed) {

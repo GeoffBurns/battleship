@@ -1,8 +1,7 @@
 import { gameMaps } from './map.js'
 import { friendUI } from './friendUI.js'
 import { player } from './player.js'
-import { clickedShip } from './utils.js'
-import { gameStatus } from './playerUI.js'
+import { clickedShip } from './utils.js' 
 
 export const friend = {
   __proto__: player,
@@ -18,79 +17,7 @@ export const friend = {
     ships = ships || this.ships
 
     this.UI.placeTally(ships)
-  },
-  recordAutoMiss: function (r, c) {
-    const key = this.score.addAutoMiss(r, c)
-    if (!key) return // already shot here
-    this.UI.cellMiss(r, c)
-  },
-  markSunk: function (ship) {
-    ship.sunk = true
-    gameStatus.info(ship.sunkDescription())
-    for (const [r, c] of ship.cells) {
-      // surrounding water misses
-      for (let dr = -1; dr <= 1; dr++)
-        for (let dc = -1; dc <= 1; dc++) {
-          const rr = r + dr
-          const cc = c + dc
-          if (gameMaps.inBounds(rr, cc)) {
-            this.recordAutoMiss(rr, cc)
-          }
-        }
-      this.UI.cellSunkAt(r, c, ship.letter)
-    }
-    this.checkFleetSunk()
-  },
-  recordFleetSunk: function () {
-    this.UI.displayFleetSunk()
-    this.boardDestroyed = true
-  },
-  checkFleetSunk: function () {
-    if (this.ships.every(s => s.sunk)) {
-      this.recordFleetSunk()
-    }
-  },
-  shipCellAt: function (r, c) {
-    return this.shipCellGrid[r]?.[c]
-  },
-  fireShot: function (r, c, key) {
-    const shipCell = this.shipCellAt(r, c)
-    if (!shipCell) {
-      this.UI.cellMiss(r, c) 
-    }
-    // check for hit
-    const hitShip = this.ships.find(s => s.id === shipCell.id)
-    if (!hitShip) {
-      this.UI.cellMiss(r, c) 
-      return { hit: false, sunk: '' }
-    }
-    // it's a hit
-    hitShip.hits.add(key)
-
-    this.UI.cellHit(r, c)
- 
-    if (hitShip.hits.size === hitShip.cells.length) {
-      // ship sunk
-      this.markSunk(hitShip)
- 
-      return { hit: true, sunkLetter: hitShip.letter }
-    }
-
-    return { hit: true, sunkLetter: '' }
-  },
-  processShot: function (r, c) { 
-    const key = this.score.createShotKey(r, c)
-    if (key === null) { 
-      // if we are here, it is because of carpet bomb, so we can just
-      return { hit: false, sunk: '' }
-    }
-
-    const result = this.fireShot(r, c, key)
-
-    this.updateUI(this.ships)
-    return result
-  },
-
+  }, 
   randomHit: function (hits) {
     const len = hits.length
     if (len > 1) return null
@@ -209,7 +136,7 @@ export const friend = {
     this.ships = this.createShips()
   },
   buildBoard: function () {
-    this.UI.buildBoard(friend.onClickCell)
+    this.UI.buildBoard()
     this.resetShipCells()
     this.UI.makeDroppable(this.shipCellGrid, this.ships)
     //  this.UI.dragLeave(this.UI.board)

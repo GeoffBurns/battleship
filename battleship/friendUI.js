@@ -176,6 +176,8 @@ export const friendUI = {
   },
   dragStart: function (dragShip, ship) {
     dragShip.addEventListener('dragstart', e => {
+
+      console.log('drag start')
       const shipElement = e.currentTarget
       const rect = shipElement.getBoundingClientRect()
       const offsetX = e.clientX - rect.left

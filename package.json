@@ -4,7 +4,8 @@
   "description": "Play a challenging version of Battleship with no-touch placement rules and special ships.",
   "main": "battlehide.js",
   "scripts": {
-    "lint": "eslint ./"
+    "lint": "eslint battleship/",
+    "dup": "pmd cpd --minimum-tokens 75 --dir ./battleship/ --language ecmascript"
   },
   "repository": {
     "type": "git",
