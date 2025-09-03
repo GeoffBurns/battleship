@@ -69,7 +69,6 @@ class SelectedShip {
   }
   setVariantByIndex (index) {
     this.index = index
-    //const variant = this.variants[index]
   }
   canFlip () {
     const symmetry = this.shape.symmetry
@@ -149,8 +148,6 @@ class ClickedShip extends SelectedShip {
 
 class DraggedShip extends SelectedShip {
   constructor (ship, offsetX, offsetY, cellSize, source, variantIndex) {
-
-      console.log('DraggedShip create')
     super(ship, variantIndex)
     const row = Math.floor(offsetY / cellSize)
     const col = Math.floor(offsetX / cellSize)
@@ -159,6 +156,9 @@ class DraggedShip extends SelectedShip {
     this.offset = [offsetX, offsetY]
     this.ghost = new Ghost(super.variant(), super.letter)
     this.shown = true
+  }
+  isNotShown () {
+    return !this.shown
   }
   hide () {
     this.shown = false

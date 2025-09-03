@@ -82,7 +82,7 @@ document.addEventListener('dragover', e => {
   e.preventDefault()
 
   if (!selection) return
-  const effect = e.dataTransfer.dropEffect
+  //const effect = e.dataTransfer.dropEffect
   const allow = e.dataTransfer.effectAllowed
 
   let changed = false
@@ -100,12 +100,12 @@ document.addEventListener('dragover', e => {
   }
 
   // position highlight under cursor
-  if (changed && selection && !selection.shown) {
+  if (changed && selection?.isNotShown()) {
     friendUI.highlight(friend.shipCellGrid)
   }
 
   // position ghost under cursor
-  if (selection && selection.shown) {
+  if (selection?.isNotShown()) {
     selection.move(e)
   }
 })

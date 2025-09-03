@@ -25,34 +25,18 @@ export const friendUI = {
     this.gameStatus.display('Your Fleet is Destroyed', '')
     this.board.classList.add('destroyed')
   },
-  gridCellAt: function (r, c) {
-    const cols = gameMaps.current.cols
-    const index = r * cols + c
-    const result = this.board.children[index]
-    if (result && result.classList) return result
-    throw new Error(
-      'Invalid cell' + JSON.stringify(result) + 'at ' + r + ',' + c
-          + ' index ' + index + ' cols ' + cols + ' in array ' + JSON.stringify(this.board.children)
-    )
-  },
   markPlaced: function (cells, letter) {
-    for (const [r, c] of cells) {
-      // surrounding water misses
-      for (let dr = -1; dr <= 1; dr++)
-        for (let dc = -1; dc <= 1; dc++) {
-          const rr = r + dr
-          const cc = c + dc
-          if (gameMaps.inBounds(rr, cc)) {
-            this.cellMiss(rr, cc)
-          }
-        }
-      this.cellPlacedAt(r, c, letter)
-    }
+    this.displaySurround(
+      cells,
+      letter,
+      (r, c) => this.cellMiss(r, c),
+      (r, c, letter) => this.cellPlacedAt(r, c, letter)
+    )
   },
   makeDroppable: function (shipCellGrid, ships) {
     for (const cell of this.board.children) {
-      cell.textContent = '' 
-      cell.classList.remove('hit', 'miss','placed')
+      cell.textContent = ''
+      cell.classList.remove('hit', 'miss', 'placed')
       this.drop(cell, shipCellGrid, ships)
       this.dragEnter(cell, shipCellGrid)
     }
@@ -143,7 +127,7 @@ export const friendUI = {
         el.classList.remove('good', 'bad')
       }
       removeSelection()
-      if (event.dataTransfer.dropEffect !== 'none') {
+      if (e.dataTransfer.dropEffect !== 'none') {
         // The item was successfully dropped on a valid drop target
 
         this.rotateBtn.disabled = true
@@ -176,8 +160,6 @@ export const friendUI = {
   },
   dragStart: function (dragShip, ship) {
     dragShip.addEventListener('dragstart', e => {
-
-      console.log('drag start')
       const shipElement = e.currentTarget
       const rect = shipElement.getBoundingClientRect()
       const offsetX = e.clientX - rect.left
@@ -185,9 +167,7 @@ export const friendUI = {
 
       this.removeClicked()
 
-      //   e.dataTransfer.setData("application/offset", JSON.stringify({ offsetX, offsetY }));
       e.dataTransfer.effectAllowed = 'all'
-      //   e.dataTransfer.setDragImage(draggable, offsetX, offsetY);
 
       e.dataTransfer.setDragImage(new Image(), 0, 0)
       const variantIndex = parseInt(shipElement.dataset.variant)
@@ -230,11 +210,6 @@ export const friendUI = {
         dragShip.appendChild(cell)
       }
     }
-  },
-  cellMiss: function (r, c) {
-    const cell = this.gridCellAt(r, c)
-    if (cell.classList.contains('placed')) return
-    cell.classList.add('miss')
   },
   displayAsPlaced: function (cell, letter) {
     cell.textContent = letter
@@ -316,10 +291,10 @@ export const friendUI = {
     const flexStyle =
       'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
     this.testBtn.style.display = 'none'
-    this.score.shotsLabel.style.display = 'none' 
-    this.score.hitsLabel.style.display = 'none' 
-    this.score.sunkLabel.style.display = 'none' 
-    this.score.placedLabel.style.display = 'block' 
+    this.score.shotsLabel.style.display = 'none'
+    this.score.hitsLabel.style.display = 'none'
+    this.score.sunkLabel.style.display = 'none'
+    this.score.placedLabel.style.display = 'block'
     this.rotateBtn.style.display = 'block'
     this.flipBtn.style.display = 'block'
     this.stopBtn.style.display = 'none'
@@ -340,8 +315,8 @@ export const friendUI = {
     this.planeTray.style.display = 'none'
     this.buildingTray.style.display = 'none'
     this.trays.style.display = 'none'
-    for (const cell of this.board.children) { 
-      cell.classList.remove('hit', 'miss','placed')
+    for (const cell of this.board.children) {
+      cell.classList.remove('hit', 'miss', 'placed')
     }
     gameStatus.game.setAttribute(
       'style',
@@ -356,19 +331,19 @@ export const friendUI = {
       'display:block;font-weight: bold;height: 52px;margin-bottom: 30px;margin-top: 45px;'
     )
   },
-   testMode: function () {
-    this.testBtn.style.display = 'block' 
+  testMode: function () {
+    this.testBtn.style.display = 'block'
     this.stopBtn.style.display = 'block'
-    this.score.shotsLabel.style.display = 'block' 
-    this.score.hitsLabel.style.display = 'block' 
-    this.score.sunkLabel.style.display = 'block' 
-    this.score.placedLabel.style.display = 'none' 
+    this.score.shotsLabel.style.display = 'block'
+    this.score.hitsLabel.style.display = 'block'
+    this.score.sunkLabel.style.display = 'block'
+    this.score.placedLabel.style.display = 'none'
     this.rotateBtn.style.display = 'none'
     this.flipBtn.style.display = 'none'
     this.shipTray.style.display = 'none'
     this.planeTray.style.display = 'none'
     this.buildingTray.style.display = 'none'
-    this.trays.style.display = 'none' 
+    this.trays.style.display = 'none'
     gameStatus.game.setAttribute(
       'style',
       'display:block;float: left; text-align: left; width: 65%;'

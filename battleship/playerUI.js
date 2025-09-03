@@ -1,7 +1,7 @@
 import { gameMaps, gameHost } from './map.js'
 
 export class StatusUI {
-  constructor () { 
+  constructor () {
     this.mode = document.getElementById('modeStatus')
     this.game = document.getElementById('gameStatus')
     this.line = document.getElementById('statusLine')
@@ -30,12 +30,12 @@ export class ScoreUI {
     this.shots = document.getElementById(playerPrefix + '-shots')
     this.hits = document.getElementById(playerPrefix + '-hits')
     this.sunk = document.getElementById(playerPrefix + '-sunk')
-    this.placed = document.getElementById(playerPrefix + '-placed') 
+    this.placed = document.getElementById(playerPrefix + '-placed')
 
     this.shotsLabel = document.getElementById(playerPrefix + '-shots-label')
-    this.hitsLabel  = document.getElementById(playerPrefix + '-hits-label')
-    this.sunkLabel  = document.getElementById(playerPrefix + '-sunk-label')
-    this.placedLabel  = document.getElementById(playerPrefix + '-placed-label') 
+    this.hitsLabel = document.getElementById(playerPrefix + '-hits-label')
+    this.sunkLabel = document.getElementById(playerPrefix + '-sunk-label')
+    this.placedLabel = document.getElementById(playerPrefix + '-placed-label')
     this.tallyBox = document.getElementById(playerPrefix + '-tallyBox')
   }
   display (ships, shots) {
@@ -123,48 +123,91 @@ export class ScoreUI {
 }
 
 export const gameStatus = new StatusUI()
-export const playerUI = {
-  board: {},
-  containerWidth: gameHost.containerWidth,
-  cellSize: function() {
+
+export class PlayerUI {
+  constructor () {
+    this.board = {}
+    this.containerWidth = gameHost.containerWidth
+  }
+
+  cellSize () {
     return gameHost.containerWidth / gameMaps.current.cols
-  },
-  resetBoardSize: function () {
+  }
+
+  gridCellAt (r, c) {
+    const result = this.board.children[r * gameMaps.current.cols + c]
+    if (result?.classList) return result
+    throw new Error(
+      'Invalid cell' + JSON.stringify(result) + 'at ' + r + ',' + c
+    )
+  }
+  cellMiss (r, c) {
+    const cell = this.gridCellAt(r, c)
+
+    if (cell.classList.contains('placed')) return
+    cell.classList.add('miss')
+  }
+  surroundMiss (r, c, cellMiss) {
+    if (!cellMiss) return
+    // surrounding water misses
+    for (let dr = -1; dr <= 1; dr++)
+      for (let dc = -1; dc <= 1; dc++) {
+        const rr = r + dr
+        const cc = c + dc
+        if (gameMaps.inBounds(rr, cc)) {
+          cellMiss(rr, cc)
+        }
+      }
+  }
+  displaySurround (cells, letter, cellMiss, display) {
+    for (const [r, c] of cells) {
+      // surrounding water misses
+      this.surroundMiss(r, c, cellMiss)
+      if (display) {
+        display(r, c, letter)
+      }
+    }
+  }
+  resetBoardSize () {
     const cellSize = this.cellSize()
     this.board.style.setProperty('--cols', gameMaps.current.cols)
     this.board.style.setProperty('--rows', gameMaps.current.rows)
     this.board.style.setProperty('--boxSize', cellSize.toString() + 'px')
     this.board.innerHTML = ''
-  },
-  buildBoard: function (onClickCell) {
+  }
+  buildCell (r, c, onClickCell) {
+    const cell = document.createElement('div')
+    const land = gameMaps.isLand(r, c)
+    const c1 = c + 1
+    const r1 = r + 1
+    cell.className = 'cell'
+    cell.classList.add(land ? 'land' : 'sea')
+    const checker = (r + c) % 2 === 0
+    cell.classList.add(checker ? 'light' : 'dark')
+    if (!land && c1 < gameMaps.current.cols && gameMaps.isLand(r, c1)) {
+      cell.classList.add('rightEdge')
+    }
+    if (c !== 0 && !land && gameMaps.isLand(r, c - 1)) {
+      cell.classList.add('leftEdge')
+    }
+    if (r1 < gameMaps.current.rows && land !== gameMaps.isLand(r1, c)) {
+      cell.classList.add('bottomEdge')
+    }
+    cell.dataset.r = r
+    cell.dataset.c = c
+
+    if (onClickCell) {
+      cell.addEventListener('click', () => onClickCell(r, c))
+    }
+    this.board.appendChild(cell)
+  }
+  buildBoard (onClickCell) {
     this.board.innerHTML = ''
     for (let r = 0; r < gameMaps.current.rows; r++) {
       for (let c = 0; c < gameMaps.current.cols; c++) {
-        const cell = document.createElement('div')
-        const land = gameMaps.isLand(r, c)
-        const c1 = c + 1
-        const r1 = r + 1
-        cell.className = 'cell'
-        cell.classList.add(land ? 'land' : 'sea')
-        const checker = (r + c) % 2 === 0
-        cell.classList.add(checker ? 'light' : 'dark')
-        if (!land && c1 < gameMaps.current.cols && gameMaps.isLand(r, c1)) {
-          cell.classList.add('rightEdge')
-        }
-        if (c !== 0 && !land && gameMaps.isLand(r, c - 1)) {
-          cell.classList.add('leftEdge')
-        }
-        if (r1 < gameMaps.current.rows && land !== gameMaps.isLand(r1, c)) {
-          cell.classList.add('bottomEdge')
-        }
-        cell.dataset.r = r
-        cell.dataset.c = c
-
-        if (onClickCell) {
-          cell.addEventListener('click', () => onClickCell(r, c))
-        }
-        this.board.appendChild(cell)
+        this.buildCell(r, c, onClickCell)
       }
     }
   }
 }
+export const playerUI = new PlayerUI()
