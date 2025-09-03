@@ -150,7 +150,7 @@ export const friendUI = {
         this.flipBtn.disabled = true
       } else {
         // The drag operation was canceled or dropped on an invalid target
-        this.assignClicked(ship, shipElement)
+        this.assignClicked(selection.ship, shipElement)
       }
       if (callback) callback()
     })

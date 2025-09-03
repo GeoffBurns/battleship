@@ -22,10 +22,6 @@ const score = {
   noOfShots: function () {
     return this.shot.size - this.autoMisses
   },
- 
-  noOfShots: function () {
-    return this.shot.size - this.autoMisses
-  },
   addAutoMiss: function (r, c) {
     const key = this.createShotKey(r, c)
     if (!key) return key // already shot here

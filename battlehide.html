@@ -1,41 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>No-Touch Battleship – 18×7</title>
 
     <meta
       name="description"
       content="Play a challenging version of Battleship with no-touch placement rules and special ships."
-    />
+    >
 
-    <link rel="stylesheet" href="battleseek.css" />
+    <link rel="stylesheet" href="battleseek.css">
   </head>
   <body>
-    <div class="battleship" style="width: 546px">
-      <div style="margin-bottom: 30px; margin-top: 30px">
-        <label for="chooseMap" style="font-size: 130%; font-weight: 900"
+    <div class="battleship">
+      <div class="choose-map-container">
+        <label for="chooseMap" class="choose-map-label"
           >Choose a Map:
         </label>
         <select
           id="chooseMap"
-          style="font-size: 120%; font-weight: bold"
+          class="choose-map-select"
         ></select>
       </div>
       <div class="container">
-        <h2 style="text-align: center">Friendly Waters</h2>
-        <div class="board-wrap" style="width: 520px">
+        <h2 class="centered-title">Friendly Waters</h2>
+        <div class="board-wrap">
           <div
-            aria-label="friendly waters"
             class="board"
             id="friend-board"
           ></div>
         </div>
 
-        <div class="board-wrap"id='tray-container' style="width: 520px">
+        <div class="board-wrap" id="tray-container">
           <div
-            aria-label="Ships"
             id="shipTray"
             style="
               display: flex;
@@ -45,7 +43,6 @@
             "
           ></div>
           <div
-            aria-label="Planes"
             id="planeTray"
             style="
               display: flex;
@@ -55,7 +52,6 @@
             "
           ></div>
           <div
-            aria-label="Buildings"
             id="buildingTray"
             style="
               display: flex;
@@ -97,17 +93,17 @@
               margin-bottom: 8px;
             "
           >
-            <button id="newGame"><span class="shortcut">C</span>lear</button>
-            <button id="rotateBtn" disabled="true">
+            <button id="newGame" type="button"><span class="shortcut">C</span>lear</button>
+            <button id="rotateBtn" type="button" disabled>
               <span class="shortcut">R</span>otate
             </button>
-            <button id="flipBtn" disabled="true">
+            <button id="flipBtn" type="button" disabled>
               <span class="shortcut">F</span>lip
             </button>
-            <button id="testBtn" style="display: none">
+            <button id="testBtn" type="button" style="display: none">
               <span class="shortcut">T</span>est
             </button>
-            <button id="stopBtn" style="display: none">
+            <button id="stopBtn" type="button" style="display: none">
               <span class="shortcut">S</span>top
             </button>
           </div>

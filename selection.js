@@ -1,23 +1,21 @@
 import { gameMaps } from './map.js'
 import { friend } from './friend.js'
 import {
-  selection,
-  removeSelection,
   setSelectionBuilder,
   setClickedShipBuilder,
   canPlace,
   placeVariant
 } from './utils.js'
 
- function normalize (cells) {
-    const minR = Math.min(...cells.map(s => s[0]))
-    const minC = Math.min(...cells.map(s => s[1]))
-    return cells.map(([r, c]) => [r - minR, c - minC])
-  } 
-    
- function normalizeVariants (variants) {
-     return  variants.map(v=>normalize(v))
-  } 
+function normalize (cells) {
+  const minR = Math.min(...cells.map(s => s[0]))
+  const minC = Math.min(...cells.map(s => s[1]))
+  return cells.map(([r, c]) => [r - minR, c - minC])
+}
+
+function normalizeVariants (variants) {
+  return variants.map(v => normalize(v))
+}
 
 class Ghost {
   constructor (variant, letter) {
@@ -29,10 +27,10 @@ class Ghost {
     friend.UI.setDragShipContents(el, variant, letter)
     document.body.appendChild(el)
   }
-  hide() {
+  hide () {
     this.element.style.opacity = 0
   }
-  show() {
+  show () {
     this.element.style.opacity = ''
   }
   setVariant (variant) {
@@ -74,7 +72,7 @@ class ClickedShip {
       this.source.innerHTML = ''
       friend.UI.setDragShipContents(this.source, variant, this.letter)
       this.source.dataset.variant = index
-    } 
+    }
   }
   variant () {
     return this.variants[this.index]
@@ -97,10 +95,11 @@ class ClickedShip {
       case 'H':
         index = (index + 1) % 4
         break
-      case 'A':
-        const flipped = index > 1 ? 2 : 0
-        const rotated = index % 2
-        index = flipped + (rotated === 0 ? 1 : 0)
+      case 'A': 
+        index = 
+                (index > 1 ? 2 : 0)
+                + 
+                ((index % 2) === 0 ? 1 : 0)
         break
     }
     this.setVariantByIndex(index)
@@ -115,10 +114,8 @@ class ClickedShip {
       case 'H':
         index = (index - 1) % 4
         break
-      case 'A':
-        const flipped = index > 1 ? 2 : 0
-        const rotated = index % 2
-        index = flipped + (rotated === 0 ? 1 : 0)
+      case 'A': 
+        index = (index > 1 ? 2 : 0) + ((index % 2) === 0 ? 1 : 0)
         break
     }
     this.setVariantByIndex(index)
@@ -130,10 +127,8 @@ class ClickedShip {
       case 'H':
         index = (index + 2) % 4
         break
-      case 'A':
-        const flipped = index > 1 ? 0 : 2
-        const rotated = index % 2
-        index = flipped + rotated
+      case 'A': 
+        index = (index > 1 ? 0 : 2) + (index % 2)
         break
     }
     this.setVariantByIndex(index)
@@ -148,7 +143,7 @@ class DraggedShip {
     this.cursor = [row, col]
     this.offset = [offsetX, offsetY]
     this.ship = ship
-    const shape = ship.shape() 
+    const shape = ship.shape()
     this.type = shape.type()
     this.id = ship.id
     this.shape = shape
@@ -156,15 +151,15 @@ class DraggedShip {
     const letter = ship.letter
     this.letter = letter
     const variants = normalizeVariants(shape.variants())
-    this.variants = variants 
+    this.variants = variants
     this.ghost = new Ghost(variants[variantIndex], letter)
     this.shown = true
   }
-hide() {
+  hide () {
     this.shown = false
     if (this.ghost) this.ghost.hide()
-}
-  show() {
+  }
+  show () {
     this.shown = true
     if (this.ghost) this.ghost.show()
   }
@@ -204,10 +199,8 @@ hide() {
       case 'H':
         index = (index + 1) % 4
         break
-      case 'A':
-        const flipped = index > 1 ? 2 : 0
-        const rotated = index % 2
-        index = flipped + (rotated === 0 ? 1 : 0)
+      case 'A': 
+        index = (index > 1 ? 2 : 0) + ((index % 2) === 0 ? 1 : 0)
         break
     }
     //  const [x,y] = this.offset
@@ -229,10 +222,8 @@ hide() {
       case 'H':
         index = (index - 1) % 4
         break
-      case 'A':
-        const flipped = index > 1 ? 2 : 0
-        const rotated = index % 2
-        index = flipped + (rotated === 0 ? 1 : 0)
+      case 'A':  
+        index =  (index > 1 ? 2 : 0) + ((index % 2) === 0 ? 1 : 0)
         break
     }
     this.setVariantByIndex(index)
@@ -244,10 +235,8 @@ hide() {
       case 'H':
         index = (index + 2) % 4
         break
-      case 'A':
-        const flipped = index > 1 ? 0 : 2
-        const rotated = index % 2
-        index = flipped + rotated
+      case 'A': 
+        index = (index > 1 ? 0 : 2) +  (index % 2)
         break
     }
     this.setVariantByIndex(index)
@@ -312,6 +301,6 @@ hide() {
 setSelectionBuilder((ship, offsetX, offsetY, cellSize, source, index) => {
   return new DraggedShip(ship, offsetX, offsetY, cellSize, source, index)
 })
-setClickedShipBuilder((ship,   source, index) => {
-  return new ClickedShip(ship,  source, index)
+setClickedShipBuilder((ship, source, index) => {
+  return new ClickedShip(ship, source, index)
 })

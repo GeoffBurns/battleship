@@ -1,7 +1,8 @@
 import { gameMaps } from './map.js'
 import { friendUI } from './friendUI.js'
 import { player } from './player.js'
-import { clickedShip, selection } from './utils.js'
+import { clickedShip } from './utils.js'
+import { gameStatus } from './playerUI.js'
 
 export const friend = {
   __proto__: player,
@@ -92,10 +93,10 @@ export const friend = {
 
   randomHit: function (hits) {
     const len = hits.length
-    if (l > 1) return null
-    if (l === 1) return hits[0]
+    if (len > 1) return null
+    if (len === 1) return hits[0]
     const pick = Math.floor(Math.random() * len)
-    return hits[0]
+    return hits[pick]
   },
   chase: function (hits, seeking) {
     for (let i = 0; i < 30; i++) {
@@ -116,9 +117,8 @@ export const friend = {
             return this.processShot(r + 1, c)
           case 3:
             return this.processShot(r - 1, c + 1)
-          case 4:
-            const q = Math.floor(Math.random() * 4)
-            switch (q) {
+          case 4: 
+            switch (Math.floor(Math.random() * 4)) {
               case 0:
                 return this.processShot(r + 1, c + 1)
               case 1:
@@ -147,33 +147,7 @@ export const friend = {
       }
       return this.processShot(r, c)
     }
-  },
-  fireShot: function (r, c, key) {
-    const shipCell = this.shipCellAt(r, c)
-    if (!shipCell) {
-      this.UI.cellMiss(r, c)
-    }
-    // check for hit
-    const hitShip = this.ships.find(s => s.id === shipCell.id)
-    if (!hitShip) {
-      this.UI.cellMiss(r, c)
-
-      return { hit: false, sunk: '' }
-    }
-    // it's a hit
-    hitShip.hits.add(key)
-
-    this.UI.cellHit(r, c)
-
-    if (hitShip.hits.size === hitShip.cells.length) {
-      // ship sunk
-      this.markSunk(hitShip)
-
-      return { hit: true, sunkLetter: hitShip.letter }
-    }
-
-    return { hit: true, sunkLetter: '' }
-  },
+  },  
   seek () {
     this.testContinue = true
     this.score.shot = new Set()
@@ -195,7 +169,7 @@ export const friend = {
     }
   },
 
-  onClickCell: function (r, c) {},
+  //onClickCell: function (r, c) {},
 
   onClickRotate: function () {
     if (clickedShip && clickedShip.canRotate()) {

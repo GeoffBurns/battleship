@@ -46,7 +46,7 @@ export class Shape {
         return straightVariantsOf(this.cells)
       default:
         throw new Error(
-          'Unknown symmetry type for ' + JSON.stringify(shapeElement, null, 2)
+          'Unknown symmetry type for ' + JSON.stringify(this, null, 2)
         ) // The 'null, 2' adds indentation for readability);
     }
   }
@@ -178,7 +178,6 @@ const seaAndLand = {
         [5, 14, 17],
         [6, 0, 3],
         [6, 14, 17],
-        ,
         [7, 0, 10],
         [7, 14, 17],
         [8, 0, 17],
