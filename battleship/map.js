@@ -423,7 +423,12 @@ class SeaAndLand {
       D: 'rgba(255,204,102,0.3)',
       P: 'rgba(204,153,255,0.3)',
       G: 'rgba(255,153,204,0.3)',
-      U: 'rgba(255,255,102,0.3)'
+      U: 'rgba(255,255,102,0.3)',
+      T: 'rgba(255,204,255,0.3)',
+      O: 'rgba(51,204,153,0.3)',
+      H: 'rgba(255,102,153,0.3)',
+      J: 'rgba(255,136,77,0.3)',
+      R: 'rgba(102,153,255,0.3)'
     }
     this.shapesByLetter = Object.fromEntries(
       this.baseShapes.map(base => [base.letter, base])
