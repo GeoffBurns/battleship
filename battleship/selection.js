@@ -1,11 +1,5 @@
 import { gameMaps } from './map.js'
-import { friend } from './friend.js'
-import {
-  setSelectionBuilder,
-  setClickedShipBuilder,
-  canPlace,
-  placeVariant
-} from './utils.js'
+import { friendUI } from './friendUI.js'
 
 function normalize (cells) {
   const minR = Math.min(...cells.map(s => s[0]))
@@ -18,13 +12,15 @@ function normalizeVariants (variants) {
 }
 
 class Ghost {
-  constructor (variant, letter) {
+  constructor (variant, letter, contentBuilder) {
     const el = document.createElement('div')
-    el.classList.add('selection')
+    el.className = 'ship-ghost'
+    // el.classList.add('selection')
     this.element = el
     this.letter = letter
-    el.className = 'ship-ghost'
-    friend.UI.setDragShipContents(el, variant, letter)
+    this.contentBuilder = contentBuilder
+    contentBuilder(el, variant, letter)
+    // friendUI.setDragShipContents(el, variant, letter)
     document.body.appendChild(el)
   }
   hide () {
@@ -36,7 +32,8 @@ class Ghost {
   setVariant (variant) {
     if (this.element) {
       this.element.innerHTML = ''
-      friend.UI.setDragShipContents(this.element, variant, this.letter)
+      this.contentBuilder(this.element, variant, this.letter)
+      //  friendUI.setDragShipContents(this.element, variant, this.letter)
     }
   }
   remove () {
@@ -55,8 +52,9 @@ class Ghost {
 }
 
 class SelectedShip {
-  constructor (ship, variantIndex) {
+  constructor (ship, variantIndex, contentBuilder) {
     this.ship = ship
+    this.contentBuilder = contentBuilder
     const shape = ship.shape()
     this.shape = shape
     this.type = shape.type()
@@ -107,7 +105,7 @@ class SelectedShip {
         index = index === 0 ? 1 : 0
         break
       case 'H':
-        index = (index - 1) % 4
+        index = index === 0 ? 3 : index - 1
         break
       case 'A':
         index = (index > 1 ? 2 : 0) + (index % 2 === 0 ? 1 : 0)
@@ -130,9 +128,9 @@ class SelectedShip {
   }
 }
 
-class ClickedShip extends SelectedShip {
-  constructor (ship, source, variantIndex) {
-    super(ship, variantIndex)
+export class ClickedShip extends SelectedShip {
+  constructor (ship, source, variantIndex, contentBuilder) {
+    super(ship, variantIndex, contentBuilder)
     this.source = source
   }
   setVariantByIndex (index) {
@@ -140,21 +138,71 @@ class ClickedShip extends SelectedShip {
     const variant = this.variants[index]
     if (this.source) {
       this.source.innerHTML = ''
-      friend.UI.setDragShipContents(this.source, variant, this.letter)
+      this.contentBuilder(this.source, variant, this.letter)
       this.source.dataset.variant = index
     }
   }
 }
 
-class DraggedShip extends SelectedShip {
-  constructor (ship, offsetX, offsetY, cellSize, source, variantIndex) {
-    super(ship, variantIndex)
+class PlacedShips {
+  constructor () {
+    this.ships = []
+  }
+
+  reset () {
+    this.ships = []
+  }
+
+  pop () {
+    const ship = this.ships.pop()
+    ship.unplace()
+    return ship
+  }
+  popAndRefresh (shipCellGrid, mark, returnShip) {
+    const ship = this.pop()
+    ship.unplace()
+    returnShip(ship)
+    for (const s of this.ships) {
+      s.addToGrid(shipCellGrid)
+      mark(s)
+    }
+
+    friendUI.undoBtn.disabled = this.ships.length === 0
+
+    return ship
+  }
+  push (ship, placed) {
+    this.ships.push(ship)
+    friendUI.undoBtn.disabled = this.ships.length === 0
+    return ship.place(placed)
+  }
+  numPlaced () {
+    return this.ships.length
+  }
+  getAll () {
+    return this.ships.slice()
+  }
+}
+
+export const placedShipsInstance = new PlacedShips()
+
+export class DraggedShip extends SelectedShip {
+  constructor (
+    ship,
+    offsetX,
+    offsetY,
+    cellSize,
+    source,
+    variantIndex,
+    contentBuilder
+  ) {
+    super(ship, variantIndex, contentBuilder)
     const row = Math.floor(offsetY / cellSize)
     const col = Math.floor(offsetX / cellSize)
     this.source = source
     this.cursor = [row, col]
     this.offset = [offsetX, offsetY]
-    this.ghost = new Ghost(super.variant(), super.letter)
+    this.ghost = new Ghost(super.variant(), ship.letter, contentBuilder)
     this.shown = true
   }
   isNotShown () {
@@ -220,19 +268,14 @@ class DraggedShip extends SelectedShip {
   canPlace (r, c, shipCellGrid) {
     const variant = this.variant()
     if (this.ghost && this.inAllBounds(r, c, variant)) {
-      return canPlace(variant, r, c, this.letter, shipCellGrid)
+      return this.ship.canPlace(variant, r, c, shipCellGrid)
     }
     return false
   }
   addToShipCell (r, c, shipCellGrid) {
-    return placeVariant(
-      this.variant(),
-      r,
-      c,
-      this.letter,
-      this.id,
-      shipCellGrid
-    )
+    this.ship.placeVariant(this.variant(), r, c)
+    this.ship.addToGrid(shipCellGrid)
+    return this.ship.cells
   }
   offsetCell (r, c) {
     const r0 = r - this.cursor[0]
@@ -255,15 +298,8 @@ class DraggedShip extends SelectedShip {
   place (r, c, shipCellGrid) {
     const placed = this.placeCells(r, c, shipCellGrid)
     if (placed) {
-      return this.ship.place(placed)
+      return placedShipsInstance.push(this.ship, placed)
     }
     return null
   }
 }
-
-setSelectionBuilder((ship, offsetX, offsetY, cellSize, source, index) => {
-  return new DraggedShip(ship, offsetX, offsetY, cellSize, source, index)
-})
-setClickedShipBuilder((ship, source, index) => {
-  return new ClickedShip(ship, source, index)
-})

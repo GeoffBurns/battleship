@@ -1,0 +1,63 @@
+:root {
+    --content-width: 546px;
+}
+
+.battleship {
+    width: var(--content-width);
+    box-sizing: border-box;
+    color: #0e1530;
+}
+
+.hidden {
+    display: none
+}
+
+.heading-container h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 200%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    color: #380101
+}
+
+.heading-container h3 {
+    text-align: center;
+    margin: 0;
+    font-size: 130%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 900;
+    color: #380101
+}
+
+.choose-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.choose-container {
+    margin-bottom: 13px;
+    margin-top: 25px;
+}
+
+.choose-map-container {
+    float: left;
+    text-align: left;
+}
+
+.choose-hunt-container {
+    float: right;
+    text-align: right;
+}
+
+
+.choose-label {
+    font-size: 130%;
+    font-weight: 900
+}
+
+.choose-select {
+    font-size: 120%;
+    font-weight: bold
+}

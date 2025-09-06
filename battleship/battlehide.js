@@ -1,114 +1,197 @@
-import { mapUI } from './mapUI.js'
-import { friend } from './friend.js'
-import { selection } from './utils.js'
-import { friendUI } from './friendUI.js'
+import { setupDropdowns } from './setup.js'
+import {
+  dragOver,
+  onClickRotate,
+  onClickFlip,
+  onClickRotateLeft,
+  friendUI
+} from './friendUI.js'
+import { placedShipsInstance } from './selection.js'
+import { Friend } from './friend.js'
+import { enemy } from './enemy.js'
+import { setupEnemy, newGame } from './enemySetup.js'
+import { gameStatus } from './playerUI.js'
+import { randomPlaceShape } from './utils.js'
 
-const newGameBtn = document.getElementById('newGame')
-friend.UI.resetBoardSize()
+const friend = new Friend(friendUI)
 
-function newGame () {
-  friend.testContinue = false
-  friend.UI.testBtn.disabled = false
-  friend.UI.placeMode()
-  friend.resetModel()
-  friend.resetUI(friend.ships)
+friendUI.resetBoardSize()
+
+function moveStatus (oldline, newLine) {
+  moveStatusChildren(newLine)
+
+  const temp = newLine
+  gameStatus.line2 = oldline
+  gameStatus.line = temp
+  oldline.classList.add('hidden')
 }
-// wire buttons
-newGameBtn.addEventListener('click', newGame)
-friend.wireupButtons()
+function moveStatusChildren (newLine) {
+  newLine.appendChild(gameStatus.game)
+  newLine.appendChild(gameStatus.mode)
+}
+function onClickTest () {
+  friend.test.bind(friend)()
+}
+let removeHideShorcuts = null
+let removeSeekShorcuts = null
+function onClickReturnToPlacement () {
+  const enemyContainer = document.getElementById('enemy-container')
+  enemyContainer.classList.add('hidden')
+  moveStatus(gameStatus.line, gameStatus.line2)
 
-mapUI.setup(function () {
-  friend.UI.resetBoardSize()
+  const tallyTitle = document.getElementById('tally-title')
+  const tallyBox = document.getElementById('friend-tally-container')
+  tallyBox.prepend(tallyTitle)
+  if (removeSeekShorcuts) removeSeekShorcuts()
+
+  enemy.opponent = null
+  friend.opponent = null
+  //friend.UI.resetBoardSize()
+  //friend.restartBoard()
+  //friend.updateUI(friend.ships)
+  //newGame()
+  newPlacement()
+}
+
+function resetFriendBoard () {
+  friend.restartBoard()
+  friend.updateUI(friend.ships)
+}
+function onClickSeek () {
+  friendUI.seekMode()
+  const enemyContainer = document.getElementById('enemy-container')
+  enemyContainer.classList.remove('hidden')
+
+  moveStatus(gameStatus.line, gameStatus.line2)
+  gameStatus.line.classList.add('small')
+
+  const tallyTitle = document.getElementById('tally-title')
+  const placeControls = document.getElementById('place-controls')
+  placeControls.appendChild(tallyTitle)
+  if (removeHideShorcuts) removeHideShorcuts()
+
+  enemy.opponent = friend
+  friend.opponent = enemy
+
+  friend.restartBoard()
+  friend.updateUI(friend.ships)
+  removeSeekShorcuts = setupEnemy(onClickReturnToPlacement, resetFriendBoard)
+  enemy.UI.resetBoardSize()
   newGame()
-})
-document.addEventListener('keydown', function (event) {
-  switch (event.key) {
-    case 'c':
-    case 'C':
-      newGame()
-      break
-    case 'r':
-    case 'R':
-      friend.onClickRotate()
-      break
-    case 'l':
-    case 'L':
-      friend.onClickRotateLeft()
-      break
-    case 'f':
-    case 'F':
-      friend.onClickFlip()
-      break
-    case 't':
-    case 'T':
-      friend.onClickTest()
-      break
-    case 's':
-    case 'S':
-      friend.onClickStop()
-      break
+}
+function onClickAuto () {
+  const ships = friend.ships
+  for (let attempt = 0; attempt < 100; attempt++) {
+    let ok = true
+    for (const ship of ships) {
+      const placed = randomPlaceShape(ship, friend.shipCellGrid)
+      if (!placed) {
+        friend.resetShipCells()
+        friendUI.placeTally(ships)
+        friendUI.displayShipInfo(ships)
+        ok = false
+        break
+      }
+      friendUI.markPlaced(placed, ship.letter)
+      friendUI.placeTally(ships)
+      friendUI.displayShipInfo(ships)
+    }
+    if (ok) return true
   }
-})
+}
+function onClickUndo () {
+  friend.resetShipCells()
+  friendUI.clearVisuals()
+  friend.score.reset()
+  placedShipsInstance.popAndRefresh(
+    friend.shipCellGrid,
+    ship => {
+      friendUI.markPlaced(ship.cells, ship.letter)
+    },
+    ship => {
+      friendUI.addShipToTrays(ship)
+    }
+  )
+  friendUI.placeTally(friend.ships)
+  friendUI.displayShipInfo(friend.ships)
+  if (friend.ships.length === 0) friendUI.undoBtn.disabled = true
+}
 
-let lastmodifier = ''
-let dragCounter = 0
-friend.UI.dragEnd(document, () => {
-  lastmodifier = ''
-  dragCounter = 0
-})
+function onClickStop () {
+  friend.testContinue = false
+  friendUI.readyMode()
+  friendUI.testBtn.disabled = false
+}
 
-friend.UI.board.addEventListener('dragenter', e => {
-  e.preventDefault()
+function wireupButtons () {
+  friendUI.newPlacementBtn.addEventListener('click', newPlacement)
+  friendUI.rotateBtn.addEventListener('click', onClickRotate)
+  friendUI.rotateLeftBtn.addEventListener('click', onClickRotateLeft)
+  friendUI.flipBtn.addEventListener('click', onClickFlip)
+  friendUI.undoBtn.addEventListener('click', onClickUndo)
+  friendUI.autoBtn.addEventListener('click', onClickAuto)
+  friendUI.testBtn.addEventListener('click', onClickTest)
+  friendUI.seekBtn.addEventListener('click', onClickSeek)
+  friendUI.stopBtn.addEventListener('click', onClickStop)
+}
 
-  dragCounter++
-
-  if (dragCounter > 1 || !selection) return
-
-  selection.hide()
-})
-
-friend.UI.board.addEventListener('dragleave', e => {
-  e.preventDefault()
-  dragCounter--
-  if (dragCounter > 0) return
-
-  friend.UI.removeHighlight()
-
-  if (!selection) return
-  selection.show()
-})
-
-document.addEventListener('dragover', e => {
-  e.preventDefault()
-
-  if (!selection) return
-  //const effect = e.dataTransfer.dropEffect
-  const allow = e.dataTransfer.effectAllowed
-
-  let changed = false
-  if (lastmodifier !== allow) {
-    lastmodifier = allow
-    if (allow === 'link') {
-      selection.rotate()
-      changed = true
-    } else if (allow === 'copy') {
-      selection.flip()
-      changed = true
-    } else if (allow === 'none') {
-      changed = true
+function setupHideShortcuts () {
+  function handleHideShortcuts (event) {
+    switch (event.key) {
+      case 'c':
+      case 'C':
+        newPlacement()
+        break
+      case 'r':
+      case 'R':
+        onClickRotate()
+        break
+      case 'l':
+      case 'L':
+        onClickRotateLeft()
+        break
+      case 'f':
+      case 'F':
+        onClickFlip()
+        break
+      case 't':
+      case 'T':
+        onClickTest()
+        break
+      case 's':
+      case 'S':
+        onClickStop()
+        break
+      case 'u':
+      case 'U':
+        onClickUndo()
+        break
     }
   }
 
-  // position highlight under cursor
-  if (changed && selection?.isNotShown()) {
-    friendUI.highlight(friend.shipCellGrid)
-  }
+  document.addEventListener('keydown', handleHideShortcuts)
 
-  // position ghost under cursor
-  if (selection?.isNotShown()) {
-    selection.move(e)
-  }
-})
+  return () => document.removeEventListener('keydown', handleHideShortcuts)
+}
 
+function newPlacement () {
+  friend.testContinue = false
+  friendUI.testBtn.disabled = false
+  friendUI.seekBtn.disabled = false
+  friendUI.placeMode()
+  friend.resetModel()
+  friend.resetUI(friend.ships)
+
+  friendUI.rotateBtn.disabled = true
+  friendUI.flipBtn.disabled = true
+  friendUI.rotateLeftBtn.disabled = true
+  friendUI.undoBtn.disabled = true
+}
+// wire buttons
+wireupButtons()
+
+dragOver(friend)
+removeHideShorcuts = setupHideShortcuts()
+setupDropdowns(friendUI.resetBoardSize.bind(friendUI), newPlacement, 'hide')
 // initial
-newGame()
+newPlacement()

@@ -7,11 +7,10 @@ import { gameStatus } from './playerUI.js'
 class Enemy extends Player {
   constructor (enemyUI) {
     super(enemyUI)
-    this.shipCellGrid = []
-    this.carpetBombsUsed = 0
+    this.preamble = 'Enemy'
+    this.preamble = 'The enemy was '
     this.carpetMode = false
     this.isRevealed = false
-    this.boardDestroyed = false
   }
 
   placeAll (ships) {
@@ -24,9 +23,7 @@ class Enemy extends Player {
       let ok = true
       for (const ship of ships) {
         const placed = randomPlaceShape(ship, this.shipCellGrid)
-        if (placed) {
-          ship.place(placed)
-        } else {
+        if (!placed) {
           ok = false
           break
         }
@@ -38,6 +35,7 @@ class Enemy extends Player {
     throw new Error('Failed to place all ships after many attempts')
   }
   revealAll () {
+    this.UI.clearClasses()
     this.UI.revealAll(this.ships)
 
     this.boardDestroyed = true
@@ -68,29 +66,46 @@ class Enemy extends Player {
       this.isRevealed ||
       this.carpetBombsUsed >= gameMaps.maxBombs
     this.UI.revealBtn.disabled = this.boardDestroyed || this.isRevealed
-    this.UI.score.buildTally(this.ships, this.carpetBombsUsed)
+    this.updateTally(this.ships, this.carpetBombsUsed, this.score.noOfShots())
   }
   onClickCell (r, c) {
     if (enemy.boardDestroyed || enemy.isRevealed) return // no action if game over
-
-    enemy.fireAt(r, c)
-  }
-  fireAt (r, c) {
-    if (!this.score.newShotKey(r, c) && !this.carpetMode) {
-      gameStatus.info('Already Shot Here - Try Again')
+    if (enemy.carpetMode && enemy.carpetBombsUsed >= gameMaps.maxBombs) {
+      gameStatus.info('No Mega Bombs Left - Switch To Single Shot')
+      enemy.carpetMode = false
+      enemy.updateUI(enemy.ships)
       return
     }
+    if (enemy?.opponent?.boardDestroyed) {
+      gameStatus.info('Game Over - No More Shots Allowed')
+      return
+    }
+    enemy.tryFireAt(r, c)
+  }
+  tryFireAt (r, c) {
+    if (!this.score.newShotKey(r, c) && !this.carpetMode) {
+      gameStatus.info('Already Shot Here - Try Again')
+      return false
+    }
+    this.fireAt(r, c)
+    this.updateUI()
+    if (enemy?.opponent) {
+      enemy.opponent.seekStep()
+    }
+    return true
+  }
+  fireAt (r, c) {
     if (this.carpetMode) {
       // Mega Bomb mode: affect 3x3 area centered on (r,c)
       if (this.carpetBombsUsed >= gameMaps.maxBombs) {
-        gameStatus.info('No Mega Bombs Left')
         return
       }
       this.processCarpetBomb(r, c)
       return
     }
-    enemy.processShot(r, c)
+    this.processShot(r, c, false)
   }
+
   processCarpetBomb (r, c) {
     let hits = 0
     let sunks = ''
@@ -100,6 +115,7 @@ class Enemy extends Player {
     this.updateResultsOfBomb(hits, sunks)
 
     this.updateBombStatus()
+    this.flash()
   }
   dropBomb (r, c, hits, sunks) {
     for (let dr = -1; dr <= 1; dr++) {
@@ -107,7 +123,7 @@ class Enemy extends Player {
         const nr = r + dr
         const nc = c + dc
         if (gameMaps.inBounds(nr, nc)) {
-          const result = this.processShot(nr, nc)
+          const result = this.processShot(nr, nc, true)
           if (result?.hit) hits++
           if (result?.sunkLetter) sunks += result.sunkLetter
         }
@@ -121,27 +137,6 @@ class Enemy extends Player {
     if (this.carpetBombsUsed >= gameMaps.maxBombs) {
       this.carpetMode = false
       gameStatus.display('Single Shot Mode')
-    }
-  }
-
-  updateResultsOfBomb (hits, sunks) {
-    if (this.boardDestroyed) {
-      // already handled  in updateUI
-    } else if (hits === 0) {
-      gameStatus.info('The Mega Bomb missed everything!')
-    } else if (sunks.length === 0) {
-      gameStatus.info(hits.toString() + ' Hits')
-    } else if (sunks.length === 1) {
-      gameStatus.info(
-        hits.toString() + ' Hits and ' + gameMaps.sunkDescription(sunks)
-      )
-    } else {
-      let message = hits.toString() + ' Hits,'
-      for (let sunk of sunks) {
-        message += ' and ' + gameMaps.sunkDescription(sunk)
-      }
-      message += ' Destroyed'
-      gameStatus.info(message)
     }
   }
 

@@ -1,0 +1,81 @@
+.board-wrap {
+    background: #0e1530;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #1b2746;
+}
+
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--boxSize));
+    grid-template-rows: repeat(var(--rows), var(--boxSize));
+    gap: 0px;
+}
+
+/* destroyed (desaturated) board   */
+.board.destroyed .land.light,
+.board.destroyed .sea.light {
+    background: #777;
+}
+
+.board.destroyed .land.dark,
+.board.destroyed .sea.dark {
+    background: #555;
+}
+
+.cell {
+    width: var(--boxSize);
+    height: var(--boxSize);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
+    overflow: clip;
+}
+
+
+.cell.land.light {
+    background: #348239;
+}
+
+.cell.land.dark {
+    background: #296334;
+}
+
+.cell.sea.light {
+    background: #1a78d6;
+}
+
+.cell.sea.dark {
+    background: #1761b0;
+}
+
+
+.cell.rightEdge.light {
+    border-right: 2px solid #024;
+}
+
+.cell.bottomEdge.light {
+    border-bottom: 2px solid #024;
+}
+
+.cell.rightEdge.dark {
+    border-right: 2px solid #000;
+}
+
+.cell.bottomEdge.dark {
+    border-bottom: 2px solid #000;
+}
+
+.cell.leftEdge.light {
+    border-left: 2px solid #000;
+}
+
+.cell.leftEdge.dark {
+    border-left: 2px solid #000;
+}

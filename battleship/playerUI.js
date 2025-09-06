@@ -5,6 +5,10 @@ export class StatusUI {
     this.mode = document.getElementById('modeStatus')
     this.game = document.getElementById('gameStatus')
     this.line = document.getElementById('statusLine')
+    this.line2 = document.getElementById('statusLine2')
+  }
+  clear () {
+    this.display('', '')
   }
   display (mode, game) {
     this.mode.textContent = mode
@@ -96,12 +100,17 @@ export class ScoreUI {
   }
   buildShipTally (ships, boxer) {
     this.resetTallyBox()
-    this.buildTallyRow(ships, 'P', this.tallyBox, boxer)
+
+    const column = document.createElement('div')
+    column.className = 'tally-col'
+    this.buildTallyRow(ships, 'P', column, boxer)
     const surfaceContainer = document.createElement('div')
     surfaceContainer.setAttribute('style', 'display:flex;gap:40px;')
 
     const seaColumn = document.createElement('div')
+    seaColumn.className = 'tally-col'
     const landColumn = document.createElement('div')
+    landColumn.className = 'tally-col'
     const sea = ['A', 'B', 'C', 'D']
     const land = ['G', 'U']
     for (const letter of sea) {
@@ -113,12 +122,39 @@ export class ScoreUI {
     surfaceContainer.appendChild(seaColumn)
     surfaceContainer.appendChild(landColumn)
 
-    this.tallyBox.appendChild(surfaceContainer)
+    column.appendChild(surfaceContainer)
+    this.tallyBox.appendChild(column)
   }
   buildTally (ships, carpetBombsUsed) {
     this.buildShipTally(ships)
     // bombs row
     this.buildBombRow(this.tallyBox, carpetBombsUsed)
+  }
+
+  altBuildTally (ships, carpetBombsUsed, boxer) {
+    this.resetTallyBox()
+    const surfaceContainer = document.createElement('div')
+    surfaceContainer.setAttribute('style', 'display:flex;gap:40px;')
+
+    const seaColumn = document.createElement('div')
+    seaColumn.className = 'tally-col'
+    const landColumn = document.createElement('div')
+    landColumn.className = 'tally-col'
+    const sea = ['A', 'B', 'C', 'D']
+    const land = ['G', 'U']
+    for (const letter of sea) {
+      this.buildTallyRow(ships, letter, seaColumn, boxer)
+    }
+
+    this.buildTallyRow(ships, 'P', landColumn, boxer)
+    for (const letter of land) {
+      this.buildTallyRow(ships, letter, landColumn, boxer)
+    }
+    this.buildBombRow(landColumn, carpetBombsUsed)
+    surfaceContainer.appendChild(seaColumn)
+    surfaceContainer.appendChild(landColumn)
+
+    this.tallyBox.appendChild(surfaceContainer)
   }
 }
 
@@ -127,6 +163,7 @@ export const gameStatus = new StatusUI()
 export class PlayerUI {
   constructor () {
     this.board = {}
+    this.placing = false
     this.containerWidth = gameHost.containerWidth
   }
 
@@ -140,6 +177,44 @@ export class PlayerUI {
     throw new Error(
       'Invalid cell' + JSON.stringify(result) + 'at ' + r + ',' + c
     )
+  }
+
+  displayAsRevealed (cell, letter) {
+    if (cell) {
+      cell.style.background =
+        gameMaps.shipColors[letter] || 'rgba(255, 209, 102, 0.3)'
+      cell.style.color = gameMaps.shipLetterColors[letter] || '#ffd166'
+      cell.textContent = letter
+    }
+  }
+  revealShip (ship) {
+    for (const [r, c] of ship.cells) {
+      const cell = this.gridCellAt(r, c)
+      this.displayAsRevealed(cell, ship.letter)
+    }
+  }
+
+  clearClasses () {
+    for (const cell of this.board.children) {
+      cell.classList.remove('hit', 'frd-hit', 'frd-sunk', 'miss', 'placed')
+    }
+  }
+  displayAsSunk (cell, letter) {
+    // cell.textContent = ''
+    cell.classList.add('frd-sunk')
+    //  cell.style.background = gameMaps.shipColors[letter] || 'rgba(0,0,0,0.8)'
+    // cell.style.color = gameMaps.shipLetterColors[letter] || '#000'
+    //cell.classList.remove('hit')
+    cell.classList.remove('miss')
+  }
+  cellSunkAt (r, c, letter) {
+    const cell = this.gridCellAt(r, c)
+    this.displayAsSunk(cell, letter)
+  }
+
+  cellHit (r, c) {
+    const cell = this.gridCellAt(r, c)
+    cell.classList.add('hit')
   }
   cellMiss (r, c) {
     const cell = this.gridCellAt(r, c)

@@ -1,24 +1,38 @@
 import { gameMaps } from './map.js'
 
-export let mapUI = {
-  chooseMap: document.getElementById('chooseMap'),
-  containerWidth: 520,
-  setup: function (callback) {
-    let mapId = 0
-    gameMaps.list.forEach(mapOption => {
+export class ChooseUI {
+  constructor (list, tagetId) {
+    this.list = list
+    this.choose = document.getElementById(tagetId)
+    this.containerWidth = 520
+  }
+
+  setup (callback, defaultIndex = 0) {
+    let id = 0
+    this.list.forEach(choice => {
       let option = document.createElement('option')
-      option.value = mapId
-      option.textContent = mapOption.title
-      this.chooseMap.appendChild(option)
-      mapId++
+      option.value = id
+      option.textContent = choice
+      this.choose.appendChild(option)
+      if (id === defaultIndex) {
+        option.selected = 'selected'
+      }
+      id++
     })
     this.onChange(callback)
-  },
-  onChange: function (callback) {
-    this.chooseMap.addEventListener('change', function () {
+  }
+
+  onChange (callback) {
+    this.choose.addEventListener('change', function () {
       const index = this.value
       gameMaps.setTo(index)
       callback()
     })
   }
 }
+
+export const mapUI = new ChooseUI(
+  gameMaps.list.map(m => m.title),
+  'chooseMap'
+)
+export const huntUI = new ChooseUI(['hide', 'seek'], 'chooseHunt')

@@ -13,20 +13,6 @@ class EnemyUI extends PlayerUI {
     gameStatus.display('Fleet Destroyed', 'All  - Well Done!')
     this.board.classList.add('destroyed')
   }
-  displayAsRevealed (cell, letter) {
-    if (cell) {
-      cell.style.background =
-        gameMaps.shipColors[letter] || 'rgba(255, 209, 102, 0.3)'
-      cell.style.color = gameMaps.shipLetterColors[letter] || '#ffd166'
-      cell.textContent = letter
-    }
-  }
-  revealShip (ship) {
-    for (const [r, c] of ship.cells) {
-      const cell = this.gridCellAt(r, c)
-      this.displayAsRevealed(cell, ship.letter)
-    }
-  }
   revealAll (ships) {
     for (const ship of ships) {
       this.revealShip(ship)
@@ -35,15 +21,7 @@ class EnemyUI extends PlayerUI {
     gameStatus.display('Enemy Fleet Revealed', 'You Gave Up')
     this.board.classList.add('destroyed')
   }
-  displayAs (cell, what) {
-    cell.classList.add(what)
-    what[0].toUpperCase()
-    gameStatus.info(what[0].toUpperCase() + what.slice(1) + '!')
-  }
-  cellHit (r, c) {
-    const cell = this.gridCellAt(r, c)
-    this.displayAs(cell, 'hit')
-  }
+
   displayAsSunk (cell, letter) {
     cell.textContent = letter
     cell.style.color = gameMaps.shipLetterColors[letter] || '#fff'
@@ -61,7 +39,7 @@ class EnemyUI extends PlayerUI {
       cell.textContent = ''
       cell.style.background = ''
       cell.style.color = ''
-      cell.classList.remove('hit', 'miss', 'placed')
+      cell.classList.remove('hit', 'frd-hit', 'miss', 'placed')
     }
   }
   reset () {
