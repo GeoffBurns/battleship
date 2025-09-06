@@ -28,7 +28,7 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
     const params = new URLSearchParams()
     params.append('map', mapUI.choose.value || `0`)
 
-    window.location.href = `./battlehide.html?${params.toString()}`
+    window.location.href = `./index.html?${params.toString()}`
   }
 
   huntUI.setup(
