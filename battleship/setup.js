@@ -25,7 +25,6 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
 
   gameMaps.setTo(mapIndex)
 
-  console.log('setup ', mapName, mapIndex, gameMaps.current.title, mapChoices)
   boardSetup()
   function switchToSeek () {
     const params = new URLSearchParams()
