@@ -23,16 +23,18 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
   }, mapIndex)
 
   gameMaps.setTo(mapIndex)
+
+  console.log('setup ', mapName, mapIndex, gameMaps.current.title, mapChoices)
   boardSetup()
   function switchToSeek () {
     const params = new URLSearchParams()
-    params.append('mapName', mapUI.choose.value || `0`)
+    params.append('mapName', gameMaps.current.title)
 
     window.location.href = `./battleseek.html?${params.toString()}`
   }
   function switchToHide () {
     const params = new URLSearchParams()
-    params.append('map', mapUI.choose.value || `0`)
+    params.append('mapName', gameMaps.current.title)
 
     window.location.href = `./index.html?${params.toString()}`
   }

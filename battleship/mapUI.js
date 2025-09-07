@@ -7,7 +7,7 @@ export class ChooseUI {
     this.containerWidth = 520
   }
 
-  setup (callback, defaultIndex = 0) {
+  setup (callback, defaultIndex = 2) {
     let id = 0
     this.list.forEach(choice => {
       let option = document.createElement('option')
