@@ -89,6 +89,25 @@ class Map {
     return this.landArea.some(inRange(r, c))
   }
 }
+const defaultMap = new Map(
+  'Jaggered Coast SS',
+  7,
+  18,
+  { A: 1, B: 1, C: 1, D: 1, P: 2, G: 1, U: 1, M: 3 },
+  [
+    [2, 16, 17],
+    [2, 0, 2],
+    [2, 16, 17],
+    [3, 0, 3],
+    [3, 15, 17],
+    [4, 15, 17],
+    [5, 15, 17],
+    [6, 15, 17],
+    [4, 0, 7],
+    [5, 0, 8],
+    [6, 0, 8]
+  ]
+)
 // gameMapTypes
 class SeaAndLand {
   constructor () {
@@ -131,25 +150,7 @@ class SeaAndLand {
           [6, 0, 8]
         ]
       ),
-      new Map(
-        'Jaggered Coast SS',
-        7,
-        18,
-        { A: 1, B: 1, C: 1, D: 1, P: 2, G: 1, U: 1, M: 3 },
-        [
-          [2, 16, 17],
-          [2, 0, 2],
-          [2, 16, 17],
-          [3, 0, 3],
-          [3, 15, 17],
-          [4, 15, 17],
-          [5, 15, 17],
-          [6, 15, 17],
-          [4, 0, 7],
-          [5, 0, 8],
-          [6, 0, 8]
-        ]
-      ),
+      defaultMap,
       new Map(
         'Jaggered Coast S',
         7,
@@ -319,7 +320,7 @@ class SeaAndLand {
         ]
       )
     ]
-    this.current = this.list[2]
+    this.current = defaultMap
     this.baseShapes = [
       new Shape('U', 'H', [
         [0, 0],

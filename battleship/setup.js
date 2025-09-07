@@ -16,7 +16,8 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
   let mapIndex = gameMaps.list.findIndex(m => m.title === mapName)
   if (mapIndex < 0) mapIndex = 0
 
-  mapUI.setup(function (_index, title) {
+  mapUI.setup(function (index) {
+    const title = gameMaps.setTo(index)
     boardSetup()
     refresh()
     localStorage.setItem('geoffs-battleship.map-name', title)
@@ -29,14 +30,15 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
   function switchToSeek () {
     const params = new URLSearchParams()
     params.append('mapName', gameMaps.current.title)
-
-    window.location.href = `./battleseek.html?${params.toString()}`
+    const location = `./battleseek.html?${params.toString()}`
+    window.location.href = location
   }
   function switchToHide () {
     const params = new URLSearchParams()
     params.append('mapName', gameMaps.current.title)
 
-    window.location.href = `./index.html?${params.toString()}`
+    const location = `./index.html?${params.toString()}`
+    window.location.href = location
   }
 
   huntUI.setup(
