@@ -5,64 +5,11 @@
 }
 
 
-.panel {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    background: #0e1530;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #1b2746
-}
-
-.panel-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.tally-title {
-    color: white;
-    margin-bottom: 12px;
-    margin-top: 0px;
-}
-
-.tally-box-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 0px;
-}
-
-.info-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    margin-bottom: 8px;
-}
-
-.board-wrap {
-    background: #0e1530;
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    border: 1px solid #1b2746
-}
-
 .board-wrap.alt {
     background: #0f1c4d;
     border: 1px solid #1f4766
 }
 
-.board {
-    display: grid;
-    grid-template-columns: repeat(var(--cols), var(--boxSize));
-    grid-template-rows: repeat(var(--rows), var(--boxSize));
-    gap: 0px;
-}
 
 .board.selected {
     background: transparent;

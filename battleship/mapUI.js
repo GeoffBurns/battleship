@@ -25,8 +25,8 @@ export class ChooseUI {
   onChange (callback) {
     this.choose.addEventListener('change', function () {
       const index = this.value
-      gameMaps.setTo(index)
-      callback()
+      const title = gameMaps.setTo(index)
+      callback(index, title)
     })
   }
 }

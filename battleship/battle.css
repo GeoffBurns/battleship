@@ -1,11 +1,14 @@
 :root {
-    --content-width: 546px;
+    --content-width: 600px;
 }
 
 .battleship {
-    width: var(--content-width);
     box-sizing: border-box;
     color: #0e1530;
+}
+
+.battleship.blog {
+    width: 546px;
 }
 
 .hidden {
@@ -60,4 +63,51 @@
 .choose-select {
     font-size: 120%;
     font-weight: bold
+}
+
+.player-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.player-container.hidden {
+    display: none
+}
+
+.player-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.player-main {
+    width: var(--content-width);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.panel-container {
+    width: var(--content-width);
+}
+
+@media (max-width: 600px) {
+    game-container {
+        width: var(--content-width)
+    }
+}
+
+@media (min-width: 1024px) {
+    .player-body {
+        flex-direction: row;
+        gap: 12px;
+    }
+}
+
+
+@media (min-width: 1200px) {
+    .battleship {
+        width: 1200px;
+        margin: 0 auto;
+    }
 }

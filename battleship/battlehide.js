@@ -87,6 +87,7 @@ function onClickAuto () {
       const placed = randomPlaceShape(ship, friend.shipCellGrid)
       if (!placed) {
         friend.resetShipCells()
+        friendUI.clearVisuals()
         friendUI.placeTally(ships)
         friendUI.displayShipInfo(ships)
         ok = false

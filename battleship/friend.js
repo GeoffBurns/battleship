@@ -136,7 +136,8 @@ export class Friend extends Player {
     this.UI.board.classList.remove('destroyed')
     this.carpetBombsUsed = 0
     this.score.reset()
-    this.UI.clearClasses()
+    ///this.UI.clearClasses()
+    this.UI.clearVisuals()
     for (const ship of this.ships) {
       ship.sunk = false
       ship.hits = new Set()

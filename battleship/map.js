@@ -1,5 +1,5 @@
 export const gameHost = {
-  containerWidth: 520
+  containerWidth: 574
 }
 
 // variant helpers
@@ -447,7 +447,8 @@ class SeaAndLand {
   }
 
   setTo (index) {
-    this.current = this.list[index]
+    this.current = this.list[index || 0]
+    return this.current.title
   }
 
   sunkDescription (letter, middle = ' ') {

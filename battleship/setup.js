@@ -8,19 +8,25 @@ export function removeShortcuts () {
 export function setupDropdowns (boardSetup, refresh, huntMode) {
   // Define urlParams using the current window's search string
   const urlParams = new URLSearchParams(window.location.search)
-  const mapChoices = urlParams.getAll('map')
+  const mapChoices = urlParams.getAll('mapName')
 
-  const mapIndex = parseInt(mapChoices[0]) || 0
-  mapUI.setup(function () {
+  const mapName =
+    mapChoices[0] || localStorage.getItem('geoffs-battleship.map-name')
+
+  let mapIndex = gameMaps.list.findIndex(m => m.title === mapName)
+  if (mapIndex < 0) mapIndex = 0
+
+  mapUI.setup(function (_index, title) {
     boardSetup()
     refresh()
+    localStorage.setItem('geoffs-battleship.map-name', title)
   }, mapIndex)
 
   gameMaps.setTo(mapIndex)
   boardSetup()
   function switchToSeek () {
     const params = new URLSearchParams()
-    params.append('map', mapUI.choose.value || `0`)
+    params.append('mapName', mapUI.choose.value || `0`)
 
     window.location.href = `./battleseek.html?${params.toString()}`
   }
