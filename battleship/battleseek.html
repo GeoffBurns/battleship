@@ -18,63 +18,77 @@
   </head>
   <body>
     <div class="battleship" id="battleship-game">
-      <div class="heading-container">
-        <h1>Geoff's Battleship</h1>
-        <h3>Seek Mode</h3>
-        <div class="choose-controls">
-          <div class="choose-container choose-map-container">
-            <label for="chooseMap" class="choose-label">Choose a Map: </label>
-            <select id="chooseMap" class="choose-select"></select>
-          </div>
-          <div class="choose-container choose-hunt-container">
-            <label for="chooseHunt" class="choose-label">Hunt Mode: </label>
-            <select id="chooseHunt" class="choose-select"></select>
+      <div class="info-wrap">
+        <div class="heading-container">
+          <h1>Geoff's Battleship</h1>
+          <h3>Seek Mode</h3>
+          <div class="choose-controls">
+            <div class="choose-container choose-map-container">
+              <label for="chooseMap" class="choose-label">Choose a Map: </label>
+              <select id="chooseMap" class="choose-select"></select>
+            </div>
+            <div class="choose-container choose-hunt-container">
+              <label for="chooseHunt" class="choose-label">Hunt Mode: </label>
+              <select id="chooseHunt" class="choose-select"></select>
+            </div>
           </div>
         </div>
       </div>
-      <div class="player-container">
-        <h2 class="centered-title">Enemy Waters</h2>
-        <div class="player-body">
-          <div class="player-main">
-            <div class="board-wrap">
-              <div class="board" id="enemy-board"></div>
-            </div>
-            <div class="status" id="statusLine">
-              <div id="gameStatus" class="game-status">
-                Click On Square To Fire
-              </div>
-              <div id="modeStatus" class="mode-status">Single Shot Mode</div>
-            </div>
+
+      <div class="game-container">
+        <div class="player-container">
+          <div class="title-wrap"></div>
+          <h2 class="centered-title">Enemy Waters</h2>
           </div>
 
-          <div class="panel-container">
-            <div class="board-wrap">
-              <div class="panel">
-                <div class="panel-controls" id="seek-controls">
-                  <button class="seek-control" id="newGame" type="button">
-                    <span class="shortcut">R</span>estart
-                  </button>
-                  <button class="seek-control" id="carpetBtn" type="button">
-                    <span class="shortcut">M</span>ega Bomb
-                  </button>
-                  <button class="seek-control" id="revealBtn" type="button">
-                    Re<span class="shortcut">v</span>eal
-                  </button>
-                </div>
-                <div class="tally-box-container">
-                  <h4 class="tally-title">Tally Boxes</h4>
-                  <div id="enemy-tallyBox"></div>
-                </div>
-                <div class="info-container">
-                  <div class="info">
-                    Shots: <span id="enemy-shots">0 </span>
+          <div class="player-body">
+            <div class="player-main">
+              <div class="board-wrap">
+                <div class="board" id="enemy-board"></div>
+              </div>
+
+              <div class="info-wrap">
+                <div class="status" id="statusLine">
+                  <div id="gameStatus" class="game-status">
+                    Click On Square To Fire
                   </div>
-                  <div class="info">Hits: <span id="enemy-hits">0 </span></div>
-                  <div class="info">
-                    Sunk: <span id="enemy-sunk">0 / 8</span>
+                  <div id="modeStatus" class="mode-status">
+                    Single Shot Mode
                   </div>
-                  <div class="info" style="display: none">
-                    Placed: <span id="enemy-placed">0 </span>
+                </div>
+              </div>
+            </div>
+            <div class="panel-container">
+              <div class="board-wrap">
+                <div class="panel">
+                  <div class="panel-controls" id="seek-controls">
+                    <button class="seek-control" id="newGame" type="button">
+                      <span class="shortcut">R</span>estart
+                    </button>
+                    <button class="seek-control" id="carpetBtn" type="button">
+                      <span class="shortcut">M</span>ega Bomb
+                    </button>
+                    <button class="seek-control" id="revealBtn" type="button">
+                      Re<span class="shortcut">v</span>eal
+                    </button>
+                  </div>
+                  <div class="tally-box-container">
+                    <h4 class="tally-title">Tally Boxes</h4>
+                    <div id="enemy-tallyBox"></div>
+                  </div>
+                  <div class="info-container">
+                    <div class="info">
+                      Shots: <span id="enemy-shots">0 </span>
+                    </div>
+                    <div class="info">
+                      Hits: <span id="enemy-hits">0 </span>
+                    </div>
+                    <div class="info">
+                      Sunk: <span id="enemy-sunk">0 / 8</span>
+                    </div>
+                    <div class="info" style="display: none">
+                      Placed: <span id="enemy-placed">0 </span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -6,6 +6,20 @@
     border: 1px solid #1b2746;
 }
 
+.info-wrap {
+    background: rgb(255, 255, 238, 0.76);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ffc;
+}
+
+.title-wrap {
+    background: rgb(255, 255, 238, 0.4);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ffc;
+}
 
 .board {
     display: grid;
