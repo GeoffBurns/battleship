@@ -17,13 +17,19 @@ const friend = new Friend(friendUI)
 
 friendUI.resetBoardSize()
 
-function moveStatus (oldline, newLine) {
+function moveStatus (oldline, newLine, placement) {
   moveStatusChildren(newLine)
 
   const temp = newLine
   gameStatus.line2 = oldline
   gameStatus.line = temp
   oldline.classList.add('hidden')
+  const wrap = document.getElementById('statusLine-wrap')
+  if (placement) {
+    wrap.classList.remove('hidden')
+  } else {
+    wrap.classList.add('hidden')
+  }
 }
 function moveStatusChildren (newLine) {
   newLine.appendChild(gameStatus.game)
@@ -37,7 +43,7 @@ let removeSeekShorcuts = null
 function onClickReturnToPlacement () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.add('hidden')
-  moveStatus(gameStatus.line, gameStatus.line2)
+  moveStatus(gameStatus.line, gameStatus.line2, true)
 
   const tallyTitle = document.getElementById('tally-title')
   const tallyBox = document.getElementById('friend-tally-container')
@@ -62,7 +68,7 @@ function onClickSeek () {
   const enemyContainer = document.getElementById('enemy-container')
   enemyContainer.classList.remove('hidden')
 
-  moveStatus(gameStatus.line, gameStatus.line2)
+  moveStatus(gameStatus.line, gameStatus.line2, false)
   gameStatus.line.classList.add('small')
 
   const tallyTitle = document.getElementById('tally-title')
