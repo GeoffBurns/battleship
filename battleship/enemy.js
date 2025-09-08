@@ -91,6 +91,7 @@ class Enemy extends Player {
     if (enemy.carpetMode && enemy.carpetBombsUsed >= gameMaps.maxBombs) {
       gameStatus.info('No Mega Bombs Left - Switch To Single Shot')
 
+      enemy.setCarpetMode(false)
       return
     }
     if (enemy?.opponent?.boardDestroyed) {
