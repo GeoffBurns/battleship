@@ -1,33 +1,15 @@
-const gulp = require("gulp");
-const concat = require("gulp-concat");
-const inject = require("gulp-inject");
-const fs = require("fs");
+const gulp = require('gulp')
+const inline = require('gulp-inline')
 
-// Task: merge CSS + JS inline into HTML
-gulp.task("build", function () {
-  const cssContent = fs.readFileSync("src/style.css", "utf8");
-  const jsContent = fs.readFileSync("src/script.js", "utf8");
-
+// Task: inline CSS and JS into HTML
+gulp.task('build', function () {
   return gulp
-    .src("src/index.html")
+    .src('battleship/battleseek.html')
     .pipe(
-      inject(gulp.src([], { read: false }), {
-        starttag: "<!-- inject:css -->",
-        endtag: "<!-- endinject -->",
-        transform: function () {
-          return `<style>\n${cssContent}\n</style>`;
-        },
+      inline({
+        base: 'battleship/', // where CSS/JS files live
+        disabledTypes: [] // keep empty if you want both CSS & JS inlined
       })
     )
-    .pipe(
-      inject(gulp.src([], { read: false }), {
-        starttag: "<!-- inject:js -->",
-        endtag: "<!-- endinject -->",
-        transform: function () {
-          return `<script>\n${jsContent}\n</script>`;
-        },
-      })
-    )
-    .pipe(concat("final.html"))
-    .pipe(gulp.dest("dist"));
-});
+    .pipe(gulp.dest('dist'))
+})
