@@ -249,6 +249,7 @@ class SeaAndLandMaps {
         ]
       )
     ]
+    this.maxBombs = 3
     this.current = defaultMap
     this.baseShapes = seaAndLand.baseShapes
     this.shipSunkDescriptions = seaAndLand.shipSunkDescriptions
