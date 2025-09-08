@@ -1,10 +1,13 @@
 :root {
     --content-width: 600px;
+    --bomb-cursor-image: url('./bomb32.png');
+    --cross-cursor-image: url('./cross32.png');
+    --background-image: url("./fleet.png");
 }
 
 
 body {
-    background-image: url("./fleet.png");
+    background-image: var(--background-image);
     background-repeat: repeat;
 }
 

@@ -1,4 +1,4 @@
-import { gameMaps } from './map.js'
+import { gameMaps } from './maps.js'
 import { friendUI } from './friendUI.js'
 
 function normalize (cells) {

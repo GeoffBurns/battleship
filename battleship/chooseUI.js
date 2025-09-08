@@ -1,4 +1,4 @@
-import { gameMaps } from './map.js'
+import { gameMaps } from './maps.js'
 
 export class ChooseUI {
   constructor (list, tagetId) {

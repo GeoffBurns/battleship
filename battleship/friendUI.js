@@ -1,5 +1,6 @@
-import { gameMaps } from './map.js'
-import { gameStatus, PlayerUI, ScoreUI } from './playerUI.js'
+import { gameMaps } from './maps.js'
+import { gameStatus, PlayerUI } from './playerUI.js'
+import { ScoreUI } from './ScoreUI.js'
 import { ClickedShip, DraggedShip } from './selection.js'
 
 let lastEntered = [-1, -1]

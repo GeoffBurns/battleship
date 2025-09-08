@@ -26,6 +26,11 @@
     grid-template-columns: repeat(var(--cols), var(--boxSize));
     grid-template-rows: repeat(var(--rows), var(--boxSize));
     gap: 0px;
+    cursor: var(--cross-cursor-image) 16 16, auto;
+}
+
+.board.bomb {
+    cursor: var(--bomb-cursor-image) 26 26, pointer;
 }
 
 
@@ -47,7 +52,6 @@
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    cursor: pointer;
     box-sizing: border-box;
     position: relative;
     overflow: clip;

@@ -1,4 +1,4 @@
-import { gameMaps } from './map.js'
+import { gameMaps } from './maps.js'
 import { Player } from './player.js'
 
 export class Friend extends Player {

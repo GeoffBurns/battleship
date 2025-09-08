@@ -1,5 +1,5 @@
 import { randomPlaceShape } from './utils.js'
-import { gameMaps } from './map.js'
+import { gameMaps } from './maps.js'
 import { enemyUI } from './enemyUI.js'
 import { Player } from './player.js'
 import { gameStatus } from './playerUI.js'
@@ -12,7 +12,25 @@ class Enemy extends Player {
     this.carpetMode = false
     this.isRevealed = false
   }
+  toggleCarpetMode () {
+    this.setCarpetMode(!this.carpetMode)
+  }
+  setCarpetMode (mode) {
+    const newMode =
+      !(this.isRevealed || this.carpetBombsUsed >= gameMaps.maxBombs) && mode
+    if (newMode === this.carpetMode) return
+    this.carpetMode = newMode
+    if (this.carpetMode) {
+      this.UI.board.classList.add('bomb')
+    } else {
+      this.UI.board.classList.remove('bomb')
+    }
+    this.updateUI(enemy.ships)
+  }
 
+  isCarpetMode () {
+    return this.carpetMode && this.carpetBombsUsed >= gameMaps.maxBombs
+  }
   placeAll (ships) {
     ships = ships || this.ships
 
@@ -72,8 +90,7 @@ class Enemy extends Player {
     if (enemy.boardDestroyed || enemy.isRevealed) return // no action if game over
     if (enemy.carpetMode && enemy.carpetBombsUsed >= gameMaps.maxBombs) {
       gameStatus.info('No Mega Bombs Left - Switch To Single Shot')
-      enemy.carpetMode = false
-      enemy.updateUI(enemy.ships)
+
       return
     }
     if (enemy?.opponent?.boardDestroyed) {
@@ -135,29 +152,29 @@ class Enemy extends Player {
   updateBombStatus () {
     gameStatus.displayBombStatus(this.carpetBombsUsed)
     if (this.carpetBombsUsed >= gameMaps.maxBombs) {
-      this.carpetMode = false
+      this.setCarpetMode(false)
       gameStatus.display('Single Shot Mode')
     }
   }
 
   onClickCarpetMode () {
-    if (!enemy.isRevealed && enemy.carpetBombsUsed < gameMaps.maxBombs) {
-      enemy.carpetMode = !enemy.carpetMode
-      enemy.updateUI(enemy.ships)
-    }
+    this.toggleCarpetMode()
   }
   onClickReveal () {
-    if (!enemy.isRevealed) {
-      enemy.revealAll()
-      enemy.updateUI(enemy.ships)
+    if (!this.isRevealed) {
+      this.revealAll()
+      this.updateUI(enemy.ships)
     }
   }
   wireupButtons () {
-    this.UI.carpetBtn.addEventListener('click', enemy.onClickCarpetMode)
-    this.UI.revealBtn.addEventListener('click', enemy.onClickReveal)
+    this.UI.carpetBtn.addEventListener(
+      'click',
+      enemy.onClickCarpetMode.bind(enemy)
+    )
+    this.UI.revealBtn.addEventListener('click', enemy.onClickReveal.bind(enemy))
   }
   resetModel () {
-    this.carpetMode = false
+    this.setCarpetMode(false)
     this.carpetBombsUsed = 0
     this.boardDestroyed = false
     this.isRevealed = false

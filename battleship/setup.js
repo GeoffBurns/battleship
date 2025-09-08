@@ -1,5 +1,5 @@
-import { mapUI, huntUI } from './mapUI.js'
-import { gameMaps } from './map.js'
+import { mapUI, huntUI } from './chooseUI.js'
+import { gameMaps } from './maps.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')

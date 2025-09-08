@@ -5,7 +5,8 @@
   "main": "battlehide.js",
   "scripts": {
     "lint": "eslint battleship/",
-    "dup": "pmd cpd --minimum-tokens 50 --dir ./battleship/ --language ecmascript"
+    "dup": "pmd cpd --minimum-tokens 50 --dir ./battleship/ --language ecmascript",
+    "bundle": "node merge.js"
   },
   "repository": {
     "type": "git",

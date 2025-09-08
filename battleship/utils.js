@@ -1,4 +1,4 @@
-import { gameMaps } from './map.js'
+import { gameMaps } from './maps.js'
 
 function shuffleArray (array) {
   for (let i = array.length - 1; i > 0; i--) {

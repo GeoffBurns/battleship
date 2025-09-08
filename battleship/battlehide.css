@@ -4,6 +4,15 @@
     margin-bottom: 12px;
 }
 
+[draggable="true"] {
+    cursor: grab;
+    /* before drag */
+}
+
+[draggable="true"]:active {
+    cursor: grabbing;
+    /* while dragging */
+}
 
 .board-wrap.alt {
     background: #0f1c4d;
