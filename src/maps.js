@@ -1,13 +1,8 @@
 import { Map } from './map.js'
-import { Shape } from './Shape.js'
-
+import { seaAndLand } from './Shape.js'
 export const gameHost = {
   containerWidth: 574
 }
-
-// geometry helper
-export const inRange = (r, c) => element =>
-  element[0] == r && element[1] <= c && element[2] >= c
 
 const jaggedXS = new Map(
   'Jaggered Coast XS',
@@ -147,7 +142,7 @@ const jaggedML = new Map(
   ]
 )
 // gameMapTypes
-class SeaAndLand {
+class SeaAndLandMaps {
   constructor () {
     this.list = [
       jaggedXS,
@@ -255,181 +250,19 @@ class SeaAndLand {
       )
     ]
     this.current = defaultMap
-    this.baseShapes = [
-      new Shape('U', 'H', [
-        [0, 0],
-        [1, 0],
-        [1, 1],
-        [1, 2],
-        [1, 3],
-        [1, 4],
-        [0, 4]
-      ]),
-      new Shape('G', 'S', [
-        [0, 0],
-        [1, 1],
-        [0, 2],
-        [2, 0],
-        [2, 2]
-      ]),
-      new Shape('R', 'H', [
-        [0, 0],
-        [1, 0],
-        [2, 0],
-        [2, 1],
-        [2, 2]
-      ]),
-      new Shape('A', 'A', [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [1, 1],
-        [1, 2],
-        [1, 3],
-        [1, 4]
-      ]),
-      new Shape('J', 'H', [
-        [1, 0],
-        [1, 1],
-        [2, 0],
-        [2, 1],
-        [2, 2]
-      ]),
-      new Shape('H', 'N', [
-        [0, 1],
-        [1, 0],
-        [1, 1],
-        [1, 2],
-        [2, 1]
-      ]),
-      new Shape('P', 'H', [
-        [0, 1],
-        [1, 0],
-        [1, 1],
-        [1, 2]
-      ]),
-      new Shape('T', 'L', [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [0, 4],
-        [0, 5]
-      ]),
-      new Shape('B', 'L', [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3],
-        [0, 4]
-      ]),
-      new Shape('O', 'N', [
-        [0, 0],
-        [0, 1],
-        [1, 0],
-        [1, 1]
-      ]),
-      new Shape('C', 'L', [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [0, 3]
-      ]),
-      new Shape('D', 'L', [
-        [0, 0],
-        [0, 1],
-        [0, 2]
-      ]),
-      new Shape('S', 'L', [
-        [0, 0],
-        [0, 1]
-      ])
-    ]
-    this.shapesByLetter = Object.fromEntries(
-      this.baseShapes.map(base => [base.letter, base])
-    )
-    this.shipSunkDescriptions = {
-      A: 'Shot Down',
-      G: 'Destroyed',
-      S: 'Sunk'
-    }
-    this.shipLetterColors = {
-      A: '#ff6666',
-      T: '#ffccff',
-      B: '#66ccff',
-      C: '#66ff66',
-      O: '#33cc99',
-      D: '#ffcc66',
-      H: '#ff6699',
-      J: '#ff884d',
-      P: '#cc99ff',
-      G: '#ff99cc',
-      R: '#6699ff',
-      U: '#ffff66',
-      M: '#ffd166'
-    }
-    this.shipDescription = {
-      A: 'Aircraft Carrier',
-      T: 'Tanker',
-      B: 'Battleship',
-      C: 'Cruiser',
-      O: 'Oil Rig',
-      D: 'Destroyer',
-      S: 'Submarine',
-      H: 'Helicopter',
-      J: 'Fighter Jet',
-      P: 'Airplane',
-      G: 'Anti-Aircraft Gun',
-      R: 'Radar Station',
-      U: 'Underground Bunker'
-    }
-    this.shipTypes = {
-      A: 'S',
-      T: 'S',
-      B: 'S',
-      C: 'S',
-      O: 'S',
-      D: 'S',
-      S: 'S',
-      H: 'A',
-      J: 'A',
-      P: 'A',
-      G: 'G',
-      R: 'G',
-      U: 'G'
-    }
-    this.maxBombs = 3
-    this.shipColors = {
-      A: 'rgba(255,102,102,0.3)',
-      B: 'rgba(102,204,255,0.3)',
-      C: 'rgba(102,255,102,0.3)',
-      D: 'rgba(255,204,102,0.3)',
-      P: 'rgba(204,153,255,0.3)',
-      G: 'rgba(255,153,204,0.3)',
-      U: 'rgba(255,255,102,0.3)',
-      T: 'rgba(255,204,255,0.3)',
-      O: 'rgba(51,204,153,0.3)',
-      H: 'rgba(255,102,153,0.3)',
-      J: 'rgba(255,136,77,0.3)',
-      R: 'rgba(102,153,255,0.3)'
-    }
-    this.shapesByLetter = Object.fromEntries(
-      this.baseShapes.map(base => [base.letter, base])
-    )
+    this.baseShapes = seaAndLand.baseShapes
+    this.shipSunkDescriptions = seaAndLand.shipSunkDescriptions
+    this.shipLetterColors = seaAndLand.shipLetterColors
+    this.shipDescription = seaAndLand.shipDescription
+    this.shipTypes = seaAndLand.shipTypes
+    this.shipColors = seaAndLand.shipColors
+    this.shipDescription = seaAndLand.shipDescription
+    this.shapesByLetter = seaAndLand.shapesByLetter
   }
 
   setTo (index) {
     this.current = this.list[index]
     return this.current.title
-  }
-
-  sunkDescription (letter, middle = ' ') {
-    return (
-      this.shipDescription[letter] +
-      middle +
-      this.shipSunkDescriptions[this.shipTypes[letter]]
-    )
   }
 
   inBounds (r, c) {
@@ -445,6 +278,6 @@ class SeaAndLand {
   }
 }
 
-const seaAndLand = new SeaAndLand()
+const seaAndLandMaps = new SeaAndLandMaps()
 
-export const gameMaps = seaAndLand
+export const gameMaps = seaAndLandMaps

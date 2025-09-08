@@ -1,4 +1,6 @@
-import { inRange } from './maps.js'
+// geometry helper
+export const inRange = (r, c) => element =>
+  element[0] == r && element[1] <= c && element[2] >= c
 
 export class Map {
   constructor (title, rows, cols, shipNum, landArea) {
