@@ -1,4 +1,5 @@
 import { gameMaps } from './maps.js'
+import { terrain } from './Shape.js'
 
 export class Ship {
   constructor (id, symmetry, letter) {
@@ -106,7 +107,7 @@ export class Ship {
     return gameMaps.shapesByLetter[this.letter]
   }
   sunkDescription (middle = ' ') {
-    return gameMaps.sunkDescription(this.letter, middle)
+    return terrain.current.sunkDescription(this.letter, middle)
   }
   type () {
     return gameMaps.shipTypes[this.letter]
