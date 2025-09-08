@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Geoff's Battleship</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      header {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: #0e1530;
+        color: white;
+      }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        padding: 2rem;
+        background: #f5f5f5;
+        text-align: center;
+        font-weight: 900;
+      }
+
+      .gallery img {
+        width: 100%;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .gallery img:hover {
+        transform: scale(1.12);
+      }
+
+      footer {
+        text-align: center;
+        padding: 2rem;
+        background: #0e1530;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Geoff's Battleship</h1>
+      <h2>Recreation of a childhood memory using javascript</h2>
+      <p>
+        Play a challenging version of Battleship with no-touch placement rules
+        and special ships.
+      </p>
+    </header>
+
+    <!-- Image Gallery Navigation -->
+    <div class="gallery">
+      <a
+        href="https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html"
+        ><img src="./landing/battle-blog.png" alt="About" />About</a
+      >
+      <a href="https://geoffburns.github.io/battleship/src/battleseek.html"
+        ><img src="./landing/seek-game.png" alt="Seek Game" />Seek Game</a
+      >
+      <a href="https://geoffburns.github.io/battleship/src/"
+        ><img src="./landing/hide-game.png" alt="Hide and Seek Game" />Hide and
+        Seek Game</a
+      >
+      <a href="https://github.com/GeoffBurns/battleship"
+        ><img src="./landing/battleship-code.png" alt="Source Code" />Source
+        Code</a
+      >
+    </div>
+
+    <footer>
+      <p>© 2025 Geoff Burns</p>
+    </footer>
+  </body>
+</html>
