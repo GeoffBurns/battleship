@@ -1,4 +1,4 @@
-import { Map } from './Map.js'
+import { Map } from './map.js'
 import { Shape } from './Shape.js'
 
 export const gameHost = {
