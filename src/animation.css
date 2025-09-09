@@ -3,6 +3,10 @@
     --flame2-image: url('flame_24.png');
     --flame-duration: 0.4s;
     --flame2-duration: 0.7s;
+    --content-width: 600px;
+    --bomb-cursor-image: url('./bomb32.png');
+    --cross-cursor-image: url('./cross32.png');
+    --background-image: url('./fleet.png');
 }
 
 .cell.flames::before {
