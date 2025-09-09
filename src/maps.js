@@ -5,7 +5,7 @@ export const gameHost = {
 }
 
 const jaggedXS = new Map(
-  'Jaggered Coast XS',
+  'Jagged Coast XS',
   6,
   18,
   { A: 0, B: 1, C: 1, D: 1, P: 2, G: 1, U: 1, M: 3 },
@@ -25,7 +25,7 @@ const jaggedXS = new Map(
 )
 
 const jaggedVS = new Map(
-  'Jaggered Coast VS',
+  'Jagged Coast VS',
   7,
   16,
   { A: 1, B: 1, C: 1, D: 1, P: 1, G: 1, U: 1, M: 3 },
@@ -45,7 +45,7 @@ const jaggedVS = new Map(
 )
 
 const jaggedSS = new Map(
-  'Jaggered Coast SS',
+  'Jagged Coast SS',
   7,
   18,
   { A: 1, B: 1, C: 1, D: 1, P: 2, G: 1, U: 1, M: 3 },
@@ -67,7 +67,7 @@ const jaggedSS = new Map(
 const defaultMap = jaggedSS
 
 const jaggedS = new Map(
-  'Jaggered Coast S',
+  'Jagged Coast S',
   7,
   19,
   { A: 1, B: 1, C: 1, D: 2, P: 2, G: 1, U: 1, M: 3 },
@@ -87,7 +87,7 @@ const jaggedS = new Map(
 )
 
 const jaggedMS = new Map(
-  'Jaggered Coast MS',
+  'Jagged Coast MS',
   8,
   18,
   { A: 1, B: 1, C: 1, D: 2, P: 2, G: 1, U: 1, M: 3 },
@@ -107,7 +107,7 @@ const jaggedMS = new Map(
 )
 
 const jaggedM = new Map(
-  'Jaggered Coast M',
+  'Jagged Coast M',
   9,
   17,
   { A: 1, B: 1, C: 1, D: 1, P: 2, G: 2, U: 1, M: 3 },
@@ -125,7 +125,7 @@ const jaggedM = new Map(
 )
 
 const jaggedML = new Map(
-  'Jaggered Coast ML',
+  'Jagged Coast ML',
   9,
   18,
   { A: 1, B: 1, C: 1, D: 2, P: 2, G: 2, U: 1, M: 3 },
@@ -153,7 +153,7 @@ class SeaAndLandMaps {
       jaggedM,
       jaggedML,
       new Map(
-        'Jaggered Coast L',
+        'Jagged Coast L',
         10,
         18,
         { A: 1, B: 1, C: 2, D: 2, P: 2, G: 2, U: 1, M: 3 },
@@ -184,7 +184,7 @@ class SeaAndLandMaps {
         ]
       ),
       new Map(
-        'Jaggered Coast LL',
+        'Jagged Coast LL',
         10,
         20,
         { A: 1, B: 1, C: 2, D: 2, P: 3, G: 2, U: 1, M: 3 },
@@ -215,7 +215,7 @@ class SeaAndLandMaps {
         ]
       ),
       new Map(
-        'Jaggered Coast VL',
+        'Jagged Coast VL',
         10,
         21,
         { A: 1, B: 1, C: 2, D: 2, P: 4, G: 2, U: 1, M: 3 },
@@ -232,7 +232,7 @@ class SeaAndLandMaps {
         ]
       ),
       new Map(
-        'Jaggered Coast XL',
+        'Jagged Coast XL',
         10,
         22,
         { A: 1, B: 1, C: 2, D: 3, P: 4, G: 2, U: 1, M: 3 },
