@@ -381,7 +381,7 @@ export class FriendUI extends PlayerUI {
     gameStatus.clear()
     const infoList = [
       'Drag ships from the trays onto the board.',
-      'Click a ship in the tray to select it, then click on the board to place it.',
+      'Click a ship in the tray to select it, then click on the buttons to rotate and flip',
       'While a ship is selected, use the rotate, rotate left and flip buttons to change its orientation.',
       'You can also use modifier keys while dragging: Control (or Command on Mac) to rotate left, Option (or Alt) to flip, Shift to rotate right.',
       'Use the undo button to remove the last placed ship.',
@@ -398,7 +398,7 @@ export class FriendUI extends PlayerUI {
         gameStatus.info(infoList[index])
         index = (index + 1) % infoList.length
       }
-    }, 10000)
+    }, 13000)
   }
   readyMode () {
     this.placing = false
