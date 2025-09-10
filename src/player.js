@@ -1,6 +1,7 @@
 import { gameMaps } from './maps.js'
 import { gameStatus } from './playerUI.js'
 import { Score } from './Score.js'
+import { terrain } from './Shape.js'
 import { Ship } from './Ship.js'
 
 export class Player {
@@ -74,9 +75,11 @@ export class Player {
   }
   sunkLetterDescription (letter) {
     if (this.opponent) {
-      return this.preamble0 + ' ' + gameMaps.sunkDescription(letter, ' was ')
+      return (
+        this.preamble0 + ' ' + terrain.current.sunkDescription(letter, ' was ')
+      )
     }
-    return gameMaps.sunkDescription(letter)
+    return terrain.current.sunkDescription(letter)
   }
   sunkWarning (ship) {
     this.displayInfo(this.sunkDescription(ship))

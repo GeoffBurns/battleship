@@ -24,6 +24,7 @@ function moveStatus (oldline, newLine, placement) {
   gameStatus.line2 = oldline
   gameStatus.line = temp
   oldline.classList.add('hidden')
+  newLine.classList.remove('hidden')
   const wrap = document.getElementById('statusLine-wrap')
   if (placement) {
     wrap.classList.remove('hidden')
@@ -81,6 +82,7 @@ function onClickSeek () {
 
   friend.restartBoard()
   friend.updateUI(friend.ships)
+
   removeSeekShorcuts = setupEnemy(onClickReturnToPlacement, resetFriendBoard)
   enemy.UI.resetBoardSize()
   newGame()

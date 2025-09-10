@@ -7,6 +7,7 @@
     --bomb-cursor-image: url('./bomb32.png');
     --cross-cursor-image: url('./cross32.png');
     --background-image: url('./fleet.png');
+    --logo-image: url('./logo2.png');
 }
 
 .cell.flames::before {

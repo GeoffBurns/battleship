@@ -115,15 +115,16 @@ export class PlayerUI {
     cell.dataset.c = c
 
     if (onClickCell) {
-      cell.addEventListener('click', () => onClickCell(r, c))
+      cell.addEventListener('click', onClickCell)
     }
     this.board.appendChild(cell)
   }
-  buildBoard (onClickCell) {
+  buildBoard (onClickCell, thisRef) {
     this.board.innerHTML = ''
     for (let r = 0; r < gameMaps.current.rows; r++) {
       for (let c = 0; c < gameMaps.current.cols; c++) {
-        this.buildCell(r, c, onClickCell)
+        if (onClickCell) this.buildCell(r, c, onClickCell.bind(thisRef, r, c))
+        else this.buildCell(r, c, null)
       }
     }
   }

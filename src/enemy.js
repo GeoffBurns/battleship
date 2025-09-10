@@ -7,10 +7,11 @@ import { gameStatus } from './playerUI.js'
 class Enemy extends Player {
   constructor (enemyUI) {
     super(enemyUI)
-    this.preamble = 'Enemy'
+    this.preamble0 = 'Enemy'
     this.preamble = 'The enemy was '
     this.carpetMode = false
     this.isRevealed = false
+    this.timeoutId = null
   }
   toggleCarpetMode () {
     this.setCarpetMode(!this.carpetMode)
@@ -46,7 +47,6 @@ class Enemy extends Player {
           break
         }
       }
-
       if (ok) return true
     }
 
@@ -59,16 +59,11 @@ class Enemy extends Player {
     this.boardDestroyed = true
     this.isRevealed = true
   }
-  updateUI (ships) {
-    ships = ships || this.ships
-    // stats
-    this.UI.score.display(ships, this.score.noOfShots())
-    // mode
-    if (this.isRevealed) {
-      /// this.UI.modeStatus.textContent = 'Enemy Fleet Revealed' // already done
-    } else if (this.boardDestroyed) {
-      /// this.UI.displayFleetSunk() // already done
-    } else if (this.carpetMode) {
+  updateMode () {
+    if (this.isRevealed || this.boardDestroyed) {
+      return
+    }
+    if (this.carpetMode) {
       gameStatus.displayBombStatus(
         this.carpetBombsUsed,
         'Click On Square To Drop Bomb'
@@ -78,6 +73,13 @@ class Enemy extends Player {
       this.UI.carpetBtn.innerHTML = '<span class="shortcut">M</span>ega Bomb'
       gameStatus.display('Single Shot Mode', 'Click On Square To Fire')
     }
+  }
+  updateUI (ships) {
+    ships = ships || this.ships
+    // stats
+    this.UI.score.display(ships, this.score.noOfShots())
+    // mode
+
     // buttons
     this.UI.carpetBtn.disabled =
       this.boardDestroyed ||
@@ -87,18 +89,22 @@ class Enemy extends Player {
     this.updateTally(this.ships, this.carpetBombsUsed, this.score.noOfShots())
   }
   onClickCell (r, c) {
-    if (enemy.boardDestroyed || enemy.isRevealed) return // no action if game over
-    if (enemy.carpetMode && enemy.carpetBombsUsed >= gameMaps.maxBombs) {
+    if (this.boardDestroyed || this.isRevealed) return // no action if game over
+    if (this.carpetMode && this.carpetBombsUsed >= gameMaps.maxBombs) {
       gameStatus.info('No Mega Bombs Left - Switch To Single Shot')
 
-      enemy.setCarpetMode(false)
+      this.setCarpetMode(false)
       return
     }
-    if (enemy?.opponent?.boardDestroyed) {
+    if (this.timeoutId) {
+      gameStatus.info('Wait For Enemy To Finish Their Turn')
+      return
+    }
+    if (this?.opponent?.boardDestroyed) {
       gameStatus.info('Game Over - No More Shots Allowed')
       return
     }
-    enemy.tryFireAt(r, c)
+    this.tryFireAt(r, c)
   }
   tryFireAt (r, c) {
     if (!this.score.newShotKey(r, c) && !this.carpetMode) {
@@ -107,14 +113,19 @@ class Enemy extends Player {
     }
     this.fireAt(r, c)
     this.updateUI()
-    if (enemy?.opponent) {
-      enemy.opponent.seekStep()
+    if (this?.opponent && !this.opponent.boardDestroyed) {
+      this.timeoutId = setTimeout(() => {
+        this.timeoutId = null
+        this.opponent.seekStep()
+      }, 1000)
+      //
     }
     return true
   }
   fireAt (r, c) {
     if (this.carpetMode) {
       // Mega Bomb mode: affect 3x3 area centered on (r,c)
+      this.updateMode()
       if (this.carpetBombsUsed >= gameMaps.maxBombs) {
         return
       }
@@ -128,6 +139,7 @@ class Enemy extends Player {
     let hits = 0
     let sunks = ''
     this.carpetBombsUsed++
+    this.updateMode()
     ;({ hits, sunks } = this.dropBomb(r, c, hits, sunks))
     // update status
     this.updateResultsOfBomb(hits, sunks)
@@ -160,6 +172,7 @@ class Enemy extends Player {
 
   onClickCarpetMode () {
     this.toggleCarpetMode()
+    this.updateMode()
   }
   onClickReveal () {
     if (!this.isRevealed) {
@@ -183,7 +196,7 @@ class Enemy extends Player {
     this.ships = this.createShips()
   }
   buildBoard () {
-    this.UI.buildBoard(enemy.onClickCell)
+    this.UI.buildBoard(this.onClickCell, this)
 
     // update destroyed state class
     this.UI.board.classList.toggle('destroyed', this.boardDestroyed)
@@ -191,6 +204,7 @@ class Enemy extends Player {
   resetUI (ships) {
     this.UI.reset()
     // this.UI.clearVisuals()
+
     this.buildBoard()
     this.placeAll(ships)
     this.updateUI(ships)

@@ -208,6 +208,10 @@ export class FriendUI extends PlayerUI {
   }
   dragStart (dragShip, ship) {
     dragShip.addEventListener('dragstart', e => {
+      if (e.target !== e.currentTarget) {
+        return
+      }
+
       const shipElement = e.currentTarget
       const rect = shipElement.getBoundingClientRect()
       const offsetX = e.clientX - rect.left
@@ -375,7 +379,26 @@ export class FriendUI extends PlayerUI {
       panel.classList.remove('alt')
     }
     gameStatus.clear()
-    gameStatus.info('drag ships onto board')
+    const infoList = [
+      'Drag ships from the trays onto the board.',
+      'Click a ship in the tray to select it, then click on the board to place it.',
+      'While a ship is selected, use the rotate, rotate left and flip buttons to change its orientation.',
+      'You can also use modifier keys while dragging: Control (or Command on Mac) to rotate left, Option (or Alt) to flip, Shift to rotate right.',
+      'Use the undo button to remove the last placed ship.',
+      'Once all ships are placed, you can test your placement or start a game against the computer.'
+    ]
+    let index = 0
+
+    gameStatus.info(infoList[0])
+    let placingInfo = setInterval(() => {
+      if (this.placing === false) {
+        clearInterval(placingInfo)
+        placingInfo = null
+      } else {
+        gameStatus.info(infoList[index])
+        index = (index + 1) % infoList.length
+      }
+    }, 10000)
   }
   readyMode () {
     this.placing = false

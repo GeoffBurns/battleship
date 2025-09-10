@@ -3,7 +3,6 @@
     justify-content: space-between;
     gap: 16px;
     font-weight: bold;
-    height: 52px;
     margin-bottom: 30px;
     margin-top: 45px;
     color: #111;
@@ -12,7 +11,6 @@
 
 .status.medium {
     font-weight: bold;
-    height: 52px;
     margin-bottom: 15px;
     margin-top: 15px;
     color: #111;

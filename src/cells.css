@@ -14,7 +14,14 @@
     border: 1px solid #ffc;
 }
 
+.info-wrap.info-top {
+    border-radius: 0 0 10px 10px;
+}
+
 .title-wrap {
+    width: var(--content-width);
+    margin: 0 auto;
+    box-sizing: border-box;
     background: rgb(255, 255, 238, 0.4);
     padding: 12px;
     border-radius: 10px;

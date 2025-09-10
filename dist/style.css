@@ -1,4 +1,3 @@
-
 /* ----- ./src/animation.css ----- */
 
 :root {
@@ -132,6 +131,7 @@
         filter: brightness(100%);
     }
 }
+
 /* ----- ./src/battle.css ----- */
 
 :root {
@@ -267,97 +267,99 @@ body {
         margin: 0 auto;
     }
 }
+
 /* ----- ./src/panel.css ----- */
 
- .panel {
-     display: flex;
-     justify-content: space-between;
-     gap: 16px;
- }
+.panel {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
 
- .panel-controls {
-     display: flex;
-     flex-direction: column;
-     gap: 8px;
- }
+.panel-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
- .tally-title {
-     color: white;
-     margin-bottom: 6px;
-     margin-top: 0px;
- }
+.tally-title {
+    color: white;
+    margin-bottom: 6px;
+    margin-top: 0px;
+}
 
- .tally-box-container {
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     gap: 8px;
-     margin-bottom: 8px;
- }
+.tally-box-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
 
- .info-container {
-     display: flex;
-     flex-direction: column;
-     align-items: flex-start;
-     gap: 4px;
-     margin-bottom: 8px;
- }
+.info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 8px;
+}
 
- .tally-row {
-     display: flex;
-     gap: 6px;
-     align-items: center
- }
+.tally-row {
+    display: flex;
+    gap: 6px;
+    align-items: center
+}
 
- .tally-col {
-     display: flex;
-     flex-direction: column;
-     gap: 6px;
- }
+.tally-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
 
- .tally-box {
-     width: 28px;
-     height: 22px;
-     border-radius: 4px;
-     border: 1px solid rgba(200, 210, 240, 0.06);
-     display: grid;
-     place-items: center;
-     font-weight: 700;
- }
+.tally-box {
+    width: 28px;
+    height: 22px;
+    border-radius: 4px;
+    border: 1px solid rgba(200, 210, 240, 0.06);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+}
 
- button {
-     padding: 8px 10px;
-     border-radius: 8px;
-     border: none;
-     background: #2b4066;
-     color: #aaccff;
-     cursor: pointer;
- }
+button {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: none;
+    background: #2b4066;
+    color: #aaccff;
+    cursor: pointer;
+}
 
- button:disabled {
-     opacity: 0.45;
-     cursor: not-allowed;
- }
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
 
- span.shortcut {
-     color: #fff;
-     font-weight: 900;
- }
+span.shortcut {
+    color: #fff;
+    font-weight: 900;
+}
 
- .info {
-     color: #fff;
- }
+.info {
+    color: #fff;
+}
 
- h2 {
-     margin: 0 0 12px 0;
- }
+h2 {
+    margin: 0 0 12px 0;
+}
 
 
- @media (min-width: 1024px) {
-     .panel {
-         align-self: flex-start;
-     }
- }
+@media (min-width: 1024px) {
+    .panel {
+        align-self: flex-start;
+    }
+}
+
 /* ----- ./src/cells.css ----- */
 
 .board-wrap {
@@ -375,6 +377,11 @@ body {
     margin-bottom: 12px;
     border: 1px solid #ffc;
 }
+
+.info-wrap.info-top {
+    border-radius: 0 0 10px 10px !important;
+}
+
 
 .title-wrap {
     background: rgb(255, 255, 238, 0.4);
@@ -460,6 +467,7 @@ body {
 .cell.leftEdge.dark {
     border-left: 2px solid #000;
 }
+
 /* ----- ./src/status.css ----- */
 
 .status {
@@ -503,6 +511,7 @@ body {
 .mode-status {
     text-align: right;
 }
+
 /* ----- ./src/battleseek.css ----- */
 
 .centered-title {

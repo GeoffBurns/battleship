@@ -5,24 +5,44 @@
     <title>Geoff's Battleship</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+      :root {
+        --background-image: url('./landing/space-battle.png');
+        --logo-image: url('./src/logo2.png');
+      }
       body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        justify-content: space-between;
         margin: 0;
         font-family: Arial, sans-serif;
+
+        background-image: var(--background-image);
+        background-repeat: repeat;
       }
 
       header {
         text-align: center;
         padding: 2rem 1rem;
-        background: #0e1530;
+
+        background-color: RGB(19, 26, 35, 0.8);
         color: white;
+
+        -webkit-backdrop-filter: blur(10px);
+        /* Safari 9+, iOS 9+ */
+        backdrop-filter: blur(10px);
+      }
+      a {
+        text-decoration: none;
+        color: #0e1530;
+        font-weight: 900;
       }
 
       .gallery {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
+        gap: 2rem;
         padding: 2rem;
-        background: #f5f5f5;
         text-align: center;
         font-weight: 900;
       }
@@ -33,7 +53,20 @@
         cursor: pointer;
         transition: transform 0.2s;
       }
+      .gallery a {
+        width: 100%;
+        border-radius: 12px;
+        padding: 0.5rem 0.3rem;
+        cursor: pointer;
+        transition: transform 0.2s;
 
+        background-color: RGB(255, 255, 255, 0.8);
+        color: RGB(19, 26, 35);
+
+        -webkit-backdrop-filter: blur(10px);
+        /* Safari 9+, iOS 9+ */
+        backdrop-filter: blur(10px);
+      }
       .gallery a:hover {
         transform: scale(1.12);
       }
@@ -41,13 +74,17 @@
       footer {
         text-align: center;
         padding: 2rem;
-        background: #0e1530;
+        background-color: RGB(19, 26, 35, 0.8);
         color: white;
+        -webkit-backdrop-filter: blur(10px);
+        /* Safari 9+, iOS 9+ */
+        backdrop-filter: blur(10px);
       }
     </style>
   </head>
   <body>
     <header>
+      <picture><img src="./src/logo2.png" width="120" height="120" /></picture>
       <h1>Geoff's Battleship</h1>
       <h2>Recreation of a childhood memory using javascript</h2>
       <p>

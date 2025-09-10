@@ -9,7 +9,9 @@
       name="description"
       content="Play a challenging version of Battleship with no-touch placement rules and special ships."
     />
+
     <link rel="stylesheet" href="animation.css" />
+    <link rel="stylesheet" href="tab.css" />
     <link rel="stylesheet" href="battle.css" />
     <link rel="stylesheet" href="panel.css" />
     <link rel="stylesheet" href="cells.css" />
@@ -18,18 +20,33 @@
   </head>
   <body>
     <div class="battleship" id="battleship-game">
-      <div class="info-wrap">
+      <div class="tab-bar-container">
+        <a href="https://geoffburns.github.io/battleship">
+          <img src="./logo3.png" alt="Battleship Logo" width="60" height="60"
+        /></a>
+        <div class="title-header">
+          <h3>Geoff's Battleship</h3>
+        </div>
+        <nav class="tab-bar">
+          <a
+            href="https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html"
+          >
+            About</a
+          >
+          <a class="you-are-here" href="#"> Seek Game</a>
+          <button class="tab-link" id="tab-hide" type="button">
+            Hide and Seek Game
+          </button>
+
+          <a href="https://github.com/GeoffBurns/battleship"> Source Code</a>
+        </nav>
+      </div>
+      <div class="info-wrap info-top">
         <div class="heading-container">
-          <h1>Geoff's Battleship</h1>
-          <h3>Seek Mode</h3>
           <div class="choose-controls">
             <div class="choose-container choose-map-container">
               <label for="chooseMap" class="choose-label">Choose a Map: </label>
               <select id="chooseMap" class="choose-select"></select>
-            </div>
-            <div class="choose-container choose-hunt-container">
-              <label for="chooseHunt" class="choose-label">Hunt Mode: </label>
-              <select id="chooseHunt" class="choose-select"></select>
             </div>
           </div>
         </div>

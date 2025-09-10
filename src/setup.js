@@ -1,4 +1,4 @@
-import { mapUI, huntUI } from './chooseUI.js'
+import { mapUI } from './chooseUI.js'
 import { gameMaps } from './maps.js'
 
 export function removeShortcuts () {
@@ -40,6 +40,14 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
     window.location.href = location
   }
 
+  if (huntMode === 'seek')
+    document.getElementById('tab-hide').addEventListener('click', switchToHide)
+
+  if (huntMode === 'hide')
+    document.getElementById('tab-seek').addEventListener('click', switchToSeek)
+}
+
+/* --- IGNORE ---
   huntUI.setup(
     function () {
       switch (huntUI.choose.value) {
@@ -56,4 +64,4 @@ export function setupDropdowns (boardSetup, refresh, huntMode) {
     },
     huntMode === 'hide' ? 0 : 1
   )
-}
+--- IGNORE --- */

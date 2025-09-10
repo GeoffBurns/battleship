@@ -6,6 +6,7 @@ export function newGame () {
   if (otherboard) otherboard()
   enemy.resetModel()
   enemy.resetUI(enemy.ships)
+  enemy.updateMode()
 }
 
 function setupSeekShortcuts (placement) {

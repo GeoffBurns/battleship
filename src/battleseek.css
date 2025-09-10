@@ -1,11 +1,7 @@
 .centered-title {
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 12px;
+    margin: 0;
 }
-
-
-
 
 a img.drop-cap {
     background: transparent;

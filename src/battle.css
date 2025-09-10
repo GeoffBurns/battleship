@@ -118,8 +118,11 @@ body {
 
 
 @media (min-width: 1200px) {
-    .battleship {
-        width: 1200px;
+
+    .battleship,
+    .title-wrap,
+    .center-title {
+        width: 1200px !important;
         margin: 0 auto;
     }
 }

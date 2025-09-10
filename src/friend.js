@@ -1,5 +1,6 @@
 import { gameMaps } from './maps.js'
 import { Player } from './player.js'
+import { gameStatus } from './playerUI.js'
 
 export class Friend extends Player {
   constructor (friendUI) {
@@ -145,6 +146,7 @@ export class Friend extends Player {
     }
   }
   test () {
+    gameStatus.display('', '')
     this.UI.testMode()
     this.UI.testBtn.disabled = true
     this.UI.seekBtn.disabled = true
