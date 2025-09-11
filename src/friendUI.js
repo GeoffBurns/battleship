@@ -32,7 +32,7 @@ export function removeSelection () {
 export class FriendUI extends PlayerUI {
   constructor () {
     super()
-    this.placing = true
+    this.placingShips = true
     this.board = document.getElementById('friend-board')
     this.score = new ScoreUI('friend')
     this.newPlacementBtn = document.getElementById('newPlacement')
@@ -342,18 +342,15 @@ export class FriendUI extends PlayerUI {
   }
   onClickTrayItem (dragShip, ship) {
     dragShip.addEventListener('click', e => {
-      console.log('click')
       const shipElement = e.currentTarget
       this.assignClicked(ship, shipElement)
     })
   }
   dragStart (dragShip, ship) {
     dragShip.addEventListener('dragstart', e => {
-      console.log('drag')
       if (e.target !== e.currentTarget) {
         return
       }
-      console.log('drag start')
       const shipElement = e.currentTarget
       const rect = shipElement.getBoundingClientRect()
       const offsetX = e.clientX - rect.left
@@ -490,7 +487,7 @@ export class FriendUI extends PlayerUI {
     }
   }
   placeMode () {
-    this.placing = true
+    this.placingShips = true
     const flexStyle =
       'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
 
@@ -533,7 +530,7 @@ export class FriendUI extends PlayerUI {
 
     gameStatus.info(infoList[0])
     let placingInfo = setInterval(() => {
-      if (this.placing === false) {
+      if (this.placingShips === false) {
         clearInterval(placingInfo)
         placingInfo = null
       } else {
@@ -543,7 +540,7 @@ export class FriendUI extends PlayerUI {
     }, 13000)
   }
   readyMode () {
-    this.placing = false
+    this.placingShips = false
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
     this.rotateBtn.classList.add('hidden')
@@ -573,7 +570,7 @@ export class FriendUI extends PlayerUI {
     gameStatus.info('test your placement or play a game against the computer')
   }
   testMode () {
-    this.placing = false
+    this.placingShips = false
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
     this.stopBtn.classList.remove('hidden')
@@ -597,7 +594,7 @@ export class FriendUI extends PlayerUI {
   }
 
   seekMode () {
-    this.placing = false
+    this.placingShips = false
     this.testBtn.classList.add('hidden')
     this.newPlacementBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
@@ -680,7 +677,6 @@ export function dragOver (friend) {
 
     let changed = false
     if (lastmodifier !== allow) {
-      console.log('modifier', allow)
       lastmodifier = allow
       if (allow === 'link') {
         // mac chrome uses control for rotate

@@ -145,7 +145,9 @@ function wireupButtons () {
 }
 
 function moveCursor (event) {
+  if (!friendUI.placingShips) return
   event.preventDefault()
+
   friendUI.assignByCursor(event.key, friend.ships)
 }
 

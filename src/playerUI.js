@@ -6,7 +6,7 @@ export const gameStatus = new StatusUI()
 export class PlayerUI {
   constructor () {
     this.board = {}
-    this.placing = false
+    this.placingShips = false
     this.containerWidth = gameHost.containerWidth
   }
 

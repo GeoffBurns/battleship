@@ -22,13 +22,13 @@ export class Ship {
     this.sunk = false
   }
   placeCells (variant, r0, c0) {
-    let placing = []
+    let placingTheCells = []
     for (const [dr, dc] of variant) {
       const rr = r0 + dr,
         cc = c0 + dc
-      placing.push([rr, cc])
+      placingTheCells.push([rr, cc])
     }
-    return placing
+    return placingTheCells
   }
   placeVariant (variant, r0, c0) {
     this.cells = this.placeCells(variant, r0, c0)
