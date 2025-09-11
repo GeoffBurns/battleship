@@ -152,6 +152,146 @@ export class FriendUI extends PlayerUI {
     this.rotateBtn.disabled = true
     this.flipBtn.disabled = true
   }
+  lastItem (tray) {
+    const items = tray.children
+    const l = items.length
+    if (l === 0) return null
+    else return items[l - 1]
+  }
+  clickAssignByCursor (arrowkey) {
+    let shipnode = null
+    switch (arrowkey) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        shipnode =
+          this.shipTray.children[0] ||
+          this.planeTray.children[0] ||
+          this.buildingTray.children[0]
+
+        break
+      case 'ArrowUp':
+        shipnode =
+          this.buildingTray.children[0] ||
+          this.planeTray.children[0] ||
+          this.shipTray.children[0]
+        break
+      case 'ArrowLeft':
+        shipnode =
+          this.lastItem(this.buildingTray) ||
+          this.lastItem(this.planeTray) ||
+          this.lastItem(this.shipTray)
+        break
+    }
+    return shipnode
+  }
+  moveNextTrayItem (arrowKey, trays, itemIndex, trayIndex) {
+    let indexT = trayIndex
+    let indexI = itemIndex
+    const traysSize = trays.length
+    switch (arrowKey) {
+      case 'ArrowRight':
+        do {
+          const tray = trays[indexT]
+          const l = tray.children.length
+          indexI++
+          if (indexI >= l) {
+            indexT++
+            indexI = -1
+            if (indexT === trayIndex)
+              return trays[trayIndex].children[itemIndex]
+            if (indexT >= traysSize) {
+              indexT = 0
+            }
+          } else {
+            return tray.children[indexI]
+          }
+          // eslint-disable-next-line no-constant-condition
+        } while (true)
+      case 'ArrowDown':
+        do {
+          indexT++
+          if (indexT === trayIndex && 0 === itemIndex)
+            return trays[trayIndex].children[itemIndex]
+          if (indexT >= traysSize) {
+            indexT = 0
+          }
+
+          const tray = trays[indexT]
+          const l = tray.children.length
+          if (l > 0) return tray.children[0]
+          // eslint-disable-next-line no-constant-condition
+        } while (true)
+      case 'ArrowUp':
+        do {
+          indexT--
+          if (indexT === trayIndex && 0 === itemIndex)
+            return trays[trayIndex].children[itemIndex]
+          if (indexT < 0) {
+            indexT = traysSize - 1
+          }
+
+          const tray = trays[indexT]
+          const l = tray.children.length
+          if (l > 0) return tray.children[0]
+          // eslint-disable-next-line no-constant-condition
+        } while (true)
+      case 'ArrowLeft':
+        do {
+          if (indexI > 0) {
+            return trays[indexT].children[indexI - 1]
+          } else {
+            indexT--
+            if (indexT < 0) {
+              indexT = traysSize - 1
+            }
+            const tray = trays[indexT]
+            const l = tray.children.length
+            indexI = l
+            if (indexT === trayIndex)
+              return trays[trayIndex].children[itemIndex]
+          }
+          // eslint-disable-next-line no-constant-condition
+        } while (true)
+    }
+    return null
+  }
+  moveAssignByCursor (arrowKey, clickedShip) {
+    let shipnode = clickedShip.source
+
+    const shipId = parseInt(shipnode.dataset.id)
+    if (shipId === null || shipnode === null) return null
+
+    let itemIndex = 0
+    let trayIndex = 0
+    let trays = [this.shipTray, this.planeTray, this.buildingTray]
+
+    for (const tray of trays) {
+      for (const child of tray.children) {
+        const id = parseInt(child.dataset.id)
+        if (id === shipId) {
+          return this.moveNextTrayItem(arrowKey, trays, itemIndex, trayIndex)
+        }
+        itemIndex++
+      }
+
+      trayIndex++
+      itemIndex = 0
+    }
+    return null
+  }
+
+  assignByCursor (arrowkey, ships) {
+    let shipElement = null
+    if (clickedShip)
+      shipElement = this.moveAssignByCursor(arrowkey, clickedShip)
+    else shipElement = this.clickAssignByCursor(arrowkey)
+
+    if (shipElement === null) return
+
+    const shipId = parseInt(shipElement.dataset.id)
+    const ship = ships.find(s => s.id === shipId)
+    if (ship && shipElement) this.assignClicked(ship, shipElement)
+  }
   assignClicked (ship, clicked) {
     const variantIndex = parseInt(clicked.dataset.variant)
     this.removeClicked()
@@ -202,16 +342,18 @@ export class FriendUI extends PlayerUI {
   }
   onClickTrayItem (dragShip, ship) {
     dragShip.addEventListener('click', e => {
+      console.log('click')
       const shipElement = e.currentTarget
       this.assignClicked(ship, shipElement)
     })
   }
   dragStart (dragShip, ship) {
     dragShip.addEventListener('dragstart', e => {
+      console.log('drag')
       if (e.target !== e.currentTarget) {
         return
       }
-
+      console.log('drag start')
       const shipElement = e.currentTarget
       const rect = shipElement.getBoundingClientRect()
       const offsetX = e.clientX - rect.left

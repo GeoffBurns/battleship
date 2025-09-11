@@ -144,6 +144,11 @@ function wireupButtons () {
   friendUI.stopBtn.addEventListener('click', onClickStop)
 }
 
+function moveCursor (event) {
+  event.preventDefault()
+  friendUI.assignByCursor(event.key, friend.ships)
+}
+
 function setupHideShortcuts () {
   function handleHideShortcuts (event) {
     switch (event.key) {
@@ -174,6 +179,12 @@ function setupHideShortcuts () {
       case 'u':
       case 'U':
         onClickUndo()
+        break
+      case 'ArrowUp':
+      case 'ArrowDown':
+      case 'ArrowLeft':
+      case 'ArrowRight':
+        moveCursor(event)
         break
     }
   }
