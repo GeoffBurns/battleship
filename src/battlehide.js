@@ -4,7 +4,9 @@ import {
   onClickRotate,
   onClickFlip,
   onClickRotateLeft,
-  friendUI
+  friendUI,
+  tabCursor,
+  enterCursor
 } from './friendUI.js'
 import { placedShipsInstance } from './selection.js'
 import { Friend } from './friend.js'
@@ -12,6 +14,8 @@ import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { gameStatus } from './playerUI.js'
 import { randomPlaceShape } from './utils.js'
+import { cursor } from './cursor.js'
+import { gameMaps } from './maps.js'
 
 const friend = new Friend(friendUI)
 
@@ -144,11 +148,41 @@ function wireupButtons () {
   friendUI.stopBtn.addEventListener('click', onClickStop)
 }
 
-function moveCursor (event) {
-  if (!friendUI.placingShips) return
+function moveGridCursor (event, shipCellGrid) {
   event.preventDefault()
+  switch (event.key) {
+    case 'ArrowUp':
+      cursor.x--
+      if (cursor.x < 0) cursor.x = gameMaps.current.rows - 1
+      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
+      break
+    case 'ArrowDown':
+      cursor.x++
+      if (cursor.x >= gameMaps.current.rows) cursor.x = 0
+      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
+      break
+    case 'ArrowLeft':
+      cursor.y--
+      if (cursor.y < 0) cursor.y = gameMaps.current.cols - 1
+      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
+      break
+    case 'ArrowRight':
+      cursor.y++
+      if (cursor.y >= gameMaps.current.cols) cursor.y = 0
+      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
+      break
+  }
+}
 
-  friendUI.assignByCursor(event.key, friend.ships)
+function moveCursor (event) {
+  if (!friendUI.placingShips || cursor.isDragging) return
+
+  event.preventDefault()
+  if (cursor.isGrid) {
+    moveGridCursor(event, friend.shipCellGrid)
+  } else {
+    friendUI.assignByCursor(event.key, friend.ships)
+  }
 }
 
 function setupHideShortcuts () {
@@ -187,6 +221,12 @@ function setupHideShortcuts () {
       case 'ArrowLeft':
       case 'ArrowRight':
         moveCursor(event)
+        break
+      case 'Tab':
+        tabCursor(event, friend.ships, friend.shipCellGrid)
+        break
+      case 'Enter':
+        enterCursor(event, friend.ships, friend.shipCellGrid)
         break
     }
   }

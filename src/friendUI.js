@@ -2,6 +2,7 @@ import { gameMaps } from './maps.js'
 import { gameStatus, PlayerUI } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
 import { ClickedShip, DraggedShip } from './selection.js'
+import { cursor } from './cursor.js'
 
 let lastEntered = [-1, -1]
 let clickedShip = null
@@ -23,9 +24,63 @@ export function onClickFlip () {
 }
 
 let selection = null
+export function enterCursor (event, ships, shipCellGrid) {
+  if (!friendUI.placingShips) return
+  if (cursor.isDragging) return
+  if (!cursor.isGrid) return
+  event.preventDefault()
+  const cell = friendUI.gridCellAt(cursor.x, cursor.y)
+  friendUI.handleDropEvent(cell, shipCellGrid, ships)
+  selection = null
+  createSelection(ships, shipCellGrid, null)
+}
+export function createSelection (ships, shipCellGrid, shipId) {
+  const shipElement =
+    shipId === null ? friendUI.getFirstTrayItem() : friendUI.getTrayItem(shipId)
 
+  if (shipElement === null) return
+  const id = shipId === null ? parseInt(shipElement.dataset.id) : shipId
+  const ship = ships.find(s => s.id === id)
+  const variantIndex = parseInt(shipElement.dataset.variant)
+
+  selection = new DraggedShip(
+    ship,
+    0,
+    0,
+    friendUI.cellSize(),
+    shipElement,
+    variantIndex,
+    friendUI.setDragShipContents.bind(friendUI)
+  )
+  selection.shown = false
+  cursor.y = 0
+  cursor.x = 0
+  friendUI.highlight(shipCellGrid, 0, 0)
+}
+export function tabCursor (event, ships, shipCellGrid) {
+  if (!friendUI.placingShips) return
+  if (cursor.isDragging) return
+
+  event.preventDefault()
+
+  cursor.isGrid = !cursor.isGrid
+
+  if (cursor.isGrid) {
+    friendUI.disableRotateFlip()
+    const shipId = clickedShip?.ship.id
+    friendUI.removeClicked()
+    clickedShip = null
+    createSelection(ships, shipCellGrid, shipId)
+  } else {
+    removeSelection()
+
+    friendUI.removeHighlight()
+    friendUI.assignByCursor('ArrowRight', ships)
+  }
+}
 export function removeSelection () {
-  if (selection) selection.remove()
+  if (!selection) return
+  selection.remove()
   selection = null
 }
 
@@ -72,28 +127,40 @@ export class FriendUI extends PlayerUI {
       this.dragEnter(cell, shipCellGrid)
     }
   }
+  handleDropEvent (cell, shipCellGrid, ships, e) {
+    if (e) e.preventDefault()
+    this.removeHighlight()
+    cursor.isDragging = false
+    if (!selection) return
+
+    const r = parseInt(cell.dataset.r)
+    const c = parseInt(cell.dataset.c)
+
+    const placed = selection.place(r, c, shipCellGrid)
+    if (placed) {
+      this.markPlaced(placed, selection.letter)
+      this.placeTally(ships)
+      if (selection) {
+        const container = selection.source.parentElement
+        selection.source.remove()
+        if (
+          container.classList.contains('drag-ship-container') &&
+          container.children.length === 0
+        )
+          container.remove()
+      }
+      this.displayShipInfo(ships)
+      clickedShip = null
+    }
+
+    removeSelection()
+  }
 
   drop (cell, shipCellGrid, ships) {
-    cell.addEventListener('drop', e => {
-      e.preventDefault()
-      this.removeHighlight()
-      if (!selection) return
-
-      const el = e.target
-      const r = parseInt(el.dataset.r)
-      const c = parseInt(el.dataset.c)
-
-      const placed = selection.place(r, c, shipCellGrid)
-      if (placed) {
-        this.markPlaced(placed, selection.letter)
-        this.placeTally(ships)
-        if (selection) {
-          selection.remove()
-          selection.source.remove()
-        }
-        this.displayShipInfo(ships)
-      }
-    })
+    cell.addEventListener(
+      'drop',
+      this.handleDropEvent.bind(this, cell, shipCellGrid, ships)
+    )
   }
 
   cellHit (r, c) {
@@ -111,8 +178,9 @@ export class FriendUI extends PlayerUI {
 
   highlight (shipCellGrid, r, c) {
     if (!selection) return
-    r = r || lastEntered[0]
-    c = c || lastEntered[1]
+    if (r === null) r = lastEntered[0]
+    if (c === null) c = lastEntered[1]
+
     const [r0, c0] = selection.offsetCell(r, c)
     if (!gameMaps.inBounds(r0, c0)) return
 
@@ -184,77 +252,116 @@ export class FriendUI extends PlayerUI {
     }
     return shipnode
   }
-  moveNextTrayItem (arrowKey, trays, itemIndex, trayIndex) {
+  moveToNextTrayItemToTheRight (trays, itemIndex, trayIndex) {
     let indexT = trayIndex
     let indexI = itemIndex
     const traysSize = trays.length
+    do {
+      const tray = trays[indexT]
+      const l = tray.children.length
+      indexI++
+      if (indexI >= l) {
+        indexT++
+        indexI = -1
+        if (indexT === trayIndex) return trays[trayIndex].children[itemIndex]
+        if (indexT >= traysSize) {
+          indexT = 0
+        }
+      } else {
+        return tray.children[indexI]
+      }
+      // eslint-disable-next-line no-constant-condition
+    } while (true)
+  }
+  moveToNextTrayItemDown (trays, itemIndex, trayIndex) {
+    let indexT = trayIndex
+    const traysSize = trays.length
+    do {
+      indexT++
+      if (indexT === trayIndex && 0 === itemIndex)
+        return trays[trayIndex].children[itemIndex]
+      if (indexT >= traysSize) {
+        indexT = 0
+      }
+
+      const tray = trays[indexT]
+      const l = tray.children.length
+      if (l > 0) return tray.children[0]
+      // eslint-disable-next-line no-constant-condition
+    } while (true)
+  }
+  moveToNextTrayItemUp (trays, itemIndex, trayIndex) {
+    let indexT = trayIndex
+    const traysSize = trays.length
+    do {
+      indexT--
+      if (indexT === trayIndex && 0 === itemIndex)
+        return trays[trayIndex].children[itemIndex]
+      if (indexT < 0) {
+        indexT = traysSize - 1
+      }
+
+      const tray = trays[indexT]
+      const l = tray.children.length
+      if (l > 0) return tray.children[0]
+      // eslint-disable-next-line no-constant-condition
+    } while (true)
+  }
+  moveToNextTrayItemToTheLeft (trays, itemIndex, trayIndex) {
+    let indexT = trayIndex
+    let indexI = itemIndex
+    const traysSize = trays.length
+    do {
+      if (indexI > 0) {
+        return trays[indexT].children[indexI - 1]
+      } else {
+        indexT--
+        if (indexT < 0) {
+          indexT = traysSize - 1
+        }
+        const tray = trays[indexT]
+        const l = tray.children.length
+        indexI = l
+        if (indexT === trayIndex) return trays[trayIndex].children[itemIndex]
+      }
+      // eslint-disable-next-line no-constant-condition
+    } while (true)
+  }
+  moveNextTrayItem (arrowKey, trays, itemIndex, trayIndex) {
     switch (arrowKey) {
       case 'ArrowRight':
-        do {
-          const tray = trays[indexT]
-          const l = tray.children.length
-          indexI++
-          if (indexI >= l) {
-            indexT++
-            indexI = -1
-            if (indexT === trayIndex)
-              return trays[trayIndex].children[itemIndex]
-            if (indexT >= traysSize) {
-              indexT = 0
-            }
-          } else {
-            return tray.children[indexI]
-          }
-          // eslint-disable-next-line no-constant-condition
-        } while (true)
+        return this.moveToNextTrayItemToTheRight(trays, itemIndex, trayIndex)
       case 'ArrowDown':
-        do {
-          indexT++
-          if (indexT === trayIndex && 0 === itemIndex)
-            return trays[trayIndex].children[itemIndex]
-          if (indexT >= traysSize) {
-            indexT = 0
-          }
-
-          const tray = trays[indexT]
-          const l = tray.children.length
-          if (l > 0) return tray.children[0]
-          // eslint-disable-next-line no-constant-condition
-        } while (true)
+        return this.moveToNextTrayItemDown(trays, itemIndex, trayIndex)
       case 'ArrowUp':
-        do {
-          indexT--
-          if (indexT === trayIndex && 0 === itemIndex)
-            return trays[trayIndex].children[itemIndex]
-          if (indexT < 0) {
-            indexT = traysSize - 1
-          }
-
-          const tray = trays[indexT]
-          const l = tray.children.length
-          if (l > 0) return tray.children[0]
-          // eslint-disable-next-line no-constant-condition
-        } while (true)
+        return this.moveToNextTrayItemUp(trays, itemIndex, trayIndex)
       case 'ArrowLeft':
-        do {
-          if (indexI > 0) {
-            return trays[indexT].children[indexI - 1]
-          } else {
-            indexT--
-            if (indexT < 0) {
-              indexT = traysSize - 1
-            }
-            const tray = trays[indexT]
-            const l = tray.children.length
-            indexI = l
-            if (indexT === trayIndex)
-              return trays[trayIndex].children[itemIndex]
-          }
-          // eslint-disable-next-line no-constant-condition
-        } while (true)
+        return this.moveToNextTrayItemToTheLeft(trays, itemIndex, trayIndex)
+      default:
+        return null
+    }
+  }
+  getTrayItem (shipId) {
+    let trays = [this.shipTray, this.planeTray, this.buildingTray]
+
+    for (const tray of trays) {
+      for (const child of tray.children) {
+        const id = parseInt(child.dataset.id)
+        if (id === shipId) {
+          return child
+        }
+      }
     }
     return null
   }
+  getFirstTrayItem () {
+    return (
+      friendUI.shipTray.children[0] ||
+      friendUI.planeTray.children[0] ||
+      friendUI.buildingTray.children[0]
+    )
+  }
+
   moveAssignByCursor (arrowKey, clickedShip) {
     let shipnode = clickedShip.source
 
@@ -292,6 +399,11 @@ export class FriendUI extends PlayerUI {
     const ship = ships.find(s => s.id === shipId)
     if (ship && shipElement) this.assignClicked(ship, shipElement)
   }
+  disableRotateFlip () {
+    this.rotateBtn.disabled = true
+    this.rotateLeftBtn.disabled = true
+    this.flipBtn.disabled = true
+  }
   assignClicked (ship, clicked) {
     const variantIndex = parseInt(clicked.dataset.variant)
     this.removeClicked()
@@ -313,17 +425,17 @@ export class FriendUI extends PlayerUI {
       for (const el of this.board.children) {
         el.classList.remove('good', 'bad')
       }
-      removeSelection()
+      cursor.isDragging = false
       if (e.dataTransfer.dropEffect !== 'none') {
         // The item was successfully dropped on a valid drop target
-
-        this.rotateBtn.disabled = true
-        this.rotateLeftBtn.disabled = true
-        this.flipBtn.disabled = true
+        this.disableRotateFlip()
       } else {
         // The drag operation was canceled or dropped on an invalid target
         this.assignClicked(selection.ship, shipElement)
       }
+
+      removeSelection()
+      friendUI.removeHighlight()
       if (callback) callback()
     })
   }
@@ -362,6 +474,7 @@ export class FriendUI extends PlayerUI {
 
       e.dataTransfer.setDragImage(new Image(), 0, 0)
       const variantIndex = parseInt(shipElement.dataset.variant)
+      cursor.isDragging = true
       selection = new DraggedShip(
         ship,
         offsetX,
@@ -639,6 +752,7 @@ export class FriendUI extends PlayerUI {
     this.displayShipInfo(ships)
   }
 }
+
 export const friendUI = new FriendUI()
 
 let lastmodifier = ''

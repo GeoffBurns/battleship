@@ -19,8 +19,6 @@
 }
 
 .title-wrap {
-    width: var(--content-width);
-    margin: 0 auto;
     box-sizing: border-box;
     background: rgb(255, 255, 238, 0.4);
     padding: 12px;
