@@ -10,3 +10,5 @@ Recreation of a childhood memory using javascript
 Play a challenging version of Battleship with no-touch placement rules and special ships
 
 [play it now](https://geoffburns.github.io/battleship)
+
+![screenshot of battleship game in placement mode](https://github.com/GeoffBurns/battleship/blob/main/landing/battleship-place.png) "Placement Mode")
