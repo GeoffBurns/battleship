@@ -1,26 +1,12 @@
-import { gameMaps } from './maps.js'
-import { friendUI } from './friendUI.js'
-
-function normalize (cells) {
-  const minR = Math.min(...cells.map(s => s[0]))
-  const minC = Math.min(...cells.map(s => s[1]))
-  return cells.map(([r, c]) => [r - minR, c - minC])
-}
-
-function normalizeVariants (variants) {
-  return variants.map(v => normalize(v))
-}
-
 class Ghost {
-  constructor (variant, letter, contentBuilder) {
+  constructor (variant, letter, contentBuilder, special) {
     const el = document.createElement('div')
     el.className = 'ship-ghost'
-    // el.classList.add('selection')
     this.element = el
     this.letter = letter
+    this.special = special
     this.contentBuilder = contentBuilder
-    contentBuilder(el, variant, letter)
-    // friendUI.setDragShipContents(el, variant, letter)
+    contentBuilder(el, variant, letter, special)
     document.body.appendChild(el)
   }
   hide () {
@@ -42,12 +28,16 @@ class Ghost {
   }
   moveTo (x, y) {
     if (this.element) {
-      //  this.element.style.left = x + 10 + 'px'
-      //   this.element.style.top = y + 10 + 'px'
-
       this.element.style.left = x + 'px'
       this.element.style.top = y + 'px'
     }
+  }
+}
+
+export class Brush {
+  constructor (size, subterrain) {
+    this.size = size
+    this.subterrain = subterrain
   }
 }
 
@@ -59,72 +49,36 @@ class SelectedShip {
     this.shape = shape
     this.type = shape.type()
     this.id = ship.id
-    const letter = ship.letter
-    this.letter = letter
-    this.index = variantIndex || 0
     this.letter = ship.letter
-    this.variants = normalizeVariants(shape.variants())
-  }
-  setVariantByIndex (index) {
-    this.index = index
+    this.variants = shape.variants()
+    this.variants.index = variantIndex
   }
   canFlip () {
-    const symmetry = this.shape.symmetry
-    return symmetry === 'H' || symmetry === 'A'
+    return this.variants.canFlip
   }
   canRotate () {
-    const symmetry = this.shape.symmetry
-    return symmetry === 'H' || symmetry === 'A' || symmetry === 'L'
+    return this.variants.canRotate
   }
 
+  placeable () {
+    return this.variants.placeable()
+  }
   variant () {
-    return this.variants[this.index]
+    return this.variants.variant()
+  }
+
+  special () {
+    return this.variants.special()
   }
   rotate () {
-    let index = this.index
-    const symmetry = this.shape.symmetry
-    switch (symmetry) {
-      case 'L':
-        index = index === 0 ? 1 : 0
-        break
-      case 'H':
-        index = (index + 1) % 4
-        break
-      case 'A':
-        index = (index > 1 ? 2 : 0) + (index % 2 === 0 ? 1 : 0)
-        break
-    }
-    this.setVariantByIndex(index)
+    return this.variants.rotate()
   }
 
   leftRotate () {
-    let index = this.index
-    const symmetry = this.shape.symmetry
-    switch (symmetry) {
-      case 'L':
-        index = index === 0 ? 1 : 0
-        break
-      case 'H':
-        index = index === 0 ? 3 : index - 1
-        break
-      case 'A':
-        index = (index > 1 ? 2 : 0) + (index % 2 === 0 ? 1 : 0)
-        break
-    }
-    this.setVariantByIndex(index)
+    return this.variants.leftRotate()
   }
   flip () {
-    let index = this.index
-    const symmetry = this.shape.symmetry
-    switch (symmetry) {
-      case 'H':
-        index = (index + 2) % 4
-        break
-      case 'A':
-        index = (index > 1 ? 0 : 2) + (index % 2)
-        break
-    }
-    this.setVariantByIndex(index)
+    return this.variants.flip()
   }
 }
 
@@ -132,14 +86,14 @@ export class ClickedShip extends SelectedShip {
   constructor (ship, source, variantIndex, contentBuilder) {
     super(ship, variantIndex, contentBuilder)
     this.source = source
-  }
-  setVariantByIndex (index) {
-    this.index = index
-    const variant = this.variants[index]
-    if (this.source) {
-      this.source.innerHTML = ''
-      this.contentBuilder(this.source, variant, this.letter)
-      this.source.dataset.variant = index
+    this.variants.onChange = () => {
+      const variant = this.variants.variant()
+      const special = this.variants.special()
+      if (this.source) {
+        this.source.innerHTML = ''
+        this.contentBuilder(this.source, variant, this.letter, special)
+        this.source.dataset.variant = this.variants.index
+      }
     }
   }
 }
@@ -147,16 +101,24 @@ export class ClickedShip extends SelectedShip {
 class PlacedShips {
   constructor () {
     this.ships = []
+    this.undoBtn = null
   }
 
   reset () {
     this.ships = []
   }
 
+  registerUndo (undoBtn) {
+    this.undoBtn = undoBtn
+  }
+
   pop () {
     const ship = this.ships.pop()
     ship.unplace()
     return ship
+  }
+  updateUndo () {
+    if (this.undoBtn) this.undoBtn.disabled = this.ships.length === 0
   }
   popAndRefresh (shipCellGrid, mark, returnShip) {
     const ship = this.pop()
@@ -167,13 +129,13 @@ class PlacedShips {
       mark(s)
     }
 
-    friendUI.undoBtn.disabled = this.ships.length === 0
+    this.updateUndo()
 
     return ship
   }
   push (ship, placed) {
     this.ships.push(ship)
-    friendUI.undoBtn.disabled = this.ships.length === 0
+    this.updateUndo()
     return ship.place(placed)
   }
   numPlaced () {
@@ -202,7 +164,12 @@ export class DraggedShip extends SelectedShip {
     this.source = source
     this.cursor = [row, col]
     this.offset = [offsetX, offsetY]
-    this.ghost = new Ghost(super.variant(), ship.letter, contentBuilder)
+    this.ghost = new Ghost(
+      super.variant(),
+      ship.letter,
+      contentBuilder,
+      super.special()
+    )
     this.shown = true
   }
   isNotShown () {
@@ -226,21 +193,12 @@ export class DraggedShip extends SelectedShip {
   move (e) {
     this.moveTo(e.pageX - this.offset[0] - 13, e.pageY - this.offset[1] - 13)
   }
-  setVariantByIndex (index) {
-    this.index = index
-    const variant = this.variants[index]
-    this.ghost.setVariant(variant)
-  }
 
   rotate () {
     this.resetOffset()
     super.rotate()
   }
   resetOffset () {
-    //  const [x,y] = this.offset
-    //   this.offset = [-y,x]
-    //  const [r,c] = this.cursor
-    //  this.cursor = [r,-c]
     this.offset = [0, 0]
     this.cursor = [0, 0]
   }
@@ -253,45 +211,38 @@ export class DraggedShip extends SelectedShip {
     this.resetOffset()
     super.flip()
   }
-  inAllBounds (r, c, variant) {
-    variant = variant || this.variant()
-
-    try {
-      const maxShipR = Math.max(...variant.map(s => s[0]))
-      const maxShipC = Math.max(...variant.map(s => s[1]))
-      return gameMaps.inAllBounds(r, c, maxShipR, maxShipC)
-    } catch (error) {
-      console.error('An error occurred:', error.message)
-      return false
-    }
-  }
-  canPlace (r, c, shipCellGrid) {
-    const variant = this.variant()
-    if (this.ghost && this.inAllBounds(r, c, variant)) {
-      return this.ship.canPlace(variant, r, c, shipCellGrid)
+  canPlaceRaw (r, c, shipCellGrid) {
+    const placeable = this.placeable()
+    if (this.ghost) {
+      // && placeable.inAllBounds(r, c))
+      return placeable.canPlace(r, c, shipCellGrid)
     }
     return false
   }
-  addToShipCell (r, c, shipCellGrid) {
-    this.ship.placeVariant(this.variant(), r, c)
+
+  addPlaceableToShipCells (placeable, r, c, shipCellGrid) {
+    this.ship.placePlaceable(placeable, r, c)
     this.ship.addToGrid(shipCellGrid)
     return this.ship.cells
+  }
+  addCurrentToShipCells (r, c, shipCellGrid) {
+    return this.addPlaceableToShipCells(this.placeable(), r, c, shipCellGrid)
   }
   offsetCell (r, c) {
     const r0 = r - this.cursor[0]
     const c0 = c - this.cursor[1]
     return [r0, c0]
   }
-  canPlaceCells (r, c, shipCellGrid) {
+  canPlace (r, c, shipCellGrid) {
     const r0 = r - this.cursor[0]
     const c0 = c - this.cursor[1]
-    return this.canPlace(r0, c0, shipCellGrid)
+    return this.canPlaceRaw(r0, c0, shipCellGrid)
   }
   placeCells (r, c, shipCellGrid) {
     const r0 = r - this.cursor[0]
     const c0 = c - this.cursor[1]
-    if (this.canPlace(r0, c0, shipCellGrid)) {
-      return this.addToShipCell(r0, c0, shipCellGrid)
+    if (this.canPlaceRaw(r0, c0, shipCellGrid)) {
+      return this.addCurrentToShipCells(r0, c0, shipCellGrid)
     }
     return null
   }

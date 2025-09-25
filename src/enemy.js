@@ -1,10 +1,10 @@
 import { randomPlaceShape } from './utils.js'
 import { gameMaps } from './maps.js'
 import { enemyUI } from './enemyUI.js'
-import { Player } from './player.js'
+import { Waters } from './player.js'
 import { gameStatus } from './playerUI.js'
 
-class Enemy extends Player {
+class Enemy extends Waters {
   constructor (enemyUI) {
     super(enemyUI)
     this.preamble0 = 'Enemy'

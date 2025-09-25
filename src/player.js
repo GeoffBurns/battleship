@@ -4,7 +4,7 @@ import { Score } from './Score.js'
 import { terrain } from './Shape.js'
 import { Ship } from './Ship.js'
 
-export class Player {
+export class Waters {
   constructor (ui) {
     this.ships = []
     this.score = new Score()
@@ -13,26 +13,63 @@ export class Player {
     this.shipCellGrid = []
     this.boardDestroyed = false
     this.carpetBombsUsed = 0
+    this.nextId = 1
     this.preamble0 = 'Your'
     this.preamble = 'You were '
     this.resetShipCells()
     this.displayInfo = gameStatus.info.bind(gameStatus)
   }
-  createShips () {
+  clipboardKey () {
+    return 'geoffs-battleship.placed-ships'
+  }
+  store () {
+    const placedShips = {
+      ships: this.ships,
+      shipCellGrid: this.shipCellGrid,
+      map: gameMaps.current.title
+    }
+    localStorage.setItem(this.clipboardKey, JSON.stringify(placedShips))
+  }
+  load () {
+    const placedShips = JSON.parse(localStorage.getItem(this.clipboardKey))
+    if (!placedShips || gameMaps.current.title !== placedShips.map) return
+
+    for (const ship of placedShips.ships) {
+      const matchingShip = this.ships.filter(
+        s => s.letter === ship.letter && s.cells.length === 0
+      )[0]
+      if (matchingShip) {
+        matchingShip.place(ship.cells)
+        matchingShip.addToGrid(this.shipCellGrid)
+      }
+      this.UI.placement(ship.cells, this.ships, matchingShip)
+    }
+  }
+
+  createShips (map) {
+    map = map || gameMaps.current
     const ships = []
     let id = 1
-    for (const base of gameMaps.baseShapes) {
-      const letter = base.letter
-      const symmetry = base.symmetry
-      const num = gameMaps.current.shipNum[letter]
+    for (const base of map.terrain.ships.baseShapes) {
+      const num = map.shipNum[base.letter]
       for (let i = 0; i < num; i++) {
-        ships.push(new Ship(id, symmetry, letter))
+        ships.push(Ship.createFromShape(base, id))
         id++
       }
     }
     return ships
   }
+  createCandidateShips () {
+    const candidates = []
+    let id = 1
+    for (const base of gameMaps.baseShapes) {
+      candidates.push(Ship.createFromShape(base, id))
+      id++
+    }
 
+    this.nextId = id
+    return candidates
+  }
   resetShipCells () {
     this.shipCellGrid = Array.from({ length: gameMaps.current.rows }, () =>
       Array(gameMaps.current.cols).fill(null)
@@ -190,9 +227,6 @@ export class Player {
     ships = ships || this.ships
     if (this.UI.placing && this.UI.placeTally) {
       this.UI.placeTally(ships)
-    } else if (this.opponent) {
-      this.UI.score.display(ships, noOfShots)
-      this.UI.score.altBuildTally(ships, carpetBombsUsed)
     } else {
       this.UI.score.display(ships, noOfShots)
       this.UI.score.buildTally(ships, carpetBombsUsed)

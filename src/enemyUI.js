@@ -1,8 +1,8 @@
 import { gameMaps } from './maps.js'
-import { gameStatus, PlayerUI } from './playerUI.js'
+import { gameStatus, WatersUI } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
 
-class EnemyUI extends PlayerUI {
+class EnemyUI extends WatersUI {
   constructor () {
     super()
     this.board = document.getElementById('enemy-board')

@@ -1,37 +1,84 @@
 import { gameMaps } from './maps.js'
 
 export class ChooseUI {
-  constructor (list, tagetId) {
-    this.list = list
-    this.choose = document.getElementById(tagetId)
-    this.containerWidth = 520
+  constructor (targetId) {
+    this.choose = document.getElementById(targetId)
   }
 
-  setup (callback, defaultIndex = 2) {
-    let id = 0
-    this.list.forEach(choice => {
-      let option = document.createElement('option')
-      option.value = id
-      option.textContent = choice
-      this.choose.appendChild(option)
-      if (id === defaultIndex) {
-        option.selected = 'selected'
-      }
-      id++
-    })
-    this.onChange(callback)
+  addOption (id, choice, defaultIndex, defaultText) {
+    let option = document.createElement('option')
+    option.value = id
+    option.textContent = choice
+    this.choose.appendChild(option)
+    if (id === defaultIndex || choice === defaultText) {
+      option.selected = 'selected'
+    }
   }
 
   onChange (callback) {
     this.choose.addEventListener('change', function () {
       const index = this.value
-      callback(index)
+      const text = this.options[this.selectedIndex].textContent
+      callback(index, text)
     })
   }
 }
 
-export const mapUI = new ChooseUI(
-  gameMaps.list.map(m => m.title),
-  'chooseMap'
+export class ChooseFromListUI extends ChooseUI {
+  constructor (list, targetId) {
+    super(targetId)
+    this.list = list
+  }
+
+  setup (callback, selectedId, selectedText) {
+    let id = 0
+    this.list.forEach(choice => {
+      this.addOption(id, choice, selectedId, selectedText)
+      id++
+    })
+    this.onChange(callback)
+  }
+}
+
+export class ChooseNumberUI extends ChooseUI {
+  constructor (min, max, step, targetId) {
+    super(targetId)
+    this.min = min
+    this.max = max
+    this.step = step
+  }
+
+  setup (callback, defaultIndex) {
+    if (defaultIndex === undefined) defaultIndex = this.min
+    for (let i = this.min; i <= this.max; i += this.step) {
+      this.addOption(i, i, defaultIndex, defaultIndex)
+    }
+    this.onChange(callback)
+  }
+}
+const mapTitles = (() => {
+  try {
+    return gameMaps.mapTitles()
+  } catch (error) {
+    console.error('An error occurred:', error.message, gameMaps.mapTitles)
+    return []
+  }
+})()
+
+export const mapUI = new ChooseFromListUI(mapTitles, 'chooseMap')
+
+export const huntUI = new ChooseFromListUI(['hide', 'seek'], 'chooseHunt')
+
+export const widthUI = new ChooseNumberUI(
+  gameMaps.minWidth,
+  gameMaps.maxWidth,
+  1,
+  'chooseWidth'
 )
-export const huntUI = new ChooseUI(['hide', 'seek'], 'chooseHunt')
+
+export const heightUI = new ChooseNumberUI(
+  gameMaps.minHeight,
+  gameMaps.maxHeight,
+  1,
+  'chooseHeight'
+)

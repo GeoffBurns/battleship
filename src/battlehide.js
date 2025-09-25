@@ -1,23 +1,23 @@
-import { setupDropdowns } from './setup.js'
+import { setupGameOptions } from './setup.js'
+import { friendUI } from './friendUI.js'
 import {
-  dragOver,
+  dragOverPlacingHandlerSetup,
   onClickRotate,
   onClickFlip,
   onClickRotateLeft,
-  friendUI,
   tabCursor,
-  enterCursor
-} from './friendUI.js'
+  enterCursor,
+  moveCursorBase
+} from './placementUI.js'
 import { placedShipsInstance } from './selection.js'
 import { Friend } from './friend.js'
 import { enemy } from './enemy.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { gameStatus } from './playerUI.js'
 import { randomPlaceShape } from './utils.js'
-import { cursor } from './cursor.js'
-import { gameMaps } from './maps.js'
 
 const friend = new Friend(friendUI)
+placedShipsInstance.registerUndo(friendUI.undoBtn)
 
 friendUI.resetBoardSize()
 
@@ -55,12 +55,9 @@ function onClickReturnToPlacement () {
   tallyBox.prepend(tallyTitle)
   if (removeSeekShorcuts) removeSeekShorcuts()
 
+  removeHideShorcuts = setupHideShortcuts()
   enemy.opponent = null
   friend.opponent = null
-  //friend.UI.resetBoardSize()
-  //friend.restartBoard()
-  //friend.updateUI(friend.ships)
-  //newGame()
   newPlacement()
 }
 
@@ -105,9 +102,7 @@ function onClickAuto () {
         ok = false
         break
       }
-      friendUI.markPlaced(placed, ship.letter)
-      friendUI.placeTally(ships)
-      friendUI.displayShipInfo(ships)
+      friendUI.placement(placed, ships, ship)
     }
     if (ok) return true
   }
@@ -116,7 +111,7 @@ function onClickUndo () {
   friend.resetShipCells()
   friendUI.clearVisuals()
   friend.score.reset()
-  placedShipsInstance.popAndRefresh(
+  const ship = placedShipsInstance.popAndRefresh(
     friend.shipCellGrid,
     ship => {
       friendUI.markPlaced(ship.cells, ship.letter)
@@ -125,9 +120,7 @@ function onClickUndo () {
       friendUI.addShipToTrays(ship)
     }
   )
-  friendUI.placeTally(friend.ships)
-  friendUI.displayShipInfo(friend.ships)
-  if (friend.ships.length === 0) friendUI.undoBtn.disabled = true
+  friendUI.unplacement(friend.ships, ship)
 }
 
 function onClickStop () {
@@ -148,41 +141,8 @@ function wireupButtons () {
   friendUI.stopBtn.addEventListener('click', onClickStop)
 }
 
-function moveGridCursor (event, shipCellGrid) {
-  event.preventDefault()
-  switch (event.key) {
-    case 'ArrowUp':
-      cursor.x--
-      if (cursor.x < 0) cursor.x = gameMaps.current.rows - 1
-      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
-      break
-    case 'ArrowDown':
-      cursor.x++
-      if (cursor.x >= gameMaps.current.rows) cursor.x = 0
-      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
-      break
-    case 'ArrowLeft':
-      cursor.y--
-      if (cursor.y < 0) cursor.y = gameMaps.current.cols - 1
-      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
-      break
-    case 'ArrowRight':
-      cursor.y++
-      if (cursor.y >= gameMaps.current.cols) cursor.y = 0
-      friendUI.highlight(shipCellGrid, cursor.x, cursor.y)
-      break
-  }
-}
-
 function moveCursor (event) {
-  if (!friendUI.placingShips || cursor.isDragging) return
-
-  event.preventDefault()
-  if (cursor.isGrid) {
-    moveGridCursor(event, friend.shipCellGrid)
-  } else {
-    friendUI.assignByCursor(event.key, friend.ships)
-  }
+  moveCursorBase(event, friendUI, friend)
 }
 
 function setupHideShortcuts () {
@@ -223,10 +183,10 @@ function setupHideShortcuts () {
         moveCursor(event)
         break
       case 'Tab':
-        tabCursor(event, friend.ships, friend.shipCellGrid)
+        tabCursor(event, friendUI, friend.ships, friend.shipCellGrid)
         break
       case 'Enter':
-        enterCursor(event, friend.ships, friend.shipCellGrid)
+        enterCursor(event, friendUI, friend.ships, friend.shipCellGrid)
         break
     }
   }
@@ -240,6 +200,8 @@ function newPlacement () {
   friend.testContinue = false
   friendUI.testBtn.disabled = false
   friendUI.seekBtn.disabled = false
+
+  friendUI.clearVisuals()
   friendUI.placeMode()
   friend.resetModel()
   friend.resetUI(friend.ships)
@@ -252,8 +214,17 @@ function newPlacement () {
 // wire buttons
 wireupButtons()
 
-dragOver(friend)
+dragOverPlacingHandlerSetup(friend, friendUI)
 removeHideShorcuts = setupHideShortcuts()
-setupDropdowns(friendUI.resetBoardSize.bind(friendUI), newPlacement, 'hide')
+const placedShips = setupGameOptions(
+  friendUI.resetBoardSize.bind(friendUI),
+  newPlacement,
+  'hide'
+)
 // initial
 newPlacement()
+
+if (placedShips) {
+  friend.load()
+  friend.updateUI(friend.ships)
+}

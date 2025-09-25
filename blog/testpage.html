@@ -1724,10 +1724,23 @@
             let id = 1
             for (const base of gameMaps.baseShapes) {
               const letter = base.letter
-              const symmetry = base.symmetry
               const num = gameMaps.current.shipNum[letter]
               for (let i = 0; i < num; i++) {
-                ships.push(new Ship(id, symmetry, letter))
+                ships.push(Ship.createFromShape(base, id))
+                id++
+              }
+            }
+            return ships
+          }
+
+          createCandidateShips() {
+            const ships = []
+            let id = 1
+            for (const base of gameMaps.terrain.baseShapes) {
+              const letter = base.letter
+              const num = gameMaps.current.shipNum[letter]
+              for (let i = 0; i < num; i++) {
+                ships.push(Ship.createFromShape(base, id))
                 id++
               }
             }

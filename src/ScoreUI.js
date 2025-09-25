@@ -8,12 +8,14 @@ export class ScoreUI {
     this.hits = document.getElementById(playerPrefix + '-hits')
     this.sunk = document.getElementById(playerPrefix + '-sunk')
     this.placed = document.getElementById(playerPrefix + '-placed')
-
+    this.zone = document.getElementById(playerPrefix + '-zone')
     this.shotsLabel = document.getElementById(playerPrefix + '-shots-label')
     this.hitsLabel = document.getElementById(playerPrefix + '-hits-label')
     this.sunkLabel = document.getElementById(playerPrefix + '-sunk-label')
     this.placedLabel = document.getElementById(playerPrefix + '-placed-label')
+    this.zoneLabel = document.getElementById(playerPrefix + '-zone-label')
     this.tallyBox = document.getElementById(playerPrefix + '-tallyBox')
+    this.zoneSync = []
   }
   display (ships, shots) {
     this.shots.textContent = shots.toString()
@@ -21,6 +23,137 @@ export class ScoreUI {
     this.hits.textContent = hits.toString()
     const sunkCount = ships.filter(s => s.sunk).length
     this.sunk.textContent = `${sunkCount} / ${ships.length}`
+  }
+
+  createZoneEntry (labelTxt, bag, stress, style) {
+    const entry = document.createElement('div')
+    entry.style = style
+    const label = document.createElement(stress)
+    label.textContent = labelTxt + ' : '
+    entry.appendChild(label)
+    const count = document.createElement('span')
+    count.textContent = bag.size.toString()
+    entry.appendChild(count)
+    this.zone.appendChild(entry)
+    return count
+  }
+
+  displacementDescription (ratio) {
+    const thresholds = [
+      { limit: 0.02, desc: 'empty' },
+      { limit: 0.15, desc: 'lonely' },
+      { limit: 0.22, desc: 'very scattered' },
+      { limit: 0.27, desc: 'scattered' },
+      { limit: 0.31, desc: 'very sparse ' },
+      { limit: 0.38, desc: 'sparse' },
+      { limit: 0.45, desc: 'very loose' },
+      { limit: 0.49, desc: 'loose' },
+      { limit: 0.53, desc: 'medium' },
+      { limit: 0.58, desc: 'close' },
+      { limit: 0.63, desc: 'very close' },
+      { limit: 0.68, desc: 'tight' },
+      { limit: 0.72, desc: 'very tight' },
+      { limit: 0.76, desc: 'crowded' },
+      { limit: 0.8, desc: 'very crowded' },
+      { limit: 0.81, desc: 'compact' },
+      { limit: 0.83, desc: 'very compact' }
+    ]
+    for (const { limit, desc } of thresholds) {
+      if (ratio < limit) return desc
+    }
+    return 'very squeezy'
+  }
+
+  createAddZoneEntry (labelTxt, displacedArea, ships, stress, style) {
+    const entry = document.createElement('div')
+    entry.style = style
+    const label = document.createElement(stress)
+    label.textContent = labelTxt + ' : '
+    entry.appendChild(label)
+    const tightness = document.createElement('span')
+    const shipDisplacement = ships.reduce(
+      (accumulator, ship) => accumulator + ship.shape().displacement,
+      0
+    )
+    tightness.textContent = this.displacementDescription(
+      shipDisplacement / displacedArea
+    )
+    //  + ` ${shipDisplacement} / ${displacedArea}`
+    entry.appendChild(tightness)
+    this.zone.appendChild(entry)
+    return tightness
+  }
+  displayZoneInfo () {
+    for (const entry of this.zoneSync) {
+      entry.counts[0].textContent = entry.tracker.total.size.toString()
+      entry.counts[1].textContent = entry.tracker.margin.size.toString()
+      entry.counts[2].textContent = entry.tracker.core.size.toString()
+    }
+  }
+  refreshZoneInfo () {
+    gameMaps.current.calcTrackers()
+    this.displayZoneInfo()
+  }
+  displayAddZoneInfo (model) {
+    this.zone.innerHTML = ''
+    const displacedArea = model.displacedArea()
+
+    this.createAddZoneEntry(
+      'Map',
+      displacedArea,
+      model.ships,
+      'b',
+      'line-height:1.2;'
+    )
+
+    for (const tracker of gameMaps.current.subterrainTrackers) {
+      gameMaps.current.recalcTracker(tracker.subterrain, tracker)
+      gameMaps.current.calcFootPrint(tracker)
+      const displacedArea = (tracker.total.size + tracker.footprint.size) / 2
+
+      this.createAddZoneEntry(
+        tracker.subterrain.title,
+        displacedArea,
+        model.ships.filter(s => s.shape().subterrain === tracker.subterrain),
+        'span',
+        'line-height:1.2;'
+      )
+    }
+  }
+  setupZoneInfo () {
+    let display = []
+    this.zone.innerHTML = ''
+    for (const tracker of gameMaps.current.subterrainTrackers) {
+      gameMaps.current.recalcTracker(tracker.subterrain, tracker)
+
+      let counts = []
+      counts.push(
+        this.createZoneEntry(
+          tracker.subterrain.title,
+          tracker.total,
+          'b',
+          'line-height:1.2;'
+        )
+      )
+      counts.push(
+        this.createZoneEntry(
+          tracker.m_zone.title,
+          tracker.margin,
+          'span',
+          'font-size:75%;line-height:1.2'
+        )
+      )
+      counts.push(
+        this.createZoneEntry(
+          tracker.c_zone.title,
+          tracker.core,
+          'span',
+          'font-size:75%;line-height:1.2'
+        )
+      )
+      display.push({ tracker: tracker, counts: counts })
+    }
+    this.zoneSync = display
   }
   resetTallyBox () {
     this.tallyBox.innerHTML = ''
@@ -72,40 +205,36 @@ export class ScoreUI {
     rowList.appendChild(row)
   }
   buildShipTally (ships, boxer) {
-    this.resetTallyBox()
-
-    const column = document.createElement('div')
-    column.className = 'tally-col'
-    this.buildTallyRow(ships, 'P', column, boxer)
-    const surfaceContainer = document.createElement('div')
-    surfaceContainer.setAttribute('style', 'display:flex;gap:40px;')
-
-    const seaColumn = document.createElement('div')
-    seaColumn.className = 'tally-col'
-    const landColumn = document.createElement('div')
-    landColumn.className = 'tally-col'
-    const sea = ['A', 'B', 'C', 'D']
-    const land = ['G', 'U']
-    for (const letter of sea) {
-      this.buildTallyRow(ships, letter, seaColumn, boxer)
-    }
-    for (const letter of land) {
-      this.buildTallyRow(ships, letter, landColumn, boxer)
-    }
-    surfaceContainer.appendChild(seaColumn)
-    surfaceContainer.appendChild(landColumn)
-
-    column.appendChild(surfaceContainer)
-    this.tallyBox.appendChild(column)
+    this.altBuildTally(ships, boxer, false)
   }
   buildTally (ships, carpetBombsUsed) {
-    this.buildShipTally(ships)
-    // bombs row
-    this.buildBombRow(this.tallyBox, carpetBombsUsed)
+    this.altBuildTally(ships, carpetBombsUsed, null, true)
+  }
+  addShipTally (ships) {
+    this.altBuildTally(ships, 0, null, false)
   }
 
-  altBuildTally (ships, carpetBombsUsed, boxer) {
+  altBuildTally (ships, carpetBombsUsed, boxer, withWeapons) {
+    function shipLetters (tallyGroup) {
+      return [
+        ...new Set(
+          ships
+            .filter(s => s.shape().tallyGroup === tallyGroup)
+            .map(s => s.letter)
+        )
+      ].toSorted()
+    }
     this.resetTallyBox()
+
+    const tallyTitle = document.getElementById('tally-title')
+    if (tallyTitle) {
+      if (ships.length > 0) {
+        tallyTitle.classList.remove('hidden')
+      } else {
+        tallyTitle.classList.add('hidden')
+      }
+    }
+
     const surfaceContainer = document.createElement('div')
     surfaceContainer.setAttribute('style', 'display:flex;gap:40px;')
 
@@ -113,17 +242,27 @@ export class ScoreUI {
     seaColumn.className = 'tally-col'
     const landColumn = document.createElement('div')
     landColumn.className = 'tally-col'
-    const sea = ['A', 'B', 'C', 'D']
-    const land = ['G', 'U']
+
+    const sea = shipLetters('S')
+    const land = shipLetters('G')
+    const air = shipLetters('A')
+    const special = shipLetters('X')
+
     for (const letter of sea) {
       this.buildTallyRow(ships, letter, seaColumn, boxer)
     }
-
-    this.buildTallyRow(ships, 'P', landColumn, boxer)
+    for (const letter of special) {
+      this.buildTallyRow(ships, letter, seaColumn, boxer)
+    }
+    for (const letter of air) {
+      this.buildTallyRow(ships, letter, landColumn, boxer)
+    }
     for (const letter of land) {
       this.buildTallyRow(ships, letter, landColumn, boxer)
     }
-    this.buildBombRow(landColumn, carpetBombsUsed)
+    if (withWeapons) {
+      this.buildBombRow(landColumn, carpetBombsUsed)
+    }
     surfaceContainer.appendChild(seaColumn)
     surfaceContainer.appendChild(landColumn)
 

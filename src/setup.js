@@ -1,67 +1,143 @@
-import { mapUI } from './chooseUI.js'
+import { heightUI, mapUI, widthUI } from './chooseUI.js'
 import { gameMaps } from './maps.js'
+import { custom } from './custom.js'
+import { terrain } from './Shape.js'
 
 export function removeShortcuts () {
   document.removeEventListener('keydown')
 }
 
-export function setupDropdowns (boardSetup, refresh, huntMode) {
-  // Define urlParams using the current window's search string
+export function switchTo (target, huntMode) {
+  const params = new URLSearchParams()
+  params.append('mapName', gameMaps.current.title)
+
+  if (huntMode === 'build' && custom.noOfPlacedShips() > 0) {
+    terrain.current.updateCustomMaps(gameMaps.current)
+    custom.store()
+    gameMaps.addCurrentCustomMap()
+    params.append('placedShips', '')
+  }
+
+  const location = `./${target}.html?${params.toString()}`
+  window.location.href = location
+}
+export function setupTabs (huntMode) {
+  function switchToSeek () {
+    switchTo('battleseek', huntMode)
+  }
+  function switchToHide () {
+    switchTo('index', huntMode)
+  }
+  function switchToBuild () {
+    switchTo('battlebuild', huntMode)
+  }
+
+  if (huntMode !== 'build')
+    document
+      .getElementById('tab-build')
+      ?.addEventListener('click', switchToBuild)
+
+  if (huntMode !== 'hide')
+    document.getElementById('tab-hide')?.addEventListener('click', switchToHide)
+
+  if (huntMode !== 'seek')
+    document.getElementById('tab-seek')?.addEventListener('click', switchToSeek)
+}
+function setupMapSelection (boardSetup, refresh) {
   const urlParams = new URLSearchParams(window.location.search)
   const mapChoices = urlParams.getAll('mapName')
 
-  const mapName =
-    mapChoices[0] || localStorage.getItem('geoffs-battleship.map-name')
+  const placedShips = urlParams.has('placedShips')
 
-  let mapIndex = gameMaps.list.findIndex(m => m.title === mapName)
-  if (mapIndex < 0) mapIndex = 0
+  const mapName = mapChoices[0] || gameMaps.getLastMapTitle()
 
-  mapUI.setup(function (index) {
-    const title = gameMaps.setTo(index)
-    boardSetup()
-    refresh()
-    localStorage.setItem('geoffs-battleship.map-name', title)
-  }, mapIndex)
+  mapUI.setup(
+    function (_index, title) {
+      gameMaps.setTo(title)
+      boardSetup()
+      refresh()
+      gameMaps.storeLastMap()
+    },
+    null,
+    mapName
+  )
 
-  gameMaps.setTo(mapIndex)
-
-  boardSetup()
-  function switchToSeek () {
-    const params = new URLSearchParams()
-    params.append('mapName', gameMaps.current.title)
-    const location = `./battleseek.html?${params.toString()}`
-    window.location.href = location
-  }
-  function switchToHide () {
-    const params = new URLSearchParams()
-    params.append('mapName', gameMaps.current.title)
-
-    const location = `./index.html?${params.toString()}`
-    window.location.href = location
-  }
-
-  if (huntMode === 'seek')
-    document.getElementById('tab-hide').addEventListener('click', switchToHide)
-
-  if (huntMode === 'hide')
-    document.getElementById('tab-seek').addEventListener('click', switchToSeek)
+  gameMaps.setTo(mapName)
+  return placedShips
 }
 
-/* --- IGNORE ---
-  huntUI.setup(
-    function () {
-      switch (huntUI.choose.value) {
-        case '0':
-          if (huntMode !== 'hide') switchToHide()
-          break
-        case '1':
-          if (huntMode !== 'seek') switchToSeek()
-          break
-        default:
-          console.log('unknown hunt mode')
-          break
-      }
-    },
-    huntMode === 'hide' ? 0 : 1
-  )
---- IGNORE --- */
+export function validateWidth () {
+  let width = parseInt(widthUI.choose.value, 10)
+  if (isNaN(width) || width < gameMaps.minWidth || width > gameMaps.maxWidth) {
+    width = widthUI.min
+    widthUI.choose.value = width
+  }
+  return width
+}
+
+export function validateHeight () {
+  let height = parseInt(heightUI.choose.value, 10)
+  if (
+    isNaN(height) ||
+    height < gameMaps.minHeight ||
+    height > gameMaps.maxHeight
+  ) {
+    height = heightUI.min
+    heightUI.choose.value = height
+  }
+  return height
+}
+
+function setupMapOptions (boardSetup, refresh) {
+  const urlParams = new URLSearchParams(window.location.search)
+
+  const map =
+    gameMaps.getMap(urlParams.getAll('mapName')[0]) || gameMaps.getLastMap()
+  let mapWidth = gameMaps.getLastWidth(map?.cols)
+  let mapHeight = gameMaps.getLastHeight(map?.rows)
+
+  setupTabs('build')
+
+  widthUI.setup(function (_index) {
+    const width = validateWidth()
+    const height = validateHeight()
+    gameMaps.setToBlank(height, width)
+
+    gameMaps.storeLastWidth(width)
+
+    boardSetup()
+    refresh()
+  }, mapWidth)
+
+  heightUI.setup(function (_index) {
+    const width = validateWidth()
+    const height = validateHeight()
+    gameMaps.setToBlank(height, width)
+    gameMaps.storeLastHeight(height)
+    boardSetup()
+    refresh()
+  }, mapHeight)
+
+  gameMaps.setToBlank(mapHeight, mapWidth)
+}
+
+export function setupGameOptions (boardSetup, refresh, huntMode) {
+  // Define urlParams using the current window's search string
+
+  const placedShips = setupMapSelection(boardSetup, refresh)
+
+  boardSetup()
+
+  setupTabs(huntMode)
+  return placedShips
+}
+
+export function setupBuildOptions (boardSetup, refresh, huntMode) {
+  // Define urlParams using the current window's search string
+
+  setupMapOptions(boardSetup, refresh)
+
+  boardSetup()
+
+  setupTabs(huntMode)
+}

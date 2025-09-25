@@ -43,6 +43,15 @@
     transition: opacity 0.2s ease-in-out;
 }
 
+.cell.special::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #CCCC33;
+    transition: opacity 0.2s ease-in-out;
+}
+
 .cell.hit {
     color: #ff3b3b
 }

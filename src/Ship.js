@@ -10,6 +10,11 @@ export class Ship {
     this.hits = new Set()
     this.sunk = false
   }
+
+  static createFromShape (shape, id) {
+    return new Ship(id, shape.symmetry, shape.letter)
+  }
+
   place (placed) {
     this.cells = placed
     this.hits = new Set()
@@ -21,19 +26,13 @@ export class Ship {
     this.hits = new Set()
     this.sunk = false
   }
-  placeCells (variant, r0, c0) {
-    let placingTheCells = []
-    for (const [dr, dc] of variant) {
-      const rr = r0 + dr,
-        cc = c0 + dc
-      placingTheCells.push([rr, cc])
-    }
-    return placingTheCells
+  placePlaceable (placeable, r, c) {
+    this.cells = placeable.placeAt(r, c).cells
   }
-  placeVariant (variant, r0, c0) {
-    this.cells = this.placeCells(variant, r0, c0)
+  placeables () {
+    return this.shape.placeables()
   }
-  isRightType (r, c) {
+  isRightZone (r, c) {
     const shipType = this.type()
     const isLand = gameMaps.isLand(r, c)
     // area rules
@@ -49,6 +48,11 @@ export class Ship {
       }
     return true
   }
+  isAllRightZone (placing) {
+    placing.some(([r, c]) => {
+      return this.isRightZone(r, c) === false
+    })
+  }
   canPlace (variant, r0, c0, shipCellGrid) {
     const placing = this.placeCells(variant, r0, c0)
     if (
@@ -59,12 +63,8 @@ export class Ship {
       // console.log('out of bounds')
       return false
     }
-    if (
-      placing.some(([r, c]) => {
-        return this.isRightType(r, c) === false
-      })
-    ) {
-      //console.log('wrong type')
+    if (this.isAllRightZone(placing)) {
+      //console.log('wrong Zone')
       return false
     }
 
@@ -86,15 +86,6 @@ export class Ship {
     }
     // console.log('good')
     return true
-    /*
-    return !placing.some(([r, c]) => {
-      return (
-        !gameMaps.inBounds(r, c) ||
-        this.isRightType(r, c) === false ||
-        this.noTouchCheck(r, c, shipCellGrid) === false
-      )
-    })
-      */
   }
   addToGrid (shipCellGrid) {
     const letter = this.letter
@@ -109,7 +100,12 @@ export class Ship {
   sunkDescription (middle = ' ') {
     return terrain.current.sunkDescription(this.letter, middle)
   }
+
+  description () {
+    return terrain.current.ships.descriptions[this.letter]
+  }
+
   type () {
-    return gameMaps.shipTypes[this.letter]
+    return terrain.current.ships.types[this.letter]
   }
 }

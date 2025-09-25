@@ -1203,6 +1203,7 @@
     function straightVariantsOf(cells) {
       return [cells, rotate(cells)]
     }
+
     class Shape {
       constructor(letter, symmetry, cells) {
         this.letter = letter
@@ -1970,9 +1971,11 @@
       cellSize() {
         return gameHost.containerWidth / gameMaps.current.cols
       }
-
+      gridCellRawAt(r, c) {
+        return this.board.children[r * gameMaps.current.cols + c]
+      }
       gridCellAt(r, c) {
-        const result = this.board.children[r * gameMaps.current.cols + c]
+        const result = this.gridCellRawAt(r, c)
         if (result?.classList) return result
         throw new Error(
           'Invalid cell' + JSON.stringify(result) + 'at ' + r + ',' + c

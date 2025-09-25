@@ -1,8 +1,8 @@
 import { gameMaps } from './maps.js'
-import { Player } from './player.js'
+import { Waters } from './player.js'
 import { gameStatus } from './playerUI.js'
 
-export class Friend extends Player {
+export class Friend extends Waters {
   constructor (friendUI) {
     super(friendUI)
     this.testContinue = true
@@ -193,6 +193,8 @@ export class Friend extends Player {
   resetModel () {
     this.score.reset()
     this.ships = this.createShips()
+    this.boardDestroyed = false
+    this.carpetBombsUsed = 0
   }
   buildBoard () {
     this.UI.buildBoard()
@@ -204,8 +206,7 @@ export class Friend extends Player {
   resetUI (ships) {
     ships = ships || this.ships
     this.UI.reset(ships)
-    // this.UI.clearVisuals()
-
+    this.UI.board.classList.remove('destroyed')
     this.buildBoard()
     this.UI.buildTrays(ships, this.shipCellGrid)
     this.updateUI(ships)

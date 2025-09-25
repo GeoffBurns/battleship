@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>No-Touch Battleship – 18×7</title>
-
     <meta
       name="description"
       content="Play a challenging version of Battleship with no-touch placement rules and special ships."
@@ -35,30 +34,36 @@
           <button class="tab-link" id="tab-seek" type="button">
             Seek Game
           </button>
-          <a class="you-are-here" href="#"> Hide and Seek Game</a>
-
-          <a href="https://github.com/GeoffBurns/battleship"> Source Code</a>
+          <button class="tab-link" id="tab-hide" type="button">
+            Hide and Seek Game
+          </button>
+          <a class="you-are-here" href="#">Build Game</a>
+          <a href="https://github.com/GeoffBurns/battleship">Source Code</a>
         </nav>
       </div>
       <div class="info-wrap info-top">
         <div class="heading-container">
           <div class="choose-controls">
-            <div class="choose-container choose-map-container">
-              <label for="chooseMap" class="choose-label">Choose a Map: </label>
-              <select id="chooseMap" class="choose-select"></select>
+            <div class="choose-container choose-height-container">
+              <label for="chooseHeight" class="choose-label">Height: </label>
+              <select id="chooseHeight" class="choose-select"></select>
+            </div>
+            <div class="choose-container choose-width-container">
+              <label for="chooseWidth" class="choose-label">Width: </label>
+              <select id="chooseWidth" class="choose-select"></select>
             </div>
           </div>
         </div>
       </div>
       <div class="game-container">
-        <div class="player-container" id="friend-container">
+        <div class="player-container" id="custom-container">
           <div class="title-wrap">
-            <h2 class="centered-title">Friendly Waters</h2>
+            <h2 class="centered-title">Customizing Waters</h2>
           </div>
           <div class="player-body">
             <div class="player-main">
               <div class="board-wrap">
-                <div class="board" id="friend-board"></div>
+                <div class="board" id="custom-board"></div>
               </div>
               <div class="info-wrap" id="statusLine-wrap">
                 <div class="status medium" id="statusLine">
@@ -67,13 +72,14 @@
                 </div>
               </div>
               <div class="board-wrap alt trays" id="tray-container">
+                <div id="brushTray" class="tray"></div>
                 <div id="shipTray" class="tray"></div>
                 <div id="planeTray" class="tray"></div>
                 <div id="specialTray" class="tray"></div>
                 <div id="buildingTray" class="tray"></div>
+                <div id="weaponsTray" class="tray"></div>
               </div>
             </div>
-
             <div class="panel-container">
               <div class="board-wrap">
                 <div class="panel">
@@ -83,7 +89,26 @@
                       id="newPlacement"
                       type="button"
                     >
-                      <span class="shortcut">C</span>lear
+                      <span class="shortcut">C</span>lear Waters
+                    </button>
+                    <button class="place-control" id="resetBtn" type="button">
+                      Clear <span class="shortcut">S</span>hips
+                    </button>
+                    <button
+                      class="place-control"
+                      id="reuseBtn"
+                      type="button"
+                      disabled
+                    >
+                      Use <span class="shortcut">D</span>efault
+                    </button>
+                    <button
+                      class="place-control"
+                      id="acceptBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">A</span>ccept
                     </button>
                     <button
                       class="place-control"
@@ -111,13 +136,20 @@
                     </button>
                     <button
                       class="place-control"
+                      id="publishBtn"
+                      type="button"
+                      disabled
+                    >
+                      <span class="shortcut">P</span>lay
+                    </button>
+                    <button
+                      class="place-control"
                       id="undoBtn"
                       type="button"
                       disabled
                     >
                       <span class="shortcut">U</span>ndo
                     </button>
-
                     <button
                       class="place-control"
                       id="testBtn"
@@ -142,81 +174,22 @@
                     >
                       <span class="shortcut">H</span>ide and Seek
                     </button>
-
                     <button class="place-control" id="autoBtn" type="button">
                       <span class="shortcut">A</span>uto
                     </button>
                   </div>
-                  <div class="tally-box-container" id="friend-tally-container">
+                  <div class="tally-box-container" id="custom-tally-container">
                     <h4 class="tally-title" id="tally-title">Tally Boxes</h4>
-                    <div id="friend-tallyBox"></div>
+                    <div id="custom-tallyBox"></div>
                   </div>
 
                   <div class="info-container">
-                    <div class="info" id="friend-placed-label">
-                      Placed: <span id="friend-placed">0 </span>
+                    <div class="info" id="custom-zone"></div>
+                    <div class="info" id="custom-placed-label">
+                      Ships Added: <span id="custom-placed">0 </span>
                     </div>
-                    <div class="info hidden" id="friend-shots-label">
-                      Shots: <span id="friend-shots">0 </span>
-                    </div>
-                    <div class="info hidden" id="friend-hits-label">
-                      Hits: <span id="friend-hits">0 </span>
-                    </div>
-                    <div class="info hidden" id="friend-sunk-label">
-                      Sunk: <span id="friend-sunk">0 / 8</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="player-container hidden" id="enemy-container">
-          <div class="title-wrap">
-            <h2 class="centered-title">Enemy Waters</h2>
-          </div>
-
-          <div class="player-body">
-            <div class="player-main">
-              <div class="board-wrap">
-                <div class="board" id="enemy-board"></div>
-              </div>
-
-              <div class="info-wrap">
-                <div class="status" id="statusLine2"></div>
-              </div>
-            </div>
-            <div class="panel-container">
-              <div class="board-wrap">
-                <div class="panel">
-                  <div class="panel-controls" id="seek-controls">
-                    <button class="seek-control" id="newPlace2" type="button">
-                      <span class="shortcut">P</span>lace Ships
-                    </button>
-                    <button class="seek-control" id="newGame" type="button">
-                      <span class="shortcut">R</span>estart
-                    </button>
-                    <button class="seek-control" id="carpetBtn" type="button">
-                      <span class="shortcut">M</span>ega Bomb
-                    </button>
-                    <button class="seek-control" id="revealBtn" type="button">
-                      Re<span class="shortcut">v</span>eal
-                    </button>
-                  </div>
-                  <div class="tally-box-container">
-                    <h4 class="tally-title">Tally Boxes</h4>
-                    <div id="enemy-tallyBox"></div>
-                  </div>
-                  <div class="info-container">
-                    <div class="info" id="enemy-shots-label">
-                      Shots: <span id="enemy-shots">0 </span>
-                    </div>
-                    <div class="info" id="enemy-hits-label">
-                      Hits: <span id="enemy-hits">0 </span>
-                    </div>
-                    <div class="info" id="enemy-sunk-label">
-                      Sunk: <span id="enemy-sunk">0 / 8</span>
+                    <div class="info hidden" id="custom-weapons-label">
+                      Weapons Added: <span id="custom-weapons">0 </span>
                     </div>
                   </div>
                 </div>
@@ -226,26 +199,22 @@
         </div>
       </div>
     </div>
-
-    <script type="module" src="./Shape.js"></script>
+    <script type="module" src="./CellsToBePlaced.js"></script>
+    <script type="module" src="./variants.js"></script>
     <script type="module" src="./map.js"></script>
+    <script type="module" src="./Shape.js"></script>
     <script type="module" src="./maps.js"></script>
     <script type="module" src="./chooseUI.js"></script>
     <script type="module" src="./utils.js"></script>
     <script type="module" src="./ScoreUI.js"></script>
-
     <script type="module" src="./StatusUI.js"></script>
     <script type="module" src="./playerUI.js"></script>
     <script type="module" src="./Score.js"></script>
     <script type="module" src="./Ship.js"></script>
     <script type="module" src="./player.js"></script>
-    <script type="module" src="./friendUI.js"></script>
+    <script type="module" src="./placementUI.js"></script>
     <script type="module" src="./selection.js"></script>
-    <script type="module" src="./friend.js"></script>
-    <script type="module" src="./enemyUI.js"></script>
-    <script type="module" src="./enemy.js"></script>
     <script type="module" src="./setup.js"></script>
-    <script type="module" src="./enemySetup.js"></script>
-    <script type="module" src="./battlehide.js"></script>
+    <script type="module" src="./battlebuild.js"></script>
   </body>
 </html>

@@ -1,4 +1,3 @@
-
 /* ----- ./src/map.js ----- */
 
 // geometry helper
@@ -277,13 +276,10 @@ export const seaAndLand = new Terrain(
   }
 )
 
-export const terrain = { current: seaAndLand }
+const terrain = { current: seaAndLand }
 
 /* ----- ./src/maps.js ----- */
-
-import { Map } from './map.js'
-import { seaAndLand } from './Shape.js'
-export const gameHost = {
+const gameHost = {
   containerWidth: 574
 }
 
@@ -1706,7 +1702,7 @@ import { setupDropdowns } from './setup.js'
 import { setupEnemy, newGame } from './enemySetup.js'
 import { enemyUI } from './enemyUI.js'
 
-setupDropdowns(enemyUI.resetBoardSize.bind(enemyUI), newGame, 'seek')
+setupGameOptions(enemyUI.resetBoardSize.bind(enemyUI), newGame, 'seek')
 setupEnemy()
 // initial
 newGame()

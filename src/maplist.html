@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>No-Touch Battleship – 18×7</title>
+    <meta
+      name="description"
+      content="Play a challenging version of Battleship with no-touch placement rules and special ships."
+    />
+    <link rel="stylesheet" href="animation.css" />
+    <link rel="stylesheet" href="tab.css" />
+    <link rel="stylesheet" href="battle.css" />
+    <link rel="stylesheet" href="panel.css" />
+    <link rel="stylesheet" href="cells.css" />
+    <link rel="stylesheet" href="status.css" />
+    <link rel="stylesheet" href="battlehide.css" />
+  </head>
+  <body>
+    <div class="battleship" id="battleship-game">
+      <div class="tab-bar-container">
+        <a href="https://geoffburns.github.io/battleship">
+          <img src="./logo3.png" alt="Battleship Logo" width="60" height="60"
+        /></a>
+        <div class="title-header">
+          <h3>Geoff's Battleship</h3>
+        </div>
+        <nav class="tab-bar">
+          <a
+            href="https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html"
+          >
+            About</a
+          >
+          <button class="tab-link" id="tab-seek" type="button">
+            Seek Game
+          </button>
+          <button class="tab-link" id="tab-hide" type="button">
+            Hide and Seek Game
+          </button>
+          <a class="you-are-here" href="#">Build Game</a>
+          <a href="https://github.com/GeoffBurns/battleship">Source Code</a>
+        </nav>
+      </div>
+      <div id="list-container"></div>
+    </div>
+
+    <script type="module" src="./maps.js"></script>
+    <script type="module" src="./setup.js"></script>
+    <script type="module" src="./maplist.js"></script>
+  </body>
+</html>
