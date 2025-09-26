@@ -199,7 +199,11 @@ class Terrain {
   }
 
   getCustomMapsRaw () {
-    return localStorage.getItem(this.customMapsLocalStorageKey) || ''
+    return localStorage.getItem(this.customMapsLocalStorageKey()) || ''
+  }
+
+  setCustomMapsRaw (csv) {
+    return localStorage.setItem(this.customMapsLocalStorageKey(), csv)
   }
 
   getCustomMapSet () {
@@ -208,17 +212,40 @@ class Terrain {
 
     return new Set()
   }
-  updateCustomMaps (newMap) {
-    let customMaps = this.getCustomMapSet()
-
-    customMaps.add(newMap.title)
-    localStorage.setItem(this.customMapsLocalStorageKey, [...customMaps].join())
+  localStorageMapKey (title) {
+    return `geoffs-battleship.${title}`
   }
-  deleteCustomMaps (newMap) {
+  updateCustomMaps (title) {
+    let customMaps = this.getCustomMapSet()
+    if (customMaps.has(title)) {
+      throw new Error('Map title ' + title + ' already exists')
+    }
+    customMaps.add(title)
+    const list = [...customMaps].filter(
+      t => t && t.length > 0 && localStorage.getItem(this.localStorageMapKey(t))
+    )
+
+    const csv = list.join()
+    localStorage.setItem(this.customMapsLocalStorageKey(), csv)
+  }
+  deleteCustomMaps (title) {
     let customMaps = this.getCustomMapSet()
 
-    customMaps.delete(newMap.title)
+    customMaps.delete(title)
     localStorage.setItem(this.customMapsLocalStorageKey, [...customMaps].join())
+
+    customMaps = this.getCustomMapSet()
+  }
+  renameCustomMaps (oldMap, newTitle) {
+    let customMaps = this.getCustomMapSet()
+
+    customMaps.delete(oldMap.title)
+    oldMap.title = newTitle
+    customMaps.add(oldMap.title)
+    localStorage.setItem(
+      this.customMapsLocalStorageKey(),
+      [...customMaps].join()
+    )
   }
 
   getCustomMaps (builder) {

@@ -14,8 +14,17 @@
     border: 1px solid #ffc;
 }
 
+.info-wrap.alt {
+    background: rgb(255, 240, 220, 0.69);
+    border: 1px solid #fea;
+}
+
 .info-wrap.info-top {
     border-radius: 0 0 10px 10px;
+}
+
+.info-wrap.info-top.sub-tabs {
+    padding: 0 12px 0 0;
 }
 
 .title-wrap {

@@ -166,8 +166,60 @@ export class CustomMap extends Map {
   isLand (r, c) {
     return this.land.has(`${r},${c}`)
   }
+
+  jsonObj () {
+    const data = { ...this }
+    delete data.terrain
+    delete data.land
+    data.land = [...this.land]
+    data.terrain = this.terrain.title
+    return data
+  }
+  jsonString () {
+    const data = this.jsonObj()
+    return JSON.stringify(data, null, 2)
+  }
+  saveToLocalStorage (title, key) {
+    title = title || makeTitle(this.terrain, this.cols, this.rows)
+    key = key || this.localStorageKey(title)
+
+    localStorage.setItem(key, this.jsonString())
+
+    this.terrain.updateCustomMaps(title)
+  }
+
+  localStorageKey (title) {
+    this.title = title || makeTitle(this.terrain, this.cols, this.rows)
+    return `geoffs-battleship.${this.title}`
+  }
 }
-export class CustomBlankMap extends CustomMap {
+
+const withModifyable = Base =>
+  class extends Base {
+    addLand (r, c) {
+      if (this.inBounds(r, c)) this.land.add(`${r},${c}`)
+    }
+
+    removeLand (r, c) {
+      if (this.inBounds(r, c)) this.land.delete(`${r},${c}`)
+    }
+
+    addShips (ships) {
+      this.shipNum = {}
+      for (const ship of ships) {
+        this.shipNum[ship.letter] = (this.shipNum[ship.letter] || 0) + 1
+      }
+    }
+    setLand (r, c, subterrain) {
+      if (subterrain.isDefault) {
+        this.removeLand(r, c)
+      } else {
+        this.addLand(r, c)
+      }
+    }
+  }
+
+export class CustomBlankMap extends withModifyable(CustomMap) {
   constructor (rows, cols, mapTerrain) {
     super(
       makeTitle(mapTerrain || terrain.current, cols, rows),
@@ -191,43 +243,6 @@ export class CustomBlankMap extends CustomMap {
       if (!this.inBounds(r, c)) this.land.delete(key)
     }
   }
-  addLand (r, c) {
-    if (this.inBounds(r, c)) this.land.add(`${r},${c}`)
-  }
-
-  removeLand (r, c) {
-    if (this.inBounds(r, c)) this.land.delete(`${r},${c}`)
-  }
-
-  addShips (ships) {
-    this.shipNum = {}
-    for (const ship of ships) {
-      this.shipNum[ship.letter] = (this.shipNum[ship.letter] || 0) + 1
-    }
-  }
-  setLand (r, c, subterrain) {
-    if (subterrain.isDefault) {
-      this.removeLand(r, c)
-    } else {
-      this.addLand(r, c)
-    }
-  }
-
-  saveToLocalStorage () {
-    const data = { ...this }
-    delete data.terrain
-    delete data.land
-    data.land = [...this.land]
-    data.terrain = this.terrain.title
-    localStorage.setItem(this.localStorageKey(), JSON.stringify(data))
-
-    this.terrain.updateCustomMaps(this)
-  }
-
-  localStorageKey () {
-    this.title = makeTitle(this.terrain, this.cols, this.rows)
-    return `geoffs-battleship.${this.title}`
-  }
 }
 
 export class SavedCustomMap extends CustomMap {
@@ -242,10 +257,59 @@ export class SavedCustomMap extends CustomMap {
     this.terrain =
       terrain.terrains.find(t => t.title === data.terrain) || seaAndLand
   }
-  static load (title) {
+
+  static loadObj (title) {
     const data = localStorage.getItem(`geoffs-battleship.${title}`)
     if (!data) return //throw new Error('No such saved map')
     const obj = JSON.parse(data)
+    return obj
+  }
+
+  static load (title) {
+    const obj = SavedCustomMap.loadObj(title)
     return new SavedCustomMap(obj)
+  }
+
+  localStorageKey () {
+    return `geoffs-battleship.${this.title}`
+  }
+
+  remove () {
+    const key = this.localStorageKey()
+    const title = this.title
+    localStorage.removeItem(key)
+    const check = localStorage.getItem(key)
+    if (check) {
+      throw new Error('Failed to delete map with key ' + key)
+    }
+
+    this.terrain.deleteCustomMaps(title)
+  }
+
+  rename (newTitle) {
+    this.remove()
+    this.title = newTitle
+    this.saveToLocalStorage(newTitle)
+  }
+
+  clone (newTitle) {
+    newTitle = newTitle || makeTitle(this.terrain, this.cols, this.rows)
+    this.title = newTitle
+    const key = this.localStorageKey()
+    this.saveToLocalStorage(newTitle, key)
+
+    const check = localStorage.getItem(key)
+    if (!check) {
+      throw new Error('Failed to copy map with key ' + key)
+    }
+  }
+}
+export class EditedCustomMap extends withModifyable(SavedCustomMap) {
+  constructor (data) {
+    super(data)
+  }
+  static load (title) {
+    const obj = SavedCustomMap.loadObj(title)
+    return new EditedCustomMap(obj)
   }
 }

@@ -37,11 +37,33 @@
           <button class="tab-link" id="tab-hide" type="button">
             Hide and Seek Game
           </button>
-          <a class="you-are-here" href="#">Build Game</a>
+          <a class="you-are-here" href="#">Customize Maps</a>
           <a href="https://github.com/GeoffBurns/battleship">Source Code</a>
         </nav>
       </div>
+      <div class="info-wrap info-top sub-tabs">
+        <div class="heading-container sub-tabs">
+          <div class="tab-bar-container sub-tabs">
+            <nav class="tab-bar sub-tabs" aria-label="Sub Navigation">
+              <a href="./battlebuild.html"> Add</a>
+              <a class="you-are-here" href="#"> List</a>
+              <button class="tab-link" id="tab-import" type="button">
+                Import
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+      <div class="title-wrap">
+        <h2 class="centered-title">Custom Waters List</h2>
+      </div>
       <div id="list-container"></div>
+      <div class="input-section hidden" id="inputDiv">
+        <label for="inputField">New Name:</label>
+        <input type="text" id="inputField" name="inputField" />
+        <button type="button" id="okBtn">OK</button>
+        <button type="button" id="cancelBtn">Cancel</button>
+      </div>
     </div>
 
     <script type="module" src="./maps.js"></script>

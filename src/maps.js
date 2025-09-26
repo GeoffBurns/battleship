@@ -1,5 +1,5 @@
 import { placingTarget } from './CellsToBePlaced.js'
-import { Map, SavedCustomMap, CustomBlankMap } from './map.js'
+import { Map, SavedCustomMap, CustomBlankMap, EditedCustomMap } from './map.js'
 import { terrain, seaAndLand } from './Shape.js'
 export const gameHost = {
   containerWidth: 574
@@ -329,6 +329,12 @@ class TerrainMaps {
   getCustomMap (mapName) {
     return this.terrain
       .getCustomMaps(SavedCustomMap.load)
+      ?.find(m => m?.title === mapName)
+  }
+  getEditableMap (mapName) {
+    if (!mapName) return null
+    return this.terrain
+      .getCustomMaps(EditedCustomMap.load)
       ?.find(m => m?.title === mapName)
   }
 

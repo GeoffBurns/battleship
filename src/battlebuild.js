@@ -39,12 +39,18 @@ function onClickUndo () {
   )
 }
 
-function onClickAccept () {
+function onClickAccept (editingMap) {
   const ships = custom.createCandidateShips()
   custom.candidateShips = ships
+  if (editingMap) {
+    custom.ships = custom.createShips()
+  }
   custom.resetShipCells()
   customUI.buildBoard()
   customUI.addShipMode(ships)
+  if (editingMap) {
+    customUI.displayShipTrackingInfo(custom)
+  }
 
   customUI.makeAddDroppable(custom)
   setupDragHandlers(customUI)
@@ -182,8 +188,15 @@ function newPlacement () {
 wireupButtons()
 
 setupBuildShortcuts()
-setupBuildOptions(customUI.resetBoardSize.bind(customUI), newPlacement, 'build')
+const editing = setupBuildOptions(
+  customUI.resetBoardSize.bind(customUI),
+  newPlacement,
+  'build',
+  onClickAccept.bind(null, true)
+)
 
-setupDragBrushHandlers(customUI)
-// initial
-newPlacement()
+if (!editing) {
+  setupDragBrushHandlers(customUI)
+  // initial
+  newPlacement()
+}

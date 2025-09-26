@@ -855,6 +855,12 @@ export class PlacementUI extends WatersUI {
     this.placeTally(ships)
     this.displayShipInfo(ships)
   }
+
+  displayShipTrackingInfo (model) {
+    this.score.addShipTally(model.ships)
+    this.displayAddInfo(model)
+    this.score.displayAddZoneInfo(model)
+  }
   addition (placed, model, ship) {
     this.showNotice(ship.description() + this.addText)
     this.markPlaced(placed, ship.letter)
@@ -868,9 +874,6 @@ export class PlacementUI extends WatersUI {
     const index = model.candidateShips.findIndex(s => s.id === ship.id)
     model.candidateShips[index] = newShip
 
-    this.score.addShipTally(model.ships)
-    this.displayAddInfo(model)
-    this.score.displayAddZoneInfo(model)
     return id
   }
 

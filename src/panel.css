@@ -54,6 +54,27 @@
      font-weight: 700;
  }
 
+ .tally-box-container.map-list {
+
+     gap: 4px;
+     margin-bottom: 4px;
+     font-size: 70%;
+ }
+
+ .tally-box-container.map-list .tally-row {
+     gap: 2px;
+ }
+
+ .tally-box-container.map-list .tally-col {
+     gap: 3px;
+ }
+
+ .tally-box-container.map-list .tally-box {
+     width: 14px;
+     height: 11px;
+     border-radius: 2px;
+ }
+
  button {
      padding: 8px 10px;
      border-radius: 8px;
