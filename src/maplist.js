@@ -173,16 +173,6 @@ class MapList {
   }
 
   makeList () {
-    /*
-    for (const key in localStorage) {
-      if (localStorage.hasOwnProperty(key)) {
-        console.log(key) // Prints the key
-        // console.log(`${key}: ${localStorage.getItem(key)}`); // To also print the value
-      }
-    }
-    seaAndLand.setCustomMapsRaw(
-      'sea-and-land-1-18x9,sea-and-land-6-18x9,sea-and-land-9-18x9,sea-and-land-10-18x9,sea-and-land-176-18x9,sea-and-land-178-18x9,sea-and-land-180-18x9,sea-and-land-182-18x9'
-    ) // Clear custom maps for testing */
     const maps = gameMaps.customMapList()
     let idx = 0
     for (const map of maps) {
