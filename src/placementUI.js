@@ -194,7 +194,7 @@ export class PlacementUI extends WatersUI {
       selection.source.dataset.id = newId
       clickedShip = null
     }
-
+    this.displayShipTrackingInfo(model)
     removeSelection()
   }
 

@@ -48,9 +48,7 @@ function onClickAccept (editingMap) {
   custom.resetShipCells()
   customUI.buildBoard()
   customUI.addShipMode(ships)
-  if (editingMap) {
-    customUI.displayShipTrackingInfo(custom)
-  }
+  customUI.displayShipTrackingInfo(custom)
 
   customUI.makeAddDroppable(custom)
   setupDragHandlers(customUI)

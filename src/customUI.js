@@ -22,6 +22,11 @@ export class CustomUI extends PlacementUI {
     this.placingShips = false
     const flexStyle =
       'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
+
+    const height = document.getElementById('height-container')
+    height.classList.remove('hidden')
+    const width = document.getElementById('width-container')
+    width.classList.remove('hidden')
     const tallyTitle = document.getElementById('tally-title')
     tallyTitle.classList.add('hidden')
     this.reuseBtn.classList.remove('hidden')
@@ -72,6 +77,10 @@ export class CustomUI extends PlacementUI {
     this.placingShips = true
     const flexStyle =
       'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
+    const height = document.getElementById('height-container')
+    height.classList.add('hidden')
+    const width = document.getElementById('width-container')
+    width.classList.add('hidden')
     this.reuseBtn.classList.add('hidden')
     this.resetBtn.classList.remove('hidden')
     this.acceptBtn.classList.add('hidden')
