@@ -40,6 +40,10 @@ body {
     align-items: center;
 }
 
+.choose-controls.hidden {
+    display: none
+}
+
 .choose-container {
     margin-bottom: 13px;
     margin-top: 25px;

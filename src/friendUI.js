@@ -33,6 +33,8 @@ export class FriendUI extends PlacementUI {
     const flexStyle =
       'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
 
+    const chooseControls = document.getElementById('choose-controls')
+    chooseControls.classList.remove('hidden')
     this.newPlacementBtn.classList.remove('hidden')
     this.testBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
@@ -65,6 +67,8 @@ export class FriendUI extends PlacementUI {
   }
   readyMode () {
     this.placingShips = false
+    const chooseControls = document.getElementById('choose-controls')
+    chooseControls.classList.add('hidden')
     this.testBtn.classList.remove('hidden')
     this.seekBtn.classList.remove('hidden')
     this.rotateBtn.classList.add('hidden')
@@ -90,6 +94,7 @@ export class FriendUI extends PlacementUI {
     for (const panel of panels) {
       panel.classList.remove('alt')
     }
+    this.hideTips()
     gameStatus.clear()
     gameStatus.info('test your placement or play a game against the computer')
   }

@@ -922,6 +922,12 @@ export class PlacementUI extends WatersUI {
       }
     }, 13000)
   }
+  hideTips () {
+    if (tipsTimerId) {
+      clearInterval(tipsTimerId)
+      tipsTimerId = null
+    }
+  }
   displayAddInfo (model) {
     if (!model.ships) return
     this.publishBtn.disabled = model.displacementRatio() < 0.35
