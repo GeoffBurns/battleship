@@ -36,7 +36,7 @@ export function enterCursor (event, viewModel, ships, shipCellGrid) {
   const cell = viewModel.gridCellAt(cursor.x, cursor.y)
   viewModel.handleDropEvent(cell, shipCellGrid, ships)
   selection = null
-  createSelection(ships, shipCellGrid, null)
+  createSelection(viewModel, ships, shipCellGrid, null)
 }
 
 function createSelection (viewModel, ships, shipCellGrid, shipId) {
@@ -48,7 +48,7 @@ function createSelection (viewModel, ships, shipCellGrid, shipId) {
   if (shipElement === null) return
   const id = shipId === null ? parseInt(shipElement.dataset.id) : shipId
   const ship = ships.find(s => s.id === id)
-  const variantIndex = parseInt(shipElement.dataset.variant)
+  const variantIndex = parseInt(shipElement.dataset.variant) || 0
 
   selection = new DraggedShip(
     ship,
@@ -77,7 +77,7 @@ export function tabCursor (event, viewModel, ships, shipCellGrid) {
     const shipId = clickedShip?.ship.id
     viewModel.removeClicked()
     clickedShip = null
-    createSelection(ships, shipCellGrid, shipId)
+    createSelection(viewModel, ships, shipCellGrid, shipId)
   } else {
     removeSelection()
 
@@ -1102,7 +1102,7 @@ export function moveCursorBase (event, viewModel, model) {
 
   event.preventDefault()
   if (cursor.isGrid) {
-    moveGridCursor(event, model.shipCellGrid)
+    moveGridCursor(event, model.shipCellGrid, viewModel)
   } else {
     viewModel.assignByCursor(event.key, model.ships)
   }
