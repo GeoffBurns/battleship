@@ -938,6 +938,14 @@ export class PlacementUI extends WatersUI {
     const total = ships.length
     const placed = ships.filter(s => s.cells.length > 0).length
     this.score.placed.textContent = `${placed} / ${total}`
+
+    if (
+      total === placed &&
+      this.placingShips &&
+      this.gotoNextStageAfterPlacement
+    ) {
+      this.gotoNextStageAfterPlacement()
+    }
   }
   reset (ships) {
     this.board.innerHTML = ''
