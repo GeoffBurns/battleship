@@ -24,11 +24,11 @@
 
     #chooseMap select {
 
-        -webkit-appearance: none;
+        -webkit-appearance: none !important;
         /* Chrome, Safari */
-        -moz-appearance: none;
+        -moz-appearance: none !important;
         /* Firefox */
-        appearance: none;
+        appearance: none !important;
         /* S
  tandard */
 
@@ -45,7 +45,7 @@
     }
 
     #chooseMap select::-ms-expand {
-        display: none;
+        display: none !important;
     }
 
     div.tab-bar-container {
