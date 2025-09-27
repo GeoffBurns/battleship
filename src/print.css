@@ -1,0 +1,92 @@
+@media print {
+    /* Hide everything except the map and the "you are here" marker */
+
+
+    nav a:not(.you-are-here),
+    nav div:not(.you-are-here),
+    nav button:not(.you-are-here),
+    #choose-map-label,
+    .panel-controls,
+    .status {
+        display: none !important;
+    }
+
+    /*
+    #chooseMap { 
+        display: none;
+    }
+ */
+    #chooseMap::after {
+        content: attr(value);
+        ;
+        display: block;
+        ;
+        font-size: 2rem;
+        ;
+        font-weight: bold;
+        ;
+        margin: 1rem 0;
+        ;
+    }
+
+    .board-wrap {
+        background: white;
+        border: 0 none;
+        border-radius: 0;
+    }
+
+    .info-wrap {
+        background: white;
+        border: 0 none;
+    }
+
+
+
+    .cell {
+
+        border: 1px solid black;
+    }
+
+    .cell.land.light {
+        background: #84c289 !important;
+    }
+
+    .cell.land.dark {
+        background: #79b384 !important;
+    }
+
+    .cell.sea.light {
+        background: #6ac8ff !important;
+    }
+
+    .cell.sea.dark {
+        background: #67b1f0 !important;
+    }
+
+    .cell.rightEdge.light {
+        border-right: 3px solid #024 !important;
+    }
+
+    .cell.bottomEdge.light {
+        border-bottom: 3px solid #024 !important;
+    }
+
+    .cell.rightEdge.dark {
+        border-right: 3px solid #000 !important;
+    }
+
+    .cell.bottomEdge.dark {
+        border-bottom: 3px solid #000 !important;
+    }
+
+    .cell.leftEdge.light {
+        border-left: 3px solid #000 !important;
+    }
+
+    .cell.leftEdge.dark {
+        border-left: 3px solid #000 !important;
+    }
+
+
+
+}

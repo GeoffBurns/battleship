@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="cells.css" />
     <link rel="stylesheet" href="status.css" />
     <link rel="stylesheet" href="battleseek.css" />
+    <link rel="stylesheet" media="print" href="print.css" />
   </head>
   <body>
     <div class="battleship" id="battleship-game">
@@ -47,7 +48,9 @@
         <div class="heading-container">
           <div class="choose-controls">
             <div class="choose-container choose-map-container">
-              <label for="chooseMap" class="choose-label">Choose a Map: </label>
+              <label for="chooseMap" class="choose-label" id="choose-map-label"
+                >Choose a Map:
+              </label>
               <select id="chooseMap" class="choose-select"></select>
             </div>
           </div>

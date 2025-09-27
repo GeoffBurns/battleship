@@ -17,7 +17,10 @@
       border-radius: 0 0 10px 10px;
       padding: 0 0 0 0;
       background-color: RGB(119, 126, 135, 0.8);
-      width: 300px;
+
+      flex: 0 0 auto;
+      /* <- shrink to fit its contents */
+      width: auto;
     }
 
     .heading-container.sub-tabs {
