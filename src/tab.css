@@ -96,7 +96,7 @@
     }
 
     .tab-bar a.you-are-here.first {
-
+      margin-left: -0.2rem;
       border-radius: 0 15px 0 10px;
     }
 

@@ -80,9 +80,18 @@ select {
     font-weight: bold
 }
 
+.trays,
 .player-container {
     display: flex;
     flex-direction: column;
+}
+
+.tray.empty {
+    display: none !important;
+}
+
+.trays {
+    gap: 10px;
 }
 
 .player-container.hidden {

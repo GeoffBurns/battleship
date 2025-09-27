@@ -198,12 +198,13 @@ export class ScoreUI {
       const box = boxer(s)
       row.appendChild(box)
     })
+
     rowList.appendChild(row)
   }
   buildBombRow (rowList, carpetBombsUsed) {
     const row = document.createElement('div')
     row.className = 'tally-row'
-
+    row.classList.add('weapon')
     for (let i = 0; i < gameMaps.maxBombs; i++) {
       const box = document.createElement('div')
       box.className = 'tally-box'

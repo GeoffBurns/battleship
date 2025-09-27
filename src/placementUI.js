@@ -172,6 +172,8 @@ export class PlacementUI extends WatersUI {
           container.children.length === 0
         )
           container.remove()
+
+        this.checkTrays()
       }
       clickedShip = null
     }
@@ -196,6 +198,8 @@ export class PlacementUI extends WatersUI {
     }
     this.displayShipTrackingInfo(model)
     removeSelection()
+
+    this.checkTrays()
   }
 
   addDrop (cell, model) {
@@ -438,14 +442,12 @@ export class PlacementUI extends WatersUI {
         return null
     }
   }
+  getTrays () {
+    return [this.shipTray, this.planeTray, this.buildingTray, this.specialTray]
+  }
 
   getTrayItemInfo (shipId, adaptInfo) {
-    let trays = [
-      this.shipTray,
-      this.planeTray,
-      this.buildingTray,
-      this.specialTray
-    ]
+    let trays = this.getTrays()
     let itemIndex = 0
     let trayIndex = 0
 
@@ -803,11 +805,23 @@ export class PlacementUI extends WatersUI {
       }
     }
   }
+  checkTrays () {
+    const trays = this.getTrays()
+    for (const tray of trays) {
+      if (tray.children.length === 0) {
+        tray.classList.add('empty')
+      } else {
+        tray.classList.remove('empty')
+      }
+    }
+  }
   buildTrays (ships) {
     for (const ship of ships) {
       this.addShipToTrays(ships, ship)
     }
+    this.checkTrays()
   }
+
   addShipToTrays (ships, ship) {
     const type = ship.type()
     switch (type) {

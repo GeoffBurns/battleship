@@ -114,6 +114,7 @@
 
     #tray-container {
         border: 0 none;
+        gap: 16px !important;
     }
 
     #buildingTray .cell:not(.empty),
@@ -144,7 +145,7 @@
     }
 
     .cell.sea.dark {
-        background: #CCDFF7 !important;
+        background: #D4E6F8 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         color: black !important;
@@ -166,6 +167,13 @@
         color: black !important;
     }
 
+    #weaponTray .cell:not(.empty),
+    div.tally-row.weapon div.tally-box {
+        background: #F0DAF5 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
 
     .cell.rightEdge.light {
         border-right: 3px solid #024 !important;
