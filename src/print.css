@@ -104,20 +104,20 @@
     }
 
     .cell.land.light {
-        background: #b4ffc9 !important;
+        background: #b9ffd9 !important;
 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .cell.land.dark {
-        background: #99f0a4 !important;
+        background: #9ff0a9 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .cell.sea.light {
-        background: #9ad8ff !important;
+        background: #aadfff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
@@ -150,5 +150,16 @@
 
     .cell.leftEdge.dark {
         border-left: 3px solid #000 !important;
+    }
+
+    .info-container,
+    .info-container .info,
+    .tally-title {
+        color: black !important;
+    }
+
+    .tally-box {
+        border: 2px solid black;
+        font-size: 85%
     }
 }
