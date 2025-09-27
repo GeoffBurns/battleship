@@ -5,6 +5,7 @@
     nav a:not(.you-are-here),
     nav div:not(.you-are-here),
     nav button:not(.you-are-here),
+    div.heading-container.sub-tabs div.tab-bar-container.sub-tabs,
     #choose-map-label,
     .panel-controls,
     .status {
