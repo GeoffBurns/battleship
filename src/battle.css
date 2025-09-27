@@ -39,6 +39,11 @@ body {
     color: #380101
 }
 
+
+select {
+    padding: 5px 8px 5px 20px;
+}
+
 .choose-controls {
     display: flex;
     justify-content: space-between;
@@ -51,7 +56,7 @@ body {
 
 .choose-container {
     margin-bottom: 13px;
-    margin-top: 25px;
+    margin-top: 13px;
 }
 
 .choose-map-container {
