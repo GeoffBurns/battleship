@@ -48,19 +48,28 @@
     }
 
     .cell.land.light {
-        background: #84c289 !important;
+        background: #a4e2a9 !important;
+
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.land.dark {
-        background: #79b384 !important;
+        background: #89d394 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.sea.light {
-        background: #6ac8ff !important;
+        background: #8ad8ff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.sea.dark {
-        background: #67b1f0 !important;
+        background: #77c1ff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .cell.rightEdge.light {
