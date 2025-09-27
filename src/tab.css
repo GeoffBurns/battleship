@@ -95,5 +95,10 @@
       color: #334155;
     }
 
+    .tab-bar a.you-are-here.first {
+
+      border-radius: 0 15px 0 10px;
+    }
+
 
     /* --- IGNORE ---      // color: #380101;*/
