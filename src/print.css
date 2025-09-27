@@ -17,13 +17,7 @@
         justify-content: space-around;
     }
 
-    #chooseMap {
-        border: 0 none;
-        text-align: center;
-        font-size: 200%;
-    }
-
-    #chooseMap select {
+    select#chooseMap {
 
         -webkit-appearance: none !important;
         /* Chrome, Safari */
@@ -33,19 +27,21 @@
         /* S
  tandard */
 
+        border: 0 none;
+        text-align: center;
+        font-size: 200%;
         text-indent: 1px;
         text-overflow: '';
-        background: none;
+        background: none !important;
+
+        background-image: none !important;
         /* remove background including arrow in some browsers */
-        background-color: white;
+        background-color: transparent !important;
         /* restore background if needed */
         padding-right: 1rem;
-        /* prevent text from overlapping */
-        border: 1px solid #ccc;
-        /* keep a visible border */
     }
 
-    #chooseMap select::-ms-expand {
+    select#chooseMap::-ms-expand {
         display: none !important;
     }
 
@@ -155,7 +151,4 @@
     .cell.leftEdge.dark {
         border-left: 3px solid #000 !important;
     }
-
-
-
 }
