@@ -31,6 +31,9 @@
         appearance: none;
         /* S
  tandard */
+
+        text-indent: 1px;
+        text-overflow: '';
         background: none;
         /* remove background including arrow in some browsers */
         background-color: white;
@@ -39,6 +42,10 @@
         /* prevent text from overlapping */
         border: 1px solid #ccc;
         /* keep a visible border */
+    }
+
+    #chooseMap select::-ms-expand {
+        display: none;
     }
 
     div.tab-bar-container {
@@ -88,6 +95,10 @@
         border: 0 none;
     }
 
+    .cell.empty {
+        background: white;
+        border: 0 none;
+    }
 
 
     .cell {
