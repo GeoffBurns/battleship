@@ -173,10 +173,25 @@ export class ScoreUI {
     }
     return box
   }
-  buildTallyRow (ships, letter, rowList, boxer) {
+  buildTallyRow (ships, letter, rowList, boxer, tallyGroup) {
     boxer = boxer || this.buildShipBox
+
     const row = document.createElement('div')
     row.className = 'tally-row'
+    switch (tallyGroup) {
+      case 'S':
+        row.classList.add('sea')
+        break
+      case 'G':
+        row.classList.add('land')
+        break
+      case 'A':
+        row.classList.add('air')
+        break
+      case 'X':
+        row.classList.add('special')
+        break
+    }
     const matching = ships.filter(s => s.letter === letter)
 
     matching.forEach(s => {
@@ -249,16 +264,16 @@ export class ScoreUI {
     const special = shipLetters('X')
 
     for (const letter of sea) {
-      this.buildTallyRow(ships, letter, seaColumn, boxer)
+      this.buildTallyRow(ships, letter, seaColumn, boxer, 'S')
     }
     for (const letter of special) {
-      this.buildTallyRow(ships, letter, seaColumn, boxer)
+      this.buildTallyRow(ships, letter, seaColumn, boxer, 'X')
     }
     for (const letter of air) {
-      this.buildTallyRow(ships, letter, landColumn, boxer)
+      this.buildTallyRow(ships, letter, landColumn, boxer, 'A')
     }
     for (const letter of land) {
-      this.buildTallyRow(ships, letter, landColumn, boxer)
+      this.buildTallyRow(ships, letter, landColumn, boxer, 'G')
     }
     if (withWeapons) {
       this.buildBombRow(landColumn, carpetBombsUsed)

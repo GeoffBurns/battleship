@@ -93,8 +93,13 @@
     }
 
     .cell.empty {
-        background: white;
+        background: transparent;
         border: 0 none;
+    }
+
+    .cell.special::after {
+        background: black;
+        transition: none;
     }
 
 
@@ -103,30 +108,64 @@
         border: 1px solid black;
     }
 
+    .tray {
+        gap: 16px !important;
+    }
+
+    #tray-container {
+        border: 0 none;
+    }
+
+    #buildingTray .cell:not(.empty),
+    div.tally-row.land div.tally-box,
     .cell.land.light {
-        background: #b9ffd9 !important;
+        background: #DAECCD !important;
 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        color: black !important;
     }
 
     .cell.land.dark {
-        background: #9ff0a9 !important;
+        background: #CAE4BA !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        color: black !important;
+
     }
 
+    #shipTray .cell:not(.empty),
+    div.tally-row.sea div.tally-box,
     .cell.sea.light {
-        background: #aadfff !important;
+        background: #DCEFFA !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        color: black !important;
     }
 
     .cell.sea.dark {
-        background: #87d1ff !important;
+        background: #CCDFF7 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        color: black !important;
     }
+
+    #planeTray .cell:not(.empty),
+    div.tally-row.air div.tally-box {
+        background: #FFF4D1 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
+    #specialTray .cell:not(.empty),
+    div.tally-row.special div.tally-box {
+        background: #F5EEFB !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color: black !important;
+    }
+
 
     .cell.rightEdge.light {
         border-right: 3px solid #024 !important;
