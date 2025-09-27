@@ -11,23 +11,71 @@
         display: none !important;
     }
 
-    /*
-    #chooseMap { 
-        display: none;
+    #choose-controls {
+        display: flex !important;
+        justify-content: space-around;
     }
- */
-    #chooseMap::after {
-        content: attr(value);
-        ;
-        display: block;
-        ;
-        font-size: 2rem;
-        ;
-        font-weight: bold;
-        ;
-        margin: 1rem 0;
-        ;
+
+    #chooseMap {
+        border: 0 none;
+        text-align: center;
+        font-size: 200%;
     }
+
+    #chooseMap select {
+
+        -webkit-appearance: none;
+        /* Chrome, Safari */
+        -moz-appearance: none;
+        /* Firefox */
+        appearance: none;
+        /* S
+ tandard */
+        background: none;
+        /* remove background including arrow in some browsers */
+        background-color: white;
+        /* restore background if needed */
+        padding-right: 1rem;
+        /* prevent text from overlapping */
+        border: 1px solid #ccc;
+        /* keep a visible border */
+    }
+
+    div.tab-bar-container {
+        justify-content: space-between !important;
+        align-items: stretch !important;
+    }
+
+    div.tab-bar-container nav.tab-bar.tab-bar.main {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: stretch !important;
+    }
+
+    .title-header {
+        color: #000 !important;
+        font-size: 150% !important;
+    }
+
+    .logo {
+        height: 120px !important;
+        width: 120px !important;
+    }
+
+    .tab-bar.main .you-are-here {
+        text-align: right !important;
+        padding-top: 2rem;
+        margin-bottom: -3rem;
+        border-radius: 0 0;
+        border: 0 none;
+        color: black;
+        transition: none;
+    }
+
+    .you-are-here {
+        font-size: 150% !important;
+    }
+
 
     .board-wrap {
         background: white;
@@ -48,26 +96,26 @@
     }
 
     .cell.land.light {
-        background: #a4e2a9 !important;
+        background: #b4ffc9 !important;
 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .cell.land.dark {
-        background: #89d394 !important;
+        background: #99f0a4 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .cell.sea.light {
-        background: #8ad8ff !important;
+        background: #9ad8ff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .cell.sea.dark {
-        background: #77c1ff !important;
+        background: #87d1ff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }

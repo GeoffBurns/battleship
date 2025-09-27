@@ -3,6 +3,11 @@ body {
     background-repeat: repeat;
 }
 
+.logo {
+    width: 90px;
+    height: 90px;
+}
+
 .battleship {
     box-sizing: border-box;
     color: #0e1530;
