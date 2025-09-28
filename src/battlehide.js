@@ -117,7 +117,7 @@ function onClickUndo () {
       friendUI.markPlaced(ship.cells, ship.letter)
     },
     ship => {
-      friendUI.addShipToTrays(ship)
+      friendUI.addShipToTrays(friend.ships, ship)
     }
   )
   friendUI.unplacement(friend.ships, ship)
