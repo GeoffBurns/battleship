@@ -65,6 +65,7 @@
      display: grid;
      place-items: center;
      font-weight: 700;
+     font-size: 80%
  }
 
  .tally-box-container.map-list .tally-box {

@@ -198,7 +198,7 @@ select {
 }
 
 @media (min-width: 1024px) {
-    .battleship .player-body {
+    .battleship:not(.print-preview) .player-body {
         flex-direction: row;
         gap: 12px;
     }
