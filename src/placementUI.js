@@ -664,9 +664,7 @@ export class PlacementUI extends WatersUI {
 
     dragShip.setAttribute(
       'style',
-      `display:grid;place-items: center;--boxSize:${
-        this.cellSize().toString() + 'px'
-      };grid-template-rows:repeat(${maxR}, var(--boxSize));grid-template-columns:repeat(${maxC}, var(--boxSize));gap:0px;`
+      `display:grid;place-items: center;--boxSize:${this.cellSizeString()};grid-template-rows:repeat(${maxR}, var(--boxSize));grid-template-columns:repeat(${maxC}, var(--boxSize));gap:0px;`
     )
     for (let r = 0; r < maxR; r++) {
       for (let c = 0; c < maxC; c++) {
@@ -777,6 +775,7 @@ export class PlacementUI extends WatersUI {
     this.makeDraggable(dragShip, ships)
     dragShipContainer.appendChild(dragShip)
     tray.appendChild(dragShipContainer)
+    tray.classList.remove('empty')
   }
   buildBrush (size, subterrain, tray) {
     const brushContainer = document.createElement('div')
