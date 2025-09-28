@@ -1,6 +1,17 @@
 @media print {
-    /* Hide everything except the map and the "you are here" marker */
+    @page {
+        size: A4 portrait;
+        margin: 20px;
+        /* or 0 for borderless-capable printers */
+    }
 
+
+    body {
+        width: 780px;
+        /* printable width */
+        height: 1115px;
+        /* printable height */
+    }
 
     nav a:not(.you-are-here),
     nav div:not(.you-are-here),
@@ -8,8 +19,14 @@
     div.heading-container.sub-tabs div.tab-bar-container.sub-tabs,
     #choose-map-label,
     .panel-controls,
+    .screen-only,
     .status {
         display: none !important;
+    }
+
+
+    .battleship.print-preview .print-only {
+        display: block !important;
     }
 
     #choose-controls {
@@ -82,13 +99,13 @@
 
 
     .board-wrap {
-        background: white;
+        background: transparent;
         border: 0 none;
         border-radius: 0;
     }
 
     .info-wrap {
-        background: white;
+        background: transparent;
         border: 0 none;
     }
 

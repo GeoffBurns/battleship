@@ -100,40 +100,105 @@ select {
 
 .player-body {
     display: flex;
+}
+
+.battleship:not(.print-preview) .player-body {
     flex-direction: column;
 }
 
-.player-main {
+.battleship.print-preview .player-body {
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.battleship:not(.print-preview) .player-main {
     width: var(--content-width);
+}
+
+.player-main {
     display: flex;
     flex-direction: column;
     gap: 8px;
     margin: 0 auto;
 }
 
-.panel-container {
+.panel-container:not(.print-preview) {
     width: var(--content-width);
+}
+
+.panel-container {
     margin: 0 auto;
 }
 
+.screen-only {
+    display: block;
+}
+
+.battleship.print-preview .print-only {
+    display: none;
+}
+
+.battleship.print-preview .title-wrap.screen-only,
+.battleship.print-preview,
+.info-wrap.info-top.print-preview,
+.game-container.print-preview {
+    box-sizing: border-box;
+    width: 780px !important;
+}
+
+.info-wrap.info-top.print-preview {
+    padding: 0 0;
+}
+
+.battleship.print-preview .title-wrap {
+    box-sizing: border-box;
+    width: 600px;
+    padding: 0 0;
+}
+
+
+.battleship.print-preview .board-column {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 600px !important;
+}
+
+.panel-container.print-preview {
+    background-color: black;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 158px !important;
+    border: 0 none;
+    margin: 0 0;
+    padding: 0 0;
+}
+
+
 @media (max-width: 600px) {
-    game-container {
+    .game-container:not(.print-preview) {
         width: var(--content-width);
+
+    }
+
+    .game-container {
         margin: 0 auto;
     }
 }
 
 @media (max-width: 1023px) {
-    .title-wrap {
+    .battleship:not(.print-preview) .title-wrap {
         width: var(--content-width);
+    }
+
+    .title-wrap {
         margin: 0 auto;
         box-sizing: border-box;
     }
 }
 
 @media (min-width: 1024px) {
-
-    .player-body {
+    .battleship .player-body {
         flex-direction: row;
         gap: 12px;
     }
@@ -142,10 +207,14 @@ select {
 
 @media (min-width: 1200px) {
 
-    .battleship,
+    .battleship:not(.print-preview),
+    .battleship:not(.print-preview) .title-wrap,
+    .battleship:not(.print-preview) .center-title {
+        width: 1200px !important;
+    }
+
     .title-wrap,
     .center-title {
-        width: 1200px !important;
         margin: 0 auto;
     }
 }

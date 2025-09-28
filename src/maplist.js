@@ -2,7 +2,7 @@ import { gameMaps } from './maps.js'
 import { WatersUI } from './playerUI.js'
 import { Waters } from './player.js'
 import { ScoreUI } from './ScoreUI.js'
-import { setupTabs, switchToEdit } from './setup.js'
+import { setupTabs, switchToEdit, switchTo } from './setup.js'
 
 class MapList {
   constructor (id) {
@@ -53,7 +53,7 @@ class MapList {
 
   addMiniMap (map, boardViewModel, entryContent, idx) {
     const boardWrapper = document.createElement('div')
-    boardWrapper.className = 'board-wrap'
+    boardWrapper.className = 'board-wrap map-list'
 
     boardWrapper.style.width = '200px'
     const board = document.createElement('div')
@@ -69,11 +69,12 @@ class MapList {
     boardViewModel.buildBoard(null, board, map)
     boardWrapper.appendChild(board)
     entryContent.appendChild(boardWrapper)
+    return boardWrapper
   }
 
   addEntryButtons (idx, map, entryContent) {
     const buttons = document.createElement('div')
-    buttons.className = 'panel-controls'
+    buttons.className = 'panel-controls map-list'
     let controls = []
     controls.push(
       this.addEntryButton('delete', idx, map, buttons, function (map) {
@@ -117,27 +118,34 @@ class MapList {
         switchToEdit(map.title)
       })
     )
+    controls.push(
+      this.addEntryButton('print', idx, map, buttons, function (map) {
+        switchTo('print', 'print', map.title)
+      })
+    )
     entryContent.appendChild(buttons)
+
+    return buttons
   }
 
   setupTallyBox (idx, entryContent) {
     const boardWrapper2 = document.createElement('div')
-    boardWrapper2.className = 'board-wrap'
-    boardWrapper2.style.width = '160px'
+    boardWrapper2.className = 'board-wrap map-list'
+    boardWrapper2.style.minWidth = '160px'
     const tallyContainer = document.createElement('div')
     tallyContainer.className = 'tally-box-container map-list'
     tallyContainer.id = 'tally-container-' + idx.toString()
 
-    tallyContainer.style.width = '160px'
+    tallyContainer.style.minWidth = '160px'
     const tallybox = document.createElement('div')
     tallybox.id = idx.toString() + '-tallybox'
     tallybox.className = 'tally-boxes'
 
     tallyContainer.appendChild(tallybox)
     boardWrapper2.appendChild(tallyContainer)
-    boardWrapper2.style.width = '160px'
+    boardWrapper2.style.minWidth = '160px'
     entryContent.appendChild(boardWrapper2)
-    return tallybox
+    return [tallybox, boardWrapper2]
   }
 
   fillTallyBox (idx, map, tallybox, boardViewModel) {
@@ -163,13 +171,18 @@ class MapList {
     entryContent.className = 'entry-container'
 
     const boardViewModel = new WatersUI()
-    this.addMiniMap(map, boardViewModel, entryContent, idx)
-    const tallybox = this.setupTallyBox(idx, entryContent)
-    this.addEntryButtons(idx, map, entryContent)
+    const boardNode = this.addMiniMap(map, boardViewModel, entryContent, idx)
+    const [tallybox, tallyWrapper] = this.setupTallyBox(idx, entryContent)
+
+    const buttonsNode = this.addEntryButtons(idx, map, entryContent)
 
     entry.appendChild(entryContent)
     this.container.appendChild(entry)
     this.fillTallyBox(idx, map, tallybox, boardViewModel)
+
+    const height =
+      Math.max(boardNode.offsetHeight, tallyWrapper.offsetHeight, 60) + 20
+    buttonsNode.style.maxHeight = height + 'px'
   }
 
   makeList () {

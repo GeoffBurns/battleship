@@ -252,7 +252,7 @@ export class ScoreUI {
     }
 
     const surfaceContainer = document.createElement('div')
-    surfaceContainer.setAttribute('style', 'display:flex;gap:40px;')
+    surfaceContainer.classList.add('tally-group-container')
 
     const seaColumn = document.createElement('div')
     seaColumn.className = 'tally-col'
