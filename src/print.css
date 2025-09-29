@@ -31,7 +31,7 @@
 
     #choose-controls {
         display: flex !important;
-        justify-content: space-around;
+        justify-content: flex-start;
     }
 
     select#chooseMap {
