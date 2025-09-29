@@ -9,8 +9,9 @@ export function locationKey (r, c) {
 }
 
 export class Map {
-  constructor (title, rows, cols, shipNum, landArea, mapTerrain, land) {
+  constructor (title, rows, cols, shipNum, landArea, name, mapTerrain, land) {
     this.title = title
+    this.name = name
     this.rows = rows
     this.cols = cols
     this.shipNum = shipNum
@@ -29,6 +30,7 @@ export class Map {
       }
     })
     this.calcTrackers()
+    this.isPreGenerated = true
   }
   recalcTracker (subterrain, tracker) {
     tracker.total.clear()
@@ -139,6 +141,33 @@ export class Map {
   isLand (r, c) {
     return this.landArea.some(inRange(r, c))
   }
+
+  savedMap (newTitle) {
+    newTitle = newTitle || makeTitle(this.terrain, this.cols, this.rows)
+
+    const clone = new SavedCustomMap({ ...this })
+    for (let i; i < this.rows; i++) {
+      for (let j; j < this.cols; j++) {
+        if (this.isLand(i, j)) clone.addLand(i, j)
+      }
+    }
+    clone.title = newTitle
+    return clone
+  }
+  clone (newTitle) {
+    const clonedMap = this.savedMap(newTitle)
+    clonedMap.saveToLocalStorage(newTitle)
+  }
+
+  exportName () {
+    return this.name + ' copy'
+  }
+
+  jsonString (newTitle) {
+    newTitle = newTitle || this.exportName()
+    const exportingMap = this.savedMap(newTitle)
+    return exportingMap.jsonString()
+  }
 }
 function getCopyNumKey (terrain, cols, rows) {
   return `geoffs-battleship.${terrain.key}-index-${cols}x${rows}`
@@ -160,11 +189,25 @@ function makeTitle (terrain, cols, rows) {
 
 export class CustomMap extends Map {
   constructor (title, rows, cols, shipNum, land, mapTerrain) {
-    super(title, rows, cols, shipNum, [], mapTerrain || terrain.current, land)
+    super(
+      title,
+      rows,
+      cols,
+      shipNum,
+      [],
+      title,
+      mapTerrain || terrain.current,
+      land
+    )
+    this.isPreGenerated = false
   }
 
   isLand (r, c) {
     return this.land.has(`${r},${c}`)
+  }
+
+  exportName () {
+    return this.title
   }
 
   jsonObj () {
@@ -260,14 +303,19 @@ export class SavedCustomMap extends CustomMap {
 
   static loadObj (title) {
     const data = localStorage.getItem(`geoffs-battleship.${title}`)
-    if (!data) return //throw new Error('No such saved map')
+    if (!data) throw new Error('No such saved map')
     const obj = JSON.parse(data)
     return obj
   }
 
   static load (title) {
-    const obj = SavedCustomMap.loadObj(title)
-    return new SavedCustomMap(obj)
+    try {
+      const obj = SavedCustomMap.loadObj(title)
+      return new SavedCustomMap(obj)
+    } catch (error) {
+      console.error("Can't Load Map : ", error)
+      return null
+    }
   }
 
   localStorageKey () {

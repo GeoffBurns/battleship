@@ -1,4 +1,4 @@
-import { heightUI, mapUI, widthUI } from './chooseUI.js'
+import { heightUI, mapUI, widthUI, listUI } from './chooseUI.js'
 import { gameMaps } from './maps.js'
 import { custom } from './custom.js'
 import { terrain } from './Shape.js'
@@ -16,9 +16,9 @@ export function switchToEdit (mapName) {
   window.location.href = location
 }
 
-export function switchTo (target, huntMode) {
+export function switchTo (target, huntMode, mapName) {
   const params = new URLSearchParams()
-  const mapName = gameMaps.current.title
+  mapName = mapName || gameMaps.current.title
   params.append('mapName', mapName)
 
   if (huntMode === 'build' && custom.noOfPlacedShips() > 0) {
@@ -101,11 +101,8 @@ export function setupTabs (huntMode) {
       ?.addEventListener('click', switchToImport)
 }
 
-function setupMapSelection (boardSetup, refresh) {
-  const urlParams = new URLSearchParams(window.location.search)
-  const mapChoices = urlParams.getAll('mapName')
-  const placedShips = urlParams.has('placedShips')
-  const mapName = mapChoices[0] || gameMaps.getLastMapTitle()
+function setupMapControl (mapName, boardSetup, refresh) {
+  mapName = mapName || gameMaps.getLastMapTitle()
 
   mapUI.setup(
     function (_index, title) {
@@ -119,6 +116,24 @@ function setupMapSelection (boardSetup, refresh) {
   )
 
   gameMaps.setTo(mapName)
+}
+
+function setupMapSelectionPrint (boardSetup, refresh) {
+  const urlParams = new URLSearchParams(window.location.search)
+  const mapName = urlParams.getAll('mapName')[0]
+
+  const targetMap = gameMaps.getMap(mapName)
+  setupMapControl(mapName, boardSetup, refresh)
+
+  return targetMap
+}
+function setupMapSelection (boardSetup, refresh) {
+  const urlParams = new URLSearchParams(window.location.search)
+  const mapChoices = urlParams.getAll('mapName')
+  const placedShips = urlParams.has('placedShips')
+
+  setupMapControl(mapChoices[0], boardSetup, refresh)
+
   return placedShips
 }
 
@@ -144,18 +159,19 @@ export function validateHeight () {
   return height
 }
 
-function setupMapOptions (boardSetup, refresh) {
+function setupMapOptions (boardSetup, refresh, huntMode) {
   const urlParams = new URLSearchParams(window.location.search)
-  const editingMap = gameMaps.getEditableMap(urlParams.getAll('edit')[0])
+  huntMode = huntMode || 'build'
+  const targetMap = gameMaps.getEditableMap(urlParams.getAll('edit')[0])
 
-  const map =
-    editingMap ||
+  const templateMap =
+    targetMap ||
     gameMaps.getMap(urlParams.getAll('mapName')[0]) ||
     gameMaps.getLastMap()
-  let mapWidth = gameMaps.getLastWidth(map?.cols)
-  let mapHeight = gameMaps.getLastHeight(map?.rows)
+  let mapWidth = gameMaps.getLastWidth(templateMap?.cols)
+  let mapHeight = gameMaps.getLastHeight(templateMap?.rows)
 
-  setupTabs('build')
+  setupTabs(huntMode)
 
   widthUI.setup(function (_index) {
     const width = validateWidth()
@@ -177,13 +193,21 @@ function setupMapOptions (boardSetup, refresh) {
     refresh()
   }, mapHeight)
 
-  if (editingMap) {
-    gameMaps.setTo(editingMap.title)
+  if (targetMap) {
+    gameMaps.setTo(targetMap.title)
   } else {
     gameMaps.setToBlank(mapHeight, mapWidth)
   }
 
-  return editingMap
+  return targetMap
+}
+
+export function setupMapListOptions (refresh) {
+  setupTabs('list')
+
+  listUI.setup(function (index, text) {
+    refresh(index, text)
+  }, 0)
 }
 
 export function setupGameOptions (boardSetup, refresh, huntMode) {
@@ -193,16 +217,22 @@ export function setupGameOptions (boardSetup, refresh, huntMode) {
   setupTabs(huntMode)
   return placedShips
 }
-
+export function setupPrintOptions (boardSetup, refresh, huntMode) {
+  // Define urlParams using the current window's search string
+  const targetMap = setupMapSelectionPrint(boardSetup, refresh)
+  boardSetup()
+  setupTabs(huntMode)
+  return targetMap
+}
 export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   // Define urlParams using the current window's search string
 
   setupTabs(huntMode)
-  const editing = setupMapOptions(boardSetup, refresh)
-  if (editing && editHandler) {
-    editHandler(editing)
+  const targetMap = setupMapOptions(boardSetup, refresh, huntMode)
+  if (targetMap && editHandler) {
+    editHandler(targetMap)
   } else {
     boardSetup()
   }
-  return editing
+  return targetMap
 }

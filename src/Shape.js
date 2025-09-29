@@ -177,8 +177,9 @@ class ShipCatelogue {
     )
   }
 }
+
 class Terrain {
-  constructor (title, ShipCatelogue, subterrains) {
+  constructor (title, ShipCatelogue, subterrains, tag) {
     this.title = title || 'Unknown'
     this.key = title.toLowerCase().replace(/\s+/g, '-')
     this.ships = ShipCatelogue
@@ -192,6 +193,7 @@ class Terrain {
       subterrains.filter(s => s.isDefault)[0] || subterrains[0]
     this.landSubterrain =
       subterrains.filter(s => s.isTheLand)[0] || subterrains[1]
+    this.tag = tag
   }
 
   customMapsLocalStorageKey () {
@@ -251,7 +253,9 @@ class Terrain {
   getCustomMaps (builder) {
     const customMaps = this.getCustomMapsRaw()
     if (!customMaps) return []
-    return [...this.getCustomMapSet()].map(title => builder(title))
+    return [...this.getCustomMapSet()]
+      .map(title => builder(title))
+      .filter(m => m !== null)
   }
 
   getCustomMapTitles () {
@@ -370,10 +374,12 @@ const land = new SubTerrain('Land', '#348239', '#296334', 'G', false, true, [
   inland
 ])
 
-export const seaAndLand = new Terrain('Sea and Land', seaAndLandShips, [
-  sea,
-  land
-])
+export const seaAndLand = new Terrain(
+  'Sea and Land',
+  seaAndLandShips,
+  [sea, land],
+  'SeaAndLand'
+)
 
 class Building extends Shape {
   constructor (description, letter, symmetry, cells, tip, racks) {

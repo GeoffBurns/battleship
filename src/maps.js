@@ -40,7 +40,8 @@ const jaggedXS = new Map(
     [3, 0, 7],
     [4, 0, 8],
     [5, 0, 8]
-  ]
+  ],
+  'Jagged Coast Battle XS'
 )
 
 const jaggedVS = new Map(
@@ -60,7 +61,8 @@ const jaggedVS = new Map(
     [4, 0, 7],
     [5, 0, 8],
     [6, 0, 8]
-  ]
+  ],
+  'Jagged Coast Battle VS'
 )
 
 const jaggedSS = new Map(
@@ -102,7 +104,8 @@ const jaggedS = new Map(
     [4, 0, 7],
     [5, 0, 8],
     [6, 0, 8]
-  ]
+  ],
+  'Jagged Coast Battle S'
 )
 
 const jaggedMS = new Map(
@@ -122,7 +125,8 @@ const jaggedMS = new Map(
     [5, 0, 8],
     [6, 0, 10],
     [7, 0, 10]
-  ]
+  ],
+  'Jagged Coast Battle MS'
 )
 
 const jaggedM = new Map(
@@ -140,7 +144,8 @@ const jaggedM = new Map(
     [6, 13, 16],
     [7, 0, 16],
     [8, 0, 16]
-  ]
+  ],
+  'Jagged Coast Battle M'
 )
 
 const jaggedML = new Map(
@@ -158,7 +163,8 @@ const jaggedML = new Map(
     [6, 14, 17],
     [7, 0, 17],
     [8, 0, 17]
-  ]
+  ],
+  'Jagged Coast Battle ML'
 )
 const JaggedL = new Map(
   'Jagged Coast L',
@@ -175,7 +181,8 @@ const JaggedL = new Map(
     [7, 14, 17],
     [8, 0, 17],
     [9, 0, 17]
-  ]
+  ],
+  'Jagged Coast Battle L'
 )
 const NarrowS = new Map(
   'Narrow Coast S',
@@ -189,7 +196,8 @@ const NarrowS = new Map(
     [8, 0, 10],
     [9, 0, 16],
     [10, 0, 16]
-  ]
+  ],
+  'Narrow Coast Battle S'
 )
 const JaggedLL = new Map(
   'Jagged Coast LL',
@@ -206,7 +214,8 @@ const JaggedLL = new Map(
     [7, 16, 19],
     [8, 0, 19],
     [9, 0, 19]
-  ]
+  ],
+  'Jagged Coast Battle LL'
 )
 const NarrowM = new Map(
   'Narrow Coast M',
@@ -220,7 +229,8 @@ const NarrowM = new Map(
     [9, 0, 10],
     [10, 0, 16],
     [11, 0, 16]
-  ]
+  ],
+  'Narrow Coast Battle M'
 )
 const JaggedVL = new Map(
   'Jagged Coast VL',
@@ -237,7 +247,8 @@ const JaggedVL = new Map(
     [7, 16, 19],
     [8, 0, 20],
     [9, 0, 20]
-  ]
+  ],
+  'Jagged Coast Battle VL'
 )
 
 const JaggedXL = new Map(
@@ -255,7 +266,8 @@ const JaggedXL = new Map(
     [7, 16, 19],
     [8, 0, 21],
     [9, 0, 21]
-  ]
+  ],
+  'Jagged Coast Battle XL'
 )
 
 // gameMapTypes
@@ -403,11 +415,16 @@ class TerrainMaps {
     this.storeLastWidth(width)
     this.storeLastHeight(height)
   }
+
   customMapList () {
     return this.terrain.getCustomMaps(SavedCustomMap.load)
   }
+
   maps () {
     return this.list.concat(this.customMapList())
+  }
+  preGenMapList () {
+    return this.list
   }
 
   mapTitles () {

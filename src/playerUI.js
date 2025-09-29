@@ -2,18 +2,44 @@ import { gameMaps, gameHost } from './maps.js'
 import { StatusUI } from './StatusUI.js'
 
 export const gameStatus = new StatusUI()
-
+const startCharCode = 65
 export class WatersUI {
   constructor () {
     this.board = {}
     this.placingShips = false
     this.containerWidth = gameHost.containerWidth
+    this.isPrinting = false
   }
 
-  cellSize () {
-    return this.containerWidth / gameMaps.current.cols
+  cellSizeScreen (map) {
+    map = map || gameMaps.current
+    return this.containerWidth / map.cols
+  }
+  cellSizeList () {
+    return this.containerWidth / 22
+  }
+  cellSizePrint (map) {
+    map = map || gameMaps.current
+    return 600 / (map.cols + 1)
   }
 
+  cellUnit () {
+    return 'px'
+  }
+  cellSize (map) {
+    return this.isPrinting ? this.cellSizePrint(map) : this.cellSizeScreen()
+  }
+
+  cellSizeString () {
+    return this.cellSize() + this.cellUnit()
+  }
+
+  cellSizeStringList () {
+    return this.cellSizeList() + this.cellUnit()
+  }
+  cellSizeStringPrint () {
+    return this.cellSizePrint() + this.cellUnit()
+  }
   gridCellRawAt (r, c) {
     return this.board.children[r * gameMaps.current.cols + c]
   }
@@ -89,15 +115,22 @@ export class WatersUI {
       }
     }
   }
-  resetBoardSize (map) {
+  resetBoardSize (map, cellSize) {
     if (!map) map = gameMaps.current
-    const cellSize = this.cellSize()
+    cellSize = cellSize || this.cellSizeString()
     this.board.style.setProperty('--cols', map.cols)
     this.board.style.setProperty('--rows', map.rows)
-    this.board.style.setProperty('--boxSize', cellSize.toString() + 'px')
+    this.board.style.setProperty('--boxSize', cellSize)
     this.board.innerHTML = ''
   }
-
+  resetBoardSizePrint (map) {
+    if (!map) map = gameMaps.current
+    const cellSize = this.cellSizeStringPrint()
+    this.board.style.setProperty('--cols', map.cols + 1)
+    this.board.style.setProperty('--rows', map.rows + 1)
+    this.board.style.setProperty('--boxSize', cellSize)
+    this.board.innerHTML = ''
+  }
   colorize (r, c) {
     this.colorizeCell(this.gridCellRawAt(r, c), r, c)
   }
@@ -154,6 +187,26 @@ export class WatersUI {
       cell.classList.add('topEdge')
     }
   }
+  buildEmptyCell () {
+    const cell = document.createElement('div')
+    cell.className = 'cell empty'
+    this.board.appendChild(cell)
+  }
+
+  buildRowLabel (max, r) {
+    const cell = document.createElement('div')
+    cell.className = 'cell row-label'
+    cell.dataset.r = r
+    cell.textContent = max - r
+    this.board.appendChild(cell)
+  }
+  buildColLabel (c) {
+    const cell = document.createElement('div')
+    cell.className = 'cell col-label'
+    cell.dataset.c = c
+    cell.textContent = String.fromCharCode(startCharCode + c)
+    this.board.appendChild(cell)
+  }
   buildCell (r, c, onClickCell, map) {
     const cell = document.createElement('div')
     cell.className = 'cell'
@@ -166,8 +219,23 @@ export class WatersUI {
     }
     this.board.appendChild(cell)
   }
+  buildBoardPrint (map) {
+    map = map || gameMaps.current
+    this.board.innerHTML = ''
+    this.buildEmptyCell()
+
+    for (let c = 0; c < map.cols; c++) {
+      this.buildColLabel(c)
+    }
+    for (let r = 0; r < map.rows; r++) {
+      this.buildRowLabel(map.rows, r)
+      for (let c = 0; c < map.cols; c++) {
+        this.buildCell(r, c, null, map)
+      }
+    }
+  }
   buildBoard (onClickCell, thisRef, map) {
-    if (!map) map = gameMaps.current
+    map = map || gameMaps.current
     this.board.innerHTML = ''
     for (let r = 0; r < map.rows; r++) {
       for (let c = 0; c < map.cols; c++) {

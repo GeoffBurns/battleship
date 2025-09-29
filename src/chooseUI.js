@@ -82,3 +82,8 @@ export const heightUI = new ChooseNumberUI(
   1,
   'chooseHeight'
 )
+
+export const listUI = new ChooseFromListUI(
+  ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
+  'chooseList'
+)

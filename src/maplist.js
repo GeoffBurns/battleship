@@ -2,7 +2,7 @@ import { gameMaps } from './maps.js'
 import { WatersUI } from './playerUI.js'
 import { Waters } from './player.js'
 import { ScoreUI } from './ScoreUI.js'
-import { setupTabs, switchToEdit, switchTo } from './setup.js'
+import { switchToEdit, switchTo, setupMapListOptions } from './setup.js'
 
 class MapList {
   constructor (id) {
@@ -16,6 +16,7 @@ class MapList {
     this.currentRenameEntry = null
     this.okBtn.addEventListener('click', this.renameOk.bind(this))
     this.cancelBtn.addEventListener('click', this.renameCancel.bind(this))
+    this.listIncludes = '0'
   }
 
   renameOk () {
@@ -55,17 +56,17 @@ class MapList {
     const boardWrapper = document.createElement('div')
     boardWrapper.className = 'board-wrap map-list'
 
-    boardWrapper.style.width = '200px'
+    boardWrapper.style.maxWidth = '200px'
     const board = document.createElement('div')
 
     board.className = 'board'
     board.id = 'custom-map-board-' + idx.toString()
-    board.style.width = '200px'
+    board.style.maxWidth = '200px'
     board.style.margin = '0 0'
     board.style.padding = '0 0'
     boardViewModel.containerWidth = 200
     boardViewModel.board = board
-    boardViewModel.resetBoardSize(map)
+    boardViewModel.resetBoardSize(map, boardViewModel.cellSizeStringList())
     boardViewModel.buildBoard(null, board, map)
     boardWrapper.appendChild(board)
     entryContent.appendChild(boardWrapper)
@@ -76,53 +77,61 @@ class MapList {
     const buttons = document.createElement('div')
     buttons.className = 'panel-controls map-list'
     let controls = []
+    if (!map.isPreGenerated) {
+      controls.push(
+        this.addEntryButton('delete', idx, map, buttons, function (map) {
+          map.remove()
+          this.refresh()
+        })
+      )
+    }
     controls.push(
-      this.addEntryButton('delete', idx, map, buttons, function (map) {
-        map.remove()
-        this.refresh()
-      })
-    )
-    controls.push(
-      this.addEntryButton('copy', idx, map, buttons, function (map) {
+      this.addEntryButton('duplicate', idx, map, buttons, function (map) {
         map.clone()
         this.refresh()
       })
     )
 
-    controls.push(
-      this.addEntryButton(
-        'rename',
-        idx,
-        map,
-        buttons,
-        function (map, controls) {
-          controls.map(c => c.classList.add('hidden'))
-          this.currentRenameEntry = { map: map, buttonList: controls }
-          buttons.appendChild(this.inputDiv)
-          this.inputDiv.classList.remove('hidden')
-          this.input.value = map.title
-          this.input.focus()
-        },
-        controls
+    if (!map.isPreGenerated) {
+      controls.push(
+        this.addEntryButton(
+          'rename',
+          idx,
+          map,
+          buttons,
+          function (map, controls) {
+            controls.map(c => c.classList.add('hidden'))
+            this.currentRenameEntry = { map: map, buttonList: controls }
+            buttons.appendChild(this.inputDiv)
+            this.inputDiv.classList.remove('hidden')
+            this.input.value = map.title
+            this.input.focus()
+          },
+          controls
+        )
       )
-    )
-
+    }
     controls.push(
       this.addEntryButton('export', idx, map, buttons, function (map) {
         saveToFile(map)
       })
     )
 
-    controls.push(
-      this.addEntryButton('edit', idx, map, buttons, function (map) {
-        switchToEdit(map.title)
-      })
-    )
-    controls.push(
-      this.addEntryButton('print', idx, map, buttons, function (map) {
-        switchTo('print', 'print', map.title)
-      })
-    )
+    if (!map.isPreGenerated) {
+      controls.push(
+        this.addEntryButton('edit', idx, map, buttons, function (map) {
+          switchToEdit(map.title)
+        })
+      )
+    }
+    const printer = map.isPreGenerated
+      ? goto
+      : function (map) {
+          switchTo('print', 'print', map.title)
+        }
+
+    controls.push(this.addEntryButton('print', idx, map, buttons, printer))
+
     entryContent.appendChild(buttons)
 
     return buttons
@@ -185,8 +194,26 @@ class MapList {
     buttonsNode.style.maxHeight = height + 'px'
   }
 
-  makeList () {
-    const maps = gameMaps.customMapList()
+  makeList (listIncludes) {
+    listIncludes = listIncludes || this.listIncludes
+    this.listIncludes = listIncludes
+
+    let maps = null
+
+    switch (listIncludes) {
+      case '0':
+        maps = gameMaps.customMapList()
+        break
+      case '1':
+        maps = gameMaps.maps()
+        break
+      case '2':
+        maps = gameMaps.preGenMapList()
+        break
+      default:
+        throw new Error('unknown list display option')
+    }
+    this.container.innerHTML = ''
     let idx = 0
     for (const map of maps) {
       if (map) {
@@ -199,9 +226,10 @@ class MapList {
   }
 }
 
-setupTabs('list')
 const mapList = new MapList()
-mapList.makeList()
+
+setupMapListOptions(mapList.makeList.bind(mapList))
+mapList.makeList('0')
 
 function saveAsJson (json, filename = 'data.json') {
   const blob = new Blob([json], { type: 'application/json' })
@@ -218,10 +246,17 @@ function saveAsJson (json, filename = 'data.json') {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
+function goto (map) {
+  const location = `../paper/${map.terrain.tag}/${map.name}.pdf`
+  window.location.href = location
+}
+
 async function saveToFile (map, suggestedName) {
   const json = map.jsonString()
-  suggestedName =
-    suggestedName || (map.title ? map.title + '.json' : 'map.json')
+
+  const name = map.exportName()
+
+  suggestedName = suggestedName || (name ? name + '.json' : 'map.json')
 
   // feature-detect
   if ('showSaveFilePicker' in window) {
