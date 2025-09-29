@@ -23,6 +23,10 @@
       width: auto;
     }
 
+    .tab-bar-container.sub-tabs.print-preview {
+      border-radius: 0 15px 10px 10px;
+    }
+
     .heading-container.sub-tabs {
       display: flex;
       justify-content: space-between;
@@ -45,12 +49,19 @@
     }
 
     .tab-bar a {
+      display: inline-block;
       padding: 1rem 1.5rem;
       text-decoration: none;
+      font-family: arial, sans-serif;
       color: #f1f5f9;
       font-weight: 500;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-sizing: none;
       transition: background 0.2s, color 0.2s;
     }
+
 
     .tab-bar button {
       padding: 1rem 1.5rem;
