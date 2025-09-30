@@ -405,11 +405,15 @@ class TerrainMaps {
       return defaultHeight || this.terrain.minHeight
     return height
   }
-  storeLastHeight (width, height) {
-    localStorage.setItem(this.lastHeightStorageKey, height)
+  storeLastHeight (height) {
+    if (height) {
+      localStorage.setItem(this.lastHeightStorageKey, height)
+    }
   }
   storeLastWidth (width) {
-    localStorage.setItem(this.lastWidthStorageKey, width)
+    if (width) {
+      localStorage.setItem(this.lastWidthStorageKey, width)
+    }
   }
   storeLastCustomSize (width, height) {
     this.storeLastWidth(width)

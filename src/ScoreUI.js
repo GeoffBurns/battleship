@@ -1,5 +1,5 @@
 import { gameMaps } from './maps.js'
-
+import { all, mixed } from './Shape.js'
 export class ScoreUI {
   constructor (playerPrefix) {
     // Initialization logic
@@ -64,17 +64,20 @@ export class ScoreUI {
     return 'very squeezy'
   }
 
-  createAddZoneEntry (labelTxt, displacedArea, ships, stress, style) {
+  createAddZoneEntry (labelTxt, displacedArea, ships, stress, style, extra) {
+    extra = extra || 0
     const entry = document.createElement('div')
     entry.style = style
     const label = document.createElement(stress)
     label.textContent = labelTxt + ' : '
     entry.appendChild(label)
     const tightness = document.createElement('span')
-    const shipDisplacement = ships.reduce(
-      (accumulator, ship) => accumulator + ship.shape().displacement,
-      0
-    )
+
+    const shipDisplacement =
+      ships.reduce(
+        (accumulator, ship) => accumulator + ship.shape().displacement,
+        0
+      ) + extra
     tightness.textContent = this.displacementDescription(
       shipDisplacement / displacedArea
     )
@@ -105,21 +108,39 @@ export class ScoreUI {
       'b',
       'line-height:1.2;'
     )
-
+    const mixedShapes = model.ships
+      .map(s => s.shape())
+      .filter(s => s.subterrain === mixed)
+    const airShapes = model.ships
+      .map(s => s.shape())
+      .filter(s => s.subterrain === all)
+    const airAmount =
+      airShapes.reduce(
+        (accumulator, shape) => accumulator + shape.displacement,
+        0
+      ) / 4
     for (const tracker of gameMaps.current.subterrainTrackers) {
       gameMaps.current.recalcTracker(tracker.subterrain, tracker)
       gameMaps.current.calcFootPrint(tracker)
       const displacedArea = (tracker.total.size + tracker.footprint.size) / 2
+
+      const mixedAmount = mixedShapes.reduce(
+        (accumulator, shape) =>
+          accumulator + shape.displacementFor(tracker.subterrain),
+        0
+      )
 
       this.createAddZoneEntry(
         tracker.subterrain.title,
         displacedArea,
         model.ships.filter(s => s.shape().subterrain === tracker.subterrain),
         'span',
-        'line-height:1.2;'
+        'line-height:1.2;',
+        airAmount + mixedAmount
       )
     }
   }
+
   setupZoneInfo () {
     let display = []
     this.zone.innerHTML = ''

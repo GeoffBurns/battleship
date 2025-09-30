@@ -49,6 +49,8 @@ export class Shape {
       addCellToFootPrint(cell[0], cell[1], footPrint)
     }
     this.displacement = (area + footPrint.size) / 2
+    this.vulnerable = []
+    this.hardened = []
   }
 
   attachWeapon (ammoBuilder) {
@@ -197,7 +199,7 @@ class Terrain {
   }
 
   customMapsLocalStorageKey () {
-    return `geoffs-battleship.${this.title}-custom-maps`
+    return `geoffs-battleship.${this.key}-custom-maps`
   }
 
   getCustomMapsRaw () {
@@ -371,6 +373,16 @@ const land = new SubTerrain('Land', '#348239', '#296334', 'G', false, true, [
   coast,
   inland
 ])
+export const mixed = new SubTerrain(
+  'Mixed',
+  '#888',
+  '#666',
+  'M',
+  false,
+  false,
+  []
+)
+export const all = new SubTerrain('Air', '#a77', '#955', 'A', false, false, [])
 
 export const seaAndLand = new Terrain(
   'Sea and Land',
@@ -456,6 +468,7 @@ class Plane extends Shape {
     )
     this.descriptionText = description
     this.terrain = seaAndLand
+    this.subterrain = all
   }
 
   type () {
@@ -534,15 +547,17 @@ class ShallowDock extends SeaVessel {
 }
 
 class SubShape {
-  constructor (validator, zoneDetail) {
+  constructor (validator, zoneDetail, subterrain) {
     this.validator = validator
     this.zoneDetail = zoneDetail
+    this.subterrain = subterrain
+    this.faction = 1
   }
 }
 
 class StandardCells extends SubShape {
-  constructor (validator, zoneDetail) {
-    super(validator, zoneDetail)
+  constructor (validator, zoneDetail, subterrain) {
+    super(validator, zoneDetail, subterrain)
     this.cells = []
   }
   setCells (allCells, secondary) {
@@ -552,8 +567,8 @@ class StandardCells extends SubShape {
   }
 }
 class SpecialCells extends SubShape {
-  constructor (cells, validator, zoneDetail) {
-    super(validator, zoneDetail)
+  constructor (cells, validator, zoneDetail, subterrain) {
+    super(validator, zoneDetail, subterrain)
     this.cells = cells
   }
 }
@@ -571,7 +586,22 @@ class Hybrid extends Shape {
     this.primary = subGroups[0]
     this.primary.setCells(cells, subGroups[0])
     this.secondary = subGroups[1]
+    this.subGroups = subGroups
+    this.size = cells.length
+    for (const group of subGroups) {
+      group.faction = group.cells / this.size
+    }
     this.descriptionText = description
+    this.terrain = seaAndLand
+    this.subterrain = mixed
+  }
+  displacementFor (subterrain) {
+    const groups = this.subGroups.filter(g => g.subterrain === subterrain)
+    const result = groups.reduce(
+      (accumulator, group) => accumulator + group.faction * this.displacement,
+      0
+    )
+    return result
   }
   variants () {
     return new Variant3(
@@ -653,6 +683,8 @@ const bombShelter = new HillFort('Bomb Shelter', 'L', 'H', [
   [1, 2],
   [0, 2]
 ])
+bombShelter.hardened = ['M']
+
 const supplyDepot = new Hybrid(
   'Supply Depot',
   'Y',
@@ -663,11 +695,17 @@ const supplyDepot = new Hybrid(
     [1, 1]
   ],
   [
-    new StandardCells(Building.validator, Building.zoneDetail),
-    new SpecialCells([[0, 0]], CoastalPort.validator, CoastalPort.zoneDetail)
+    new StandardCells(Building.validator, Building.zoneDetail, land),
+    new SpecialCells(
+      [[0, 0]],
+      CoastalPort.validator,
+      CoastalPort.zoneDetail,
+      land
+    )
   ],
   'place Supply Depot on the coast.'
 )
+supplyDepot.subterrain = land
 const pier = new Hybrid(
   'Pier',
   'I',
@@ -677,11 +715,17 @@ const pier = new Hybrid(
     [1, 0]
   ],
   [
-    new StandardCells(SeaVessel.validator, SeaVessel.zoneDetail),
-    new SpecialCells([[0, 0]], ShallowDock.validator, ShallowDock.zoneDetail)
+    new StandardCells(SeaVessel.validator, SeaVessel.zoneDetail, sea),
+    new SpecialCells(
+      [[0, 0]],
+      ShallowDock.validator,
+      ShallowDock.zoneDetail,
+      sea
+    )
   ],
   'place Pier adjacent to the coast.'
 )
+pier.subterrain = sea
 const navalBase = new Hybrid(
   'Naval Base',
   'N',
@@ -693,14 +737,15 @@ const navalBase = new Hybrid(
     [2, 1]
   ],
   [
-    new StandardCells(Building.validator, Building.zoneDetail),
+    new StandardCells(Building.validator, Building.zoneDetail, land),
     new SpecialCells(
       [
         [0, 0],
         [1, 0]
       ],
       SeaVessel.validator,
-      SeaVessel.zoneDetail
+      SeaVessel.zoneDetail,
+      sea
     )
   ],
   'place Naval Base half on land and half on sea.'
@@ -734,6 +779,7 @@ const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
   [1, 1],
   [0, 2]
 ])
+stealthBomber.hardened = ['W']
 
 const aircraftCarrier = new SeaVessel('Aircraft Carrier', 'A', 'A', [
   [0, 0],
@@ -754,7 +800,7 @@ const tanker = new SeaVessel('Tanker', 'T', 'L', [
   [0, 4],
   [0, 5]
 ])
-
+tanker.vulnerable = ['Z']
 const battleship = new SeaVessel('Battleship', 'B', 'L', [
   [0, 0],
   [0, 1],
@@ -762,13 +808,13 @@ const battleship = new SeaVessel('Battleship', 'B', 'L', [
   [0, 3],
   [0, 4]
 ])
-
 const oilRig = new DeepSeaVessel('Oil Rig', 'O', 'S', [
   [0, 0],
   [0, 1],
   [1, 0],
   [1, 1]
 ])
+oilRig.vulnerable = ['M']
 const cruiser = new SeaVessel('Cruiser', 'C', 'L', [
   [0, 0],
   [0, 1],
@@ -802,7 +848,7 @@ const submarine = new SeaVessel(
     [0, 1]
   ]
 )
-
+submarine.vulnerable = ['E']
 seaAndLandShips.addShapes([
   undergroundBunker,
   antiAircraftGun,
@@ -827,21 +873,12 @@ seaAndLandShips.addShapes([
 terrain.setCurrent(seaAndLand)
 
 export class Weapon {
-  constructor (
-    name,
-    letter,
-    standard,
-    hardened,
-    vulnerable,
-    isLimited,
-    destroys,
-    points
-  ) {
+  constructor (name, letter, isLimited, destroys, points) {
     this.name = name
     this.letter = letter
     this.isLimited = isLimited
     this.destroys = destroys
-    this.pionts = points
+    this.points = points
   }
 }
 export class StandardShot extends Weapon {

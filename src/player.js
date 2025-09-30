@@ -28,10 +28,10 @@ export class Waters {
       shipCellGrid: this.shipCellGrid,
       map: gameMaps.current.title
     }
-    localStorage.setItem(this.clipboardKey, JSON.stringify(placedShips))
+    localStorage.setItem(this.clipboardKey(), JSON.stringify(placedShips))
   }
   load () {
-    const placedShips = JSON.parse(localStorage.getItem(this.clipboardKey))
+    const placedShips = JSON.parse(localStorage.getItem(this.clipboardKey()))
     if (!placedShips || gameMaps.current.title !== placedShips.map) return
 
     for (const ship of placedShips.ships) {
