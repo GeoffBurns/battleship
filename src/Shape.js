@@ -297,7 +297,7 @@ const seaAndLandShips = new ShipCatelogue(
     L: '#ff9933',
     N: '#33ffcc',
     I: '#cc33cc',
-    Y: '#5555dd',
+    Y: '#7799ee',
     M: '#ffd166'
   },
   {

@@ -150,7 +150,17 @@ export class PlacementUI extends WatersUI {
       this.dragBrushEnter(cell, model)
     }
   }
+  removeDragShip (dragShip) {
+    const container = dragShip.parentElement
+    dragShip.remove()
+    if (
+      container.classList.contains('drag-ship-container') &&
+      container.children.length === 0
+    )
+      container.remove()
 
+    this.checkTrays()
+  }
   handleDropEvent (cell, shipCellGrid, ships, e) {
     if (e) e.preventDefault()
     this.removeHighlight()
@@ -164,16 +174,8 @@ export class PlacementUI extends WatersUI {
     if (placed) {
       this.placement(placed, ships, selection.ship)
 
-      if (selection) {
-        const container = selection.source.parentElement
-        selection.source.remove()
-        if (
-          container.classList.contains('drag-ship-container') &&
-          container.children.length === 0
-        )
-          container.remove()
-
-        this.checkTrays()
+      if (selection?.source) {
+        this.removeDragShip(selection?.source)
       }
       clickedShip = null
     }

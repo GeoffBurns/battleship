@@ -102,14 +102,16 @@ class PlacedShips {
   constructor () {
     this.ships = []
     this.undoBtn = null
+    this.resetBtn = null
   }
 
   reset () {
     this.ships = []
   }
 
-  registerUndo (undoBtn) {
+  registerUndo (undoBtn, resetBtn) {
     this.undoBtn = undoBtn
+    this.resetBtn = resetBtn
   }
 
   pop () {
@@ -119,10 +121,10 @@ class PlacedShips {
   }
   updateUndo () {
     if (this.undoBtn) this.undoBtn.disabled = this.ships.length === 0
+    if (this.resetBtn) this.resetBtn.disabled = this.ships.length === 0
   }
   popAndRefresh (shipCellGrid, mark, returnShip) {
     const ship = this.pop()
-    ship.unplace()
     returnShip(ship)
     for (const s of this.ships) {
       s.addToGrid(shipCellGrid)
@@ -130,8 +132,14 @@ class PlacedShips {
     }
 
     this.updateUndo()
-
     return ship
+  }
+  popAll (returnShip) {
+    for (const s of this.ships) {
+      returnShip(s)
+    }
+    this.reset()
+    this.updateUndo()
   }
   push (ship, placed) {
     this.ships.push(ship)

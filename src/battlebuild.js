@@ -22,7 +22,7 @@ import {
 
 customUI.resetBoardSize()
 
-placedShipsInstance.registerUndo(customUI.undoBtn)
+placedShipsInstance.registerUndo(customUI.undoBtn, customUI.resetBtn)
 function onClickUndo () {
   custom.resetShipCells()
   customUI.clearVisuals()
@@ -77,11 +77,12 @@ function onClickClear () {
 
 function clearShips () {
   customUI.showNotice('ships removed')
-  custom.ships = []
-
-  customUI.score.addShipTally(custom.ships)
-  customUI.displayAddInfo(custom)
-  customUI.score.displayAddZoneInfo(custom)
+  custom.resetShipCells()
+  customUI.clearVisuals()
+  custom.score.reset()
+  placedShipsInstance.popAll(ship => {
+    customUI.subtraction(custom, ship)
+  })
 }
 
 function saveMap () {
@@ -180,6 +181,7 @@ function newPlacement () {
   customUI.flipBtn.disabled = true
   customUI.rotateLeftBtn.disabled = true
   customUI.undoBtn.disabled = true
+  customUI.resetBtn.disabled = true
 }
 // wire buttons
 wireupButtons()

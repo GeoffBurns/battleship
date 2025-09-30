@@ -41,8 +41,12 @@ export class Waters {
       if (matchingShip) {
         matchingShip.place(ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
+        // this.UI.addShipToTrays(this.ships, ship)
+
+        this.UI.placement(ship.cells, this.ships, matchingShip)
+        const dragship = this.UI.getTrayItem(ship.id)
+        if (dragship) this.UI.removeDragShip(dragship)
       }
-      this.UI.placement(ship.cells, this.ships, matchingShip)
     }
   }
 
