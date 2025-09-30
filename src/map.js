@@ -1,4 +1,10 @@
-import { seaAndLand, terrain, addCellToFootPrint } from './Shape.js'
+import {
+  seaAndLand,
+  terrain,
+  addCellToFootPrint,
+  standardShot,
+  Megabomb
+} from './Shape.js'
 
 // geometry helper
 export const inRange = (r, c) => element =>
@@ -9,7 +15,17 @@ export function locationKey (r, c) {
 }
 
 export class Map {
-  constructor (title, rows, cols, shipNum, landArea, name, mapTerrain, land) {
+  constructor (
+    title,
+    rows,
+    cols,
+    shipNum,
+    landArea,
+    name,
+    mapTerrain,
+    land,
+    weapons
+  ) {
     this.title = title
     this.name = name
     this.rows = rows
@@ -31,6 +47,7 @@ export class Map {
     })
     this.calcTrackers()
     this.isPreGenerated = true
+    this.weapons = weapons || [standardShot, new Megabomb(3)]
   }
   recalcTracker (subterrain, tracker) {
     tracker.total.clear()
@@ -188,7 +205,7 @@ function makeTitle (terrain, cols, rows) {
 }
 
 export class CustomMap extends Map {
-  constructor (title, rows, cols, shipNum, land, mapTerrain) {
+  constructor (title, rows, cols, shipNum, land, mapTerrain, weapons) {
     super(
       title,
       rows,
@@ -197,7 +214,8 @@ export class CustomMap extends Map {
       [],
       title,
       mapTerrain || terrain.current,
-      land
+      land,
+      weapons
     )
     this.isPreGenerated = false
   }
@@ -278,7 +296,7 @@ export class CustomBlankMap extends withModifyable(CustomMap) {
   }
 
   setSize (rows, cols) {
-    this.title = makeTitle(this.terrain.title, cols, rows)
+    this.title = makeTitle(this.terrain, cols, rows)
     this.rows = rows
     this.cols = cols
     for (const key of this.land) {

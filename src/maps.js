@@ -311,7 +311,7 @@ class TerrainMaps {
   addCurrentCustomMap () {
     if (!(this.current instanceof CustomBlankMap)) return
 
-    this.current.saveToLocalStorage()
+    this.current.saveToLocalStorage(this.current.title)
   }
   hasMapSize (r, c) {
     return this.mapWithSize(r, c) !== undefined

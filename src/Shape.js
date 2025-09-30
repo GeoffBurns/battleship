@@ -235,8 +235,6 @@ class Terrain {
 
     customMaps.delete(title)
     localStorage.setItem(this.customMapsLocalStorageKey, [...customMaps].join())
-
-    customMaps = this.getCustomMapSet()
   }
   renameCustomMaps (oldMap, newTitle) {
     let customMaps = this.getCustomMapSet()
@@ -827,3 +825,185 @@ seaAndLandShips.addShapes([
 ])
 
 terrain.setCurrent(seaAndLand)
+
+export class Weapon {
+  constructor (
+    name,
+    letter,
+    standard,
+    hardened,
+    vulnerable,
+    isLimited,
+    destroys,
+    points
+  ) {
+    this.name = name
+    this.letter = letter
+    this.isLimited = isLimited
+    this.destroys = destroys
+    this.pionts = points
+  }
+}
+export class StandardShot extends Weapon {
+  constructor () {
+    super('Standard Shot', '-', false, true, 1)
+    this.cursors = ['']
+    this.hint = 'Click On Square To Fire'
+  }
+  aoe (coords) {
+    return [coords[0][0], coords[0][1], 2]
+  }
+}
+
+export const standardShot = new StandardShot()
+
+export class Megabomb extends Weapon {
+  constructor (ammo) {
+    super('Megabomb', '-', false, true, 1)
+    this.ammo = ammo
+    this.cursors = ['bomb']
+    this.hint = 'Click On Square To Drop Bomb'
+  }
+
+  aoe (coords) {
+    const r = coords[0][0]
+    const c = coords[0][1]
+    let result = [r, c, 2]
+    for (let i = -1; i < 2; i++) {
+      for (let j = -1; j < 2; j++) {
+        if (i !== 0 && j !== 0) {
+          result.push([r + i, c + j, 1])
+        }
+      }
+    }
+    for (let i = -1; i < 2; i++) {
+      result.push([r + i, c - 2, 0])
+      result.push([r + i, c + 2, 0])
+    }
+    for (let j = -1; j < 2; j++) {
+      result.push([r - 2, c + j, 0])
+      result.push([r + 2, c + j, 0])
+    }
+    return result
+  }
+}
+
+export class LoadOut {
+  constructor (weapons) {
+    this.weapons = weapons
+    this.weaponSystems = LoadOut.wps(weapons)
+
+    this.OutOfAllAmmo = Function.prototype
+    this.OutOfAmmo = Function.prototype
+    this.destroy = Function.prototype
+    this.reveal = Function.prototype
+    this.onCursorChange = Function.prototype
+    this.sound = Function.prototype
+    this.index = 0
+    this.coords = []
+  }
+
+  static wps (weapons) {
+    return weapons.map(w => {
+      return { ammo: w.isLimited ? null : this.ammo, weapon: w }
+    })
+  }
+  limitedSystems () {
+    return this.weaponSystems.filter(w => w.weapon.isLimited)
+  }
+  limitedWeapons () {
+    return this.weapons.filter(w => w.isLimited)
+  }
+  totalAmmo () {
+    return LoadOut.wps(this.limitedWeapons())
+  }
+  ammoLeft () {
+    return this.limitedSystems()
+  }
+  reload (weapons) {
+    weapons = weapons || this.weapons
+    this.weaponSystems = LoadOut.wps(weapons)
+  }
+  weaponSystem () {
+    return this.weaponSystems[this.index]
+  }
+  weapon () {
+    return this.weaponSystem().weapon
+  }
+
+  useAmmo () {
+    if (!this.weapon().isLimited) return
+
+    this.weaponSystem().ammo--
+
+    if (this.weaponSystem().ammo === 0) {
+      const i = this.index
+      const oldWeapon = this.weapon()
+      this.weaponSystems = this.weaponSystems.splice(i, i)
+
+      if (i >= this.weaponSystems.length) {
+        this.index = 0
+      }
+      this.OutOfAmmo(oldWeapon, this.weapon())
+      if (1 <= this.weaponSystems.length) {
+        this.OutOfAllAmmo()
+      }
+    }
+  }
+  cursors () {
+    return this.weaponSystems
+      .flatMap(w => {
+        return w.weapon.cursors
+      })
+      .filter(c => c !== '')
+  }
+
+  cursor () {
+    const weapon = this.weapon()
+    const index = Math.Min(this.coords.length, weapon.point - 1)
+    return weapon.cursors[index]
+  }
+
+  switch () {
+    const oldCursor = this.cursor()
+    this.index++
+    this.coords = []
+    if (this.index >= this.weaponsSystems.length) {
+      this.index = 0
+    }
+    this.onCursorChange(oldCursor, this.cursor())
+    return this.weapon()
+  }
+
+  aim (r, c) {
+    const oldCursor = this.cursor()
+    this.coords = []
+    this.onCursorChange(oldCursor, this.cursor())
+    this.coords.push([r, c])
+    if (this.coords.length >= this.weapon().points) {
+      this.fire(this.coords)
+      this.coords = []
+    }
+
+    const newCursor = this.cursor()
+    if (oldCursor !== newCursor) {
+      this.onCursorChange(oldCursor, this.cursor())
+    }
+  }
+
+  dismiss () {
+    const oldCursor = this.cursor()
+    this.coords = []
+    this.onCursorChange(oldCursor, this.cursor())
+  }
+
+  fire () {
+    const weapon = this.weapon()
+    const effected = weapon.aoe(this.coords)
+    if (weapon.destroys) {
+      this.destroy(weapon, effected)
+    } else {
+      this.reveal(weapon, effected)
+    }
+  }
+}
