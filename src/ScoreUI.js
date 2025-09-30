@@ -88,15 +88,13 @@ export class ScoreUI {
   }
   displayZoneInfo () {
     for (const entry of this.zoneSync) {
+      gameMaps.current.recalcTracker(entry.tracker.subterrain, entry.tracker)
       entry.counts[0].textContent = entry.tracker.total.size.toString()
       entry.counts[1].textContent = entry.tracker.margin.size.toString()
       entry.counts[2].textContent = entry.tracker.core.size.toString()
     }
   }
-  refreshZoneInfo () {
-    gameMaps.current.calcTrackers()
-    this.displayZoneInfo()
-  }
+  refresh
   displayAddZoneInfo (model) {
     this.zone.innerHTML = ''
     const displacedArea = model.displacedArea()

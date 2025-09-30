@@ -23,7 +23,6 @@ import {
 customUI.resetBoardSize()
 
 placedShipsInstance.registerUndo(customUI.undoBtn)
-function onClickAuto () {}
 function onClickUndo () {
   custom.resetShipCells()
   customUI.clearVisuals()
@@ -60,7 +59,7 @@ function onClickDefault () {
   gameMaps.setToDefaultBlank(validateHeight(), validateWidth())
   customUI.refreshAllColor()
 
-  customUI.score.refreshZoneInfo(custom)
+  customUI.score.displayZoneInfo()
 }
 function onClickClear () {
   if (customUI.placingShips) {
@@ -73,7 +72,7 @@ function onClickClear () {
 
   gameMaps.clearBlank()
   customUI.refreshAllColor()
-  customUI.score.refreshZoneInfo(custom)
+  customUI.score.displayZoneInfo()
 }
 
 function clearShips () {
@@ -199,4 +198,4 @@ if (!editing) {
   newPlacement()
 }
 console.table({ ...localStorage })
-//localStorage.clear()
+localStorage.clear()

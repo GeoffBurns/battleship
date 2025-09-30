@@ -260,7 +260,7 @@ export class PlacementUI extends WatersUI {
       this.highlight(shipCellGrid, r, c)
     })
   }
-  dragBrushEnter (cell, model) {
+  dragBrushEnter (cell) {
     /// this.brushlistenCancellables = []
 
     function setLandCells (r, c, min, max, map, subterrain) {
@@ -304,7 +304,7 @@ export class PlacementUI extends WatersUI {
 
       setLandCells(r, c, min, max, map, subterrain)
       recolorCells.call(this, r, c, min, max)
-      this.score.refreshZoneInfo(model)
+      this.score.displayZoneInfo()
     }
     cell.addEventListener('dragenter', handler)
   }
