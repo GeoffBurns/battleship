@@ -584,12 +584,12 @@ class Hybrid extends Shape {
       racks
     )
     this.primary = subGroups[0]
-    this.primary.setCells(cells, subGroups[0])
+    this.primary.setCells(cells, subGroups[1])
     this.secondary = subGroups[1]
     this.subGroups = subGroups
     this.size = cells.length
     for (const group of subGroups) {
-      group.faction = group.cells / this.size
+      group.faction = group.cells.length / this.size
     }
     this.descriptionText = description
     this.terrain = seaAndLand
