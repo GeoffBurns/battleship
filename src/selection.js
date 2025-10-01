@@ -202,9 +202,14 @@ export class DraggedShip extends SelectedShip {
     this.moveTo(e.pageX - this.offset[0] - 13, e.pageY - this.offset[1] - 13)
   }
 
+  setGhostVariant () {
+    if (this.ghost) this.ghost.setVariant(this.variant())
+  }
+
   rotate () {
     this.resetOffset()
     super.rotate()
+    this.setGhostVariant()
   }
   resetOffset () {
     this.offset = [0, 0]
@@ -214,10 +219,12 @@ export class DraggedShip extends SelectedShip {
   leftRotate () {
     this.resetOffset()
     super.leftRotate()
+    this.setGhostVariant()
   }
   flip () {
     this.resetOffset()
     super.flip()
+    this.setGhostVariant()
   }
   canPlaceRaw (r, c, shipCellGrid) {
     const placeable = this.placeable()

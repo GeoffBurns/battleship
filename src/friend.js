@@ -199,7 +199,7 @@ export class Friend extends Waters {
   buildBoard () {
     this.UI.buildBoard()
     this.resetShipCells()
-    this.UI.makeDroppable(this.shipCellGrid, this.ships)
+    this.UI.makeDroppable(this)
     //  this.UI.dragLeave(this.UI.board)
   }
 

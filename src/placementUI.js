@@ -129,12 +129,12 @@ export class PlacementUI extends WatersUI {
     )
   }
 
-  makeDroppable (shipCellGrid, ships) {
+  makeDroppable (model) {
     for (const cell of this.board.children) {
       cell.textContent = ''
       cell.classList.remove('hit', 'miss', 'placed')
-      this.drop(cell, shipCellGrid, ships)
-      this.dragEnter(cell, shipCellGrid)
+      this.drop(cell, model)
+      this.dragEnter(cell, model)
     }
   }
   makeAddDroppable (model) {
@@ -142,7 +142,7 @@ export class PlacementUI extends WatersUI {
       cell.textContent = ''
       cell.classList.remove('hit', 'miss', 'placed')
       this.addDrop(cell, model)
-      this.dragEnter(cell, model.shipCellGrid)
+      this.dragEnter(cell, model)
     }
   }
   makeBrushable (model) {
@@ -161,7 +161,7 @@ export class PlacementUI extends WatersUI {
 
     this.checkTrays()
   }
-  handleDropEvent (cell, shipCellGrid, ships, e) {
+  handleDropEvent (cell, model, e) {
     if (e) e.preventDefault()
     this.removeHighlight()
     cursor.isDragging = false
@@ -170,9 +170,9 @@ export class PlacementUI extends WatersUI {
     const r = parseInt(cell.dataset.r)
     const c = parseInt(cell.dataset.c)
 
-    const placed = selection.place(r, c, shipCellGrid)
+    const placed = selection.place(r, c, model.shipCellGrid)
     if (placed) {
-      this.placement(placed, ships, selection.ship)
+      this.placement(placed, model.ships, selection.ship)
 
       if (selection?.source) {
         this.removeDragShip(selection?.source)
@@ -210,11 +210,8 @@ export class PlacementUI extends WatersUI {
       this.handleAddDropEvent.bind(this, cell, model)
     )
   }
-  drop (cell, shipCellGrid, ships) {
-    cell.addEventListener(
-      'drop',
-      this.handleDropEvent.bind(this, cell, shipCellGrid, ships)
-    )
+  drop (cell, model) {
+    cell.addEventListener('drop', this.handleDropEvent.bind(this, cell, model))
   }
 
   removeHighlight () {
@@ -249,7 +246,7 @@ export class PlacementUI extends WatersUI {
       }
     }
   }
-  dragEnter (cell, shipCellGrid) {
+  dragEnter (cell, model) {
     cell.addEventListener('dragenter', e => {
       e.preventDefault()
 
@@ -259,7 +256,7 @@ export class PlacementUI extends WatersUI {
       if (lastEntered[0] === r && lastEntered[1] === c) return
 
       lastEntered = [r, c]
-      this.highlight(shipCellGrid, r, c)
+      this.highlight(model.shipCellGrid, r, c)
     })
   }
   dragBrushEnter (cell) {
