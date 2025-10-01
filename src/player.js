@@ -4,6 +4,21 @@ import { Score } from './Score.js'
 import { terrain } from './Shape.js'
 import { Ship } from './Ship.js'
 
+function popFirst (arr, predicate, obj) {
+  // find index of first match
+  const idx = arr.findIndex(predicate)
+
+  let found = null
+  if (idx !== -1) {
+    // remove and store the object
+    ;[found] = arr.splice(idx, 1)
+  }
+  if (found === null && obj) {
+    console.log('not found : ', JSON.stringify(obj))
+  }
+
+  return found
+}
 export class Waters {
   constructor (ui) {
     this.ships = []
@@ -30,23 +45,36 @@ export class Waters {
     }
     localStorage.setItem(this.clipboardKey(), JSON.stringify(placedShips))
   }
-  load () {
-    const placedShips = JSON.parse(localStorage.getItem(this.clipboardKey()))
+  load (placedShips) {
+    placedShips =
+      placedShips || JSON.parse(localStorage.getItem(this.clipboardKey()))
     if (!placedShips || gameMaps.current.title !== placedShips.map) return
 
+    const matchableShips = [...this.ships]
     for (const ship of placedShips.ships) {
-      const matchingShip = this.ships.filter(
-        s => s.letter === ship.letter && s.cells.length === 0
-      )[0]
+      const matchingShip = popFirst(
+        matchableShips,
+        s => s.letter === ship.letter,
+        ship
+      )
+
       if (matchingShip) {
         matchingShip.place(ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
-        // this.UI.addShipToTrays(this.ships, ship)
 
         this.UI.placement(ship.cells, this.ships, matchingShip)
         const dragship = this.UI.getTrayItem(ship.id)
-        if (dragship) this.UI.removeDragShip(dragship)
+        if (dragship) {
+          this.UI.removeDragShip(dragship)
+        } else {
+          console.log('drag ship not found : ', JSON.stringify(ship))
+        }
       }
+    }
+    if (matchableShips.length !== 0) {
+      console.log(`${matchableShips.length} ships not matched`)
+    } else {
+      this.UI.resetTrays()
     }
   }
 

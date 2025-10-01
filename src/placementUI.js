@@ -326,6 +326,16 @@ export class PlacementUI extends WatersUI {
     if (l === 0) return null
     else return items[l - 1]
   }
+
+  getFirstTrayItem () {
+    return (
+      this.shipTray.children[0] ||
+      this.planeTray.children[0] ||
+      this.specialTray.children[0] ||
+      this.buildingTray.children[0]
+    )
+  }
+
   clickAssignByCursor (arrowkey) {
     let shipnode = null
     switch (arrowkey) {
@@ -448,6 +458,30 @@ export class PlacementUI extends WatersUI {
     return [this.shipTray, this.planeTray, this.buildingTray, this.specialTray]
   }
 
+  resetTrays () {
+    let trays = this.getTrays()
+
+    for (const tray of trays) {
+      tray.innerHTML = ''
+      tray.classList.add('empty')
+    }
+  }
+  forEachTrayItem (action) {
+    let trays = this.getTrays()
+    let itemIndex = 0
+    let trayIndex = 0
+
+    for (const tray of trays) {
+      for (const child of tray.children) {
+        action(child, trayIndex, itemIndex, trays)
+        itemIndex++
+      }
+      trayIndex++
+      itemIndex = 0
+    }
+    return null
+  }
+
   getTrayItemInfo (shipId, adaptInfo) {
     let trays = this.getTrays()
     let itemIndex = 0
@@ -472,14 +506,6 @@ export class PlacementUI extends WatersUI {
       return child
     }
     return this.getTrayItemInfo(shipId, adaptInfo)
-  }
-
-  getFirstTrayItem () {
-    return (
-      this.shipTray.children[0] ||
-      this.planeTray.children[0] ||
-      this.buildingTray.children[0]
-    )
   }
 
   moveAssignByCursor (arrowKey, clickedShip) {

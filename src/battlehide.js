@@ -227,4 +227,5 @@ newPlacement()
 if (placedShips) {
   friend.load()
   friend.updateUI(friend.ships)
+  friendUI.readyMode()
 }

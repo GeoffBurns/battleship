@@ -17,9 +17,13 @@ body {
     width: 546px;
 }
 
-.hidden {
-    display: none
+.hidden,
+.choose-controls.hidden,
+.player-container.hidden,
+.board-wrap.alt.hidden {
+    display: none !important;
 }
+
 
 .heading-container h1 {
     text-align: center;
