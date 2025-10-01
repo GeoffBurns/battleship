@@ -120,6 +120,7 @@ export class FriendUI extends PlacementUI {
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('hidden')
     gameStatus.line.classList.add('medium')
+    this.hideTips()
   }
 
   seekMode () {
@@ -145,6 +146,7 @@ export class FriendUI extends PlacementUI {
     for (const panel of panels) {
       panel.classList.add('alt')
     }
+    this.hideTips()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('medium')
