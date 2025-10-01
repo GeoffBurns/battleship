@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Geoff's Battleship Print Game</title>
+
+    <meta
+      name="description"
+      content="Play a challenging version of Battleship with no-touch placement rules and special ships."
+    />
+
+    <link rel="icon" type="image/png" href="../favicon.png" />
+    <link rel="stylesheet" href="animation.css" />
+    <link rel="stylesheet" href="tab.css" />
+    <link rel="stylesheet" href="battle.css" />
+    <link rel="stylesheet" href="panel.css" />
+    <link rel="stylesheet" href="cells.css" />
+    <link rel="stylesheet" href="status.css" />
+    <link rel="stylesheet" href="battlehide.css" />
+    <link rel="stylesheet" media="print" href="print.css" />
+  </head>
+  <body>
+    <div class="battleship print-preview" id="battleship-game">
+      <div class="tab-bar-container screen-only">
+        <a href="https://geoffburns.github.io/battleship">
+          <img class="logo" src="./logo3.png" alt="Battleship Logo"
+        /></a>
+        <div class="title-header">
+          <h3>Geoff's Battleship</h3>
+        </div>
+        <nav class="tab-bar main" aria-label="Main Navigation">
+          <a
+            href="https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html"
+          >
+            About</a
+          >
+          <button class="tab-link" id="tab-seek" type="button">
+            Seek Game
+          </button>
+          <button class="tab-link" id="tab-hide" type="button">
+            Hide and Seek Game
+          </button>
+          <a class="you-are-here" href="#">Customize Maps</a>
+          <a href="https://github.com/GeoffBurns/battleship">Source Code</a>
+        </nav>
+      </div>
+      <div class="info-wrap info-top sub-tabs screen-only">
+        <div class="heading-container sub-tabs">
+          <div class="tab-bar-container sub-tabs print-preview">
+            <nav class="tab-bar sub-tabs" aria-label="Sub Navigation">
+              <a class="first" href="./battlebuild.html"> Add</a>v
+              <a href="./maplist.html"> List</a>
+              <button class="tab-link" id="tab-import" type="button">
+                Import
+              </button>
+              <a class="you-are-here" href="#"> Print</a>
+            </nav>
+          </div>
+        </div>
+      </div>
+      <div class="title-wrap screen-only">
+        <h2 class="centered-title">Print Game</h2>
+      </div>
+      <div class="info-wrap info-top print-preview">
+        <div class="heading-container">
+          <div class="choose-controls" id="choose-controls">
+            <img
+              class="logo print-only"
+              src="./logo3.png"
+              alt="Battleship Logo"
+            />
+            <div class="choose-container choose-map-container">
+              <label for="chooseMap" class="choose-label" id="choose-map-label"
+                >Choose a Map:
+              </label>
+              <select id="chooseMap" class="choose-select"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="game-container print-preview">
+        <div class="player-container print-preview" id="friend-container">
+          <div class="player-body">
+            <div class="board-column">
+              <div class="title-wrap">
+                <h2 class="centered-title">Friendly Waters</h2>
+              </div>
+              <div class="board print-preview" id="friend-board"></div>
+            </div>
+            <div class="panel-container print-preview">
+              <h4 class="tally-title centered-title">Tally Boxes</h4>
+              <div id="friend-tallyBox"></div>
+            </div>
+          </div>
+          <div class="player-container print-preview" id="enemy-container">
+            <div class="player-body print-preview">
+              <div class="board-column">
+                <div class="title-wrap">
+                  <h2 class="centered-title">Enemy Waters</h2>
+                </div>
+                <div class="board print-preview" id="enemy-board"></div>
+              </div>
+              <div class="panel-container print-preview">
+                <h4 class="tally-title centered-title">Tally Boxes</h4>
+                <div id="enemy-tallyBox"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./Shape.js"></script>
+    <script type="module" src="./map.js"></script>
+    <script type="module" src="./maps.js"></script>
+    <script type="module" src="./chooseUI.js"></script>
+    <script type="module" src="./utils.js"></script>
+    <script type="module" src="./ScoreUI.js"></script>
+
+    <script type="module" src="./StatusUI.js"></script>
+    <script type="module" src="./playerUI.js"></script>
+    <script type="module" src="./Score.js"></script>
+    <script type="module" src="./Ship.js"></script>
+    <script type="module" src="./player.js"></script>
+    <script type="module" src="./friendUI.js"></script>
+    <script type="module" src="./selection.js"></script>
+    <script type="module" src="./friend.js"></script>
+    <script type="module" src="./enemyUI.js"></script>
+    <script type="module" src="./enemy.js"></script>
+    <script type="module" src="./setup.js"></script>
+    <script type="module" src="./print.js"></script>
+  </body>
+</html>
