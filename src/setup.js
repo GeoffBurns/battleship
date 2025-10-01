@@ -22,7 +22,6 @@ export function switchTo (target, huntMode, mapName) {
   params.append('mapName', mapName)
 
   if (huntMode === 'build' && custom.noOfPlacedShips() > 0) {
-    terrain.current.updateCustomMaps(mapName)
     custom.store()
     gameMaps.addCurrentCustomMap(custom.placedShips())
     params.append('placedShips', '')

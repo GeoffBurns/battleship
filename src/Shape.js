@@ -222,7 +222,7 @@ class Terrain {
   updateCustomMaps (title) {
     let customMaps = this.getCustomMapSet()
     if (customMaps.has(title)) {
-      throw new Error('Map title ' + title + ' already exists')
+      return
     }
     customMaps.add(title)
     const list = [...customMaps].filter(

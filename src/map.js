@@ -241,7 +241,9 @@ export class CustomMap extends Map {
 
     localStorage.setItem(key, this.jsonString())
 
-    this.terrain.updateCustomMaps(title)
+    if (this instanceof CustomBlankMap) {
+      this.terrain.updateCustomMaps(title)
+    }
   }
 
   localStorageKey (title) {
