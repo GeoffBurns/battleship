@@ -169,6 +169,7 @@ function setReuseBtn () {
 function newPlacement () {
   customUI.resetAdd(custom)
   customUI.buildBoard((_r, _c) => {})
+  customUI.showBrushTrays()
   customUI.makeBrushable(custom)
   customUI.buildBrushTray(gameMaps.terrain)
   customUI.brushMode()

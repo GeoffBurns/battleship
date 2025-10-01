@@ -48,8 +48,6 @@ export class CustomUI extends PlacementUI {
       cell.classList.remove('hit', 'placed')
     }
 
-    this.showBrushTrays()
-
     const panels = document.getElementsByClassName('panel')
     for (const panel of panels) {
       panel.classList.remove('alt')
