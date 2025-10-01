@@ -317,6 +317,7 @@ export class SavedCustomMap extends CustomMap {
     )
     this.terrain =
       terrain.terrains.find(t => t.title === data.terrain) || seaAndLand
+    this.example = null
   }
 
   static loadObj (title) {

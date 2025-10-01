@@ -37,14 +37,45 @@ export class Waters {
   clipboardKey () {
     return 'geoffs-battleship.placed-ships'
   }
-  store () {
-    const placedShips = {
+
+  placedShips () {
+    return {
       ships: this.ships,
       shipCellGrid: this.shipCellGrid,
       map: gameMaps.current.title
     }
-    localStorage.setItem(this.clipboardKey(), JSON.stringify(placedShips))
   }
+
+  store () {
+    localStorage.setItem(
+      this.clipboardKey(),
+      JSON.stringify(this.placedShips())
+    )
+  }
+
+  loadForEdit (map) {
+    map = map || gameMaps.current
+    const placedShips = map.example
+    if (!placedShips) return
+    const matchableShips = [...this.ships]
+    for (const ship of placedShips.ships) {
+      const matchingShip = popFirst(
+        matchableShips,
+        s => s.letter === ship.letter,
+        ship
+      )
+      if (matchingShip) {
+        matchingShip.place(ship.cells)
+        matchingShip.addToGrid(this.shipCellGrid)
+
+        this.UI.placement(ship.cells, this.ships, matchingShip)
+      }
+    }
+    if (matchableShips.length !== 0) {
+      console.log(`${matchableShips.length} ships not matched`)
+    }
+  }
+
   load (placedShips) {
     placedShips =
       placedShips || JSON.parse(localStorage.getItem(this.clipboardKey()))

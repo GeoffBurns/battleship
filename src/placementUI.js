@@ -460,11 +460,46 @@ export class PlacementUI extends WatersUI {
 
   resetTrays () {
     let trays = this.getTrays()
-
     for (const tray of trays) {
       tray.innerHTML = ''
       tray.classList.add('empty')
     }
+  }
+  clearTrays () {
+    let trays = this.getTrays()
+    for (const tray of trays) {
+      tray.innerHTML = ''
+    }
+  }
+  setTrays () {
+    let trays = this.getTrays()
+    for (const tray of trays) {
+      tray.innerHTML = ''
+      tray.classList.remove('empty')
+    }
+  }
+  showShipTrays () {
+    let trays = this.getTrays()
+    for (const tray of trays) {
+      tray.innerHTML = ''
+      tray.classList.remove('empty')
+      tray.classList.remove('hidden')
+    }
+    this.brushTray.innerHTML = ''
+    this.brushTray.classList.add('hidded')
+    this.trays.classList.remove('hidden')
+  }
+  showBrushTrays () {
+    let trays = this.getTrays()
+    for (const tray of trays) {
+      tray.innerHTML = ''
+      tray.classList.remove('empty')
+      tray.classList.add('hidden')
+    }
+    this.brushTray.innerHTML = ''
+    this.brushTray.classList.remove('hidded')
+
+    this.trays.classList.remove('hidden')
   }
   forEachTrayItem (action) {
     let trays = this.getTrays()

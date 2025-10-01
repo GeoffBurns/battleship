@@ -63,9 +63,7 @@ function onClickDefault () {
 }
 function onClickClear () {
   if (customUI.placingShips) {
-    customUI.shipTray.innerHTML = ''
-    customUI.buildingTray.innerHTML = ''
-    customUI.planeTray.innerHTML = ''
+    customUI.setTrays()
     newPlacement()
     return
   }
@@ -194,10 +192,12 @@ const editing = setupBuildOptions(
   onClickAccept.bind(null, true)
 )
 
-if (!editing) {
+if (editing) {
+  custom.loadForEdit()
+} else {
   setupDragBrushHandlers(customUI)
   // initial
   newPlacement()
 }
-//console.table({ ...localStorage })
+console.table({ ...localStorage })
 //localStorage.clear()
