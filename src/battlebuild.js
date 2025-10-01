@@ -199,5 +199,3 @@ if (editing) {
   // initial
   newPlacement()
 }
-console.table({ ...localStorage })
-//localStorage.clear()

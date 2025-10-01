@@ -3,6 +3,7 @@ import { gameStatus } from './playerUI.js'
 import { Score } from './Score.js'
 import { terrain } from './Shape.js'
 import { Ship } from './Ship.js'
+import { placedShipsInstance } from './selection.js'
 
 function popFirst (arr, predicate, obj) {
   // find index of first match
@@ -65,9 +66,8 @@ export class Waters {
         ship
       )
       if (matchingShip) {
-        matchingShip.place(ship.cells)
+        placedShipsInstance.push(matchingShip, ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
-
         this.UI.placement(ship.cells, this.ships, matchingShip)
       }
     }

@@ -195,7 +195,7 @@ function setupMapOptions (boardSetup, refresh, huntMode) {
   }, mapHeight)
 
   if (targetMap) {
-    gameMaps.setTo(targetMap.title)
+    gameMaps.current = targetMap
     boardSetup()
     refresh()
   } else {
