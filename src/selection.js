@@ -199,7 +199,10 @@ export class DraggedShip extends SelectedShip {
     if (this.ghost) this.ghost.moveTo(x, y)
   }
   move (e) {
-    this.moveTo(e.pageX - this.offset[0] - 13, e.pageY - this.offset[1] - 13)
+    this.moveTo(
+      e.clientX - this.offset[0] - 13,
+      e.clientY - this.offset[1] - 13
+    )
   }
 
   setGhostVariant () {
