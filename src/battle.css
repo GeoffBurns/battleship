@@ -50,9 +50,6 @@ select {
     align-items: center;
 }
 
-.choose-controls.hidden {
-    display: none
-}
 
 .choose-container {
     margin-bottom: 13px;
@@ -94,9 +91,7 @@ select {
     gap: 10px;
 }
 
-.player-container.hidden {
-    display: none
-}
+
 
 .player-body {
     display: flex;

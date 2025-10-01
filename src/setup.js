@@ -168,8 +168,9 @@ function setupMapOptions (boardSetup, refresh, huntMode) {
     targetMap ||
     gameMaps.getMap(urlParams.getAll('mapName')[0]) ||
     gameMaps.getLastMap()
-  let mapWidth = gameMaps.getLastWidth(templateMap?.cols)
-  let mapHeight = gameMaps.getLastHeight(templateMap?.rows)
+
+  let mapWidth = targetMap?.cols || gameMaps.getLastWidth(templateMap?.cols)
+  let mapHeight = targetMap?.rows || gameMaps.getLastHeight(templateMap?.rows)
 
   setupTabs(huntMode)
 
@@ -195,6 +196,8 @@ function setupMapOptions (boardSetup, refresh, huntMode) {
 
   if (targetMap) {
     gameMaps.setTo(targetMap.title)
+    boardSetup()
+    refresh()
   } else {
     gameMaps.setToBlank(mapHeight, mapWidth)
   }
