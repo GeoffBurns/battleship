@@ -25,8 +25,7 @@ export const terrainMaps = {
 
 const jaggedXS = new Map(
   'Jagged Coast XS',
-  6,
-  18,
+  [6, 18],
   { A: 0, B: 1, C: 1, D: 1, P: 2, G: 1, U: 1, M: 3 },
   [
     [1, 16, 17],
@@ -46,8 +45,7 @@ const jaggedXS = new Map(
 
 const jaggedVS = new Map(
   'Jagged Coast VS',
-  7,
-  16,
+  [7, 16],
   { A: 1, B: 1, C: 1, D: 1, P: 1, G: 1, U: 1, M: 3 },
   [
     [2, 14, 15],
@@ -67,8 +65,7 @@ const jaggedVS = new Map(
 
 const jaggedSS = new Map(
   'Jagged Coast SS',
-  7,
-  18,
+  [7, 18],
   { A: 1, B: 1, C: 1, D: 1, P: 2, G: 1, U: 1, M: 3 },
   [
     [2, 16, 17],
@@ -89,8 +86,7 @@ const defaultMap = jaggedSS
 
 const jaggedS = new Map(
   'Jagged Coast S',
-  7,
-  19,
+  [7, 19],
   { A: 1, B: 1, C: 1, D: 2, P: 2, G: 1, U: 1, M: 3 },
   [
     [1, 16, 18],
@@ -110,8 +106,7 @@ const jaggedS = new Map(
 
 const jaggedMS = new Map(
   'Jagged Coast MS',
-  8,
-  18,
+  [8, 18],
   { A: 1, B: 1, C: 1, D: 2, P: 2, G: 1, U: 1, M: 3 },
   [
     [2, 14, 16],
@@ -131,8 +126,7 @@ const jaggedMS = new Map(
 
 const jaggedM = new Map(
   'Jagged Coast M',
-  9,
-  17,
+  [9, 17],
   { A: 1, B: 1, C: 1, D: 1, P: 2, G: 2, U: 1, M: 3 },
   [
     [3, 13, 15],
@@ -150,8 +144,7 @@ const jaggedM = new Map(
 
 const jaggedML = new Map(
   'Jagged Coast ML',
-  9,
-  18,
+  [9, 18],
   { A: 1, B: 1, C: 1, D: 2, P: 2, G: 2, U: 1, M: 3 },
   [
     [3, 14, 16],
@@ -168,8 +161,7 @@ const jaggedML = new Map(
 )
 const JaggedL = new Map(
   'Jagged Coast L',
-  10,
-  18,
+  [10, 18],
   { A: 1, B: 1, C: 2, D: 2, P: 2, G: 2, U: 1, M: 3 },
   [
     [4, 14, 16],
@@ -186,8 +178,7 @@ const JaggedL = new Map(
 )
 const NarrowS = new Map(
   'Narrow Coast S',
-  11,
-  17,
+  [11, 17],
   { A: 1, B: 1, C: 2, D: 2, P: 3, G: 1, U: 1, M: 3 },
   [
     [7, 13, 16],
@@ -201,8 +192,7 @@ const NarrowS = new Map(
 )
 const JaggedLL = new Map(
   'Jagged Coast LL',
-  10,
-  20,
+  [10, 20],
   { A: 1, B: 1, C: 2, D: 2, P: 3, G: 2, U: 1, M: 3 },
   [
     [4, 16, 18],
@@ -219,8 +209,7 @@ const JaggedLL = new Map(
 )
 const NarrowM = new Map(
   'Narrow Coast M',
-  12,
-  17,
+  [12, 17],
   { A: 1, B: 1, C: 2, D: 3, P: 4, G: 1, U: 1, M: 3 },
   [
     [8, 13, 16],
@@ -234,8 +223,7 @@ const NarrowM = new Map(
 )
 const JaggedVL = new Map(
   'Jagged Coast VL',
-  10,
-  21,
+  [10, 21],
   { A: 1, B: 1, C: 2, D: 2, P: 4, G: 2, U: 1, M: 3 },
   [
     [4, 16, 18],
@@ -253,8 +241,7 @@ const JaggedVL = new Map(
 
 const JaggedXL = new Map(
   'Jagged Coast XL',
-  10,
-  22,
+  [10, 22],
   { A: 1, B: 1, C: 2, D: 3, P: 4, G: 2, U: 1, M: 3 },
   [
     [4, 16, 18],

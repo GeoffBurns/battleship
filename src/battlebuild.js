@@ -193,7 +193,7 @@ const editing = setupBuildOptions(
 )
 
 if (editing) {
-  custom.loadForEdit()
+  custom.loadForEdit(editing)
 } else {
   setupDragBrushHandlers(customUI)
   // initial

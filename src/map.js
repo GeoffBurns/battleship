@@ -15,25 +15,20 @@ export function locationKey (r, c) {
 }
 
 export class Map {
-  constructor (
-    title,
-    rows,
-    cols,
-    shipNum,
-    landArea,
-    name,
-    mapTerrain,
-    land,
-    weapons
-  ) {
+  constructor (title, size, shipNum, landArea, name, mapTerrain, land, weapons) {
     this.title = title
     this.name = name
-    this.rows = rows
-    this.cols = cols
+    this.rows = size[0]
+    this.cols = size[1]
     this.shipNum = shipNum
     this.landArea = landArea
     this.land = land instanceof Set ? land : new Set()
     this.terrain = mapTerrain || terrain.current
+
+    if (!this?.terrain.subterrains) {
+      console.log('bad')
+      throw new Error('map called with bad parameter : ', this.terrain)
+    }
     this.subterrainTrackers = this.terrain.subterrains.map(s => {
       return {
         subterrain: s,
@@ -205,11 +200,10 @@ function makeTitle (terrain, cols, rows) {
 }
 
 export class CustomMap extends Map {
-  constructor (title, rows, cols, shipNum, land, mapTerrain, weapons) {
+  constructor (title, size, shipNum, land, mapTerrain, example, weapons) {
     super(
       title,
-      rows,
-      cols,
+      size,
       shipNum,
       [],
       title,
@@ -218,6 +212,7 @@ export class CustomMap extends Map {
       weapons
     )
     this.isPreGenerated = false
+    this.example = example
   }
 
   isLand (r, c) {
@@ -284,8 +279,7 @@ export class CustomBlankMap extends withModifyable(CustomMap) {
   constructor (rows, cols, mapTerrain) {
     super(
       makeTitle(mapTerrain || terrain.current, cols, rows),
-      rows,
-      cols,
+      [rows, cols],
       0,
       new Set(),
       mapTerrain || terrain.current
@@ -310,14 +304,14 @@ export class SavedCustomMap extends CustomMap {
   constructor (data) {
     super(
       data.title,
-      data.rows,
-      data.cols,
+      [data.rows, data.cols],
       data.shipNum,
-      new Set([...data.land])
+      new Set([...data.land]),
+      null,
+      data.example
     )
     this.terrain =
       terrain.terrains.find(t => t.title === data.terrain) || seaAndLand
-    this.example = null
   }
 
   static loadObj (title) {
