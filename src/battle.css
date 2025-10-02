@@ -82,9 +82,27 @@ select {
 }
 
 .trays,
-.player-container {
+.player-container,
+.rules-container .tray .drag-ship-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: column !important;
+}
+
+.rules-container .tray .drag-ship-container {
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rules-container .tray .drag-ship-container label {
+    font-weight: 700;
+    font-size: 200%;
+}
+
+.rules-container .tray {
+    display: flex;
+    gap: 40px;
+    flex-direction: row;
+    justify-content: stretch;
 }
 
 .tray.empty {

@@ -112,3 +112,13 @@
 .cell.leftEdge.dark {
     border-left: 2px solid #000;
 }
+
+.cell.empty {
+    background: transparent
+}
+
+.cell.empty,
+.cell.row-label,
+.cell.col-label {
+    border: 0 none !important;
+}

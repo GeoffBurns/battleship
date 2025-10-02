@@ -24,6 +24,10 @@
         display: none !important;
     }
 
+    .page-break {
+        page-break-before: always;
+        break-before: page;
+    }
 
     .battleship.print-preview .print-only {
         display: block !important;
