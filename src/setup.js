@@ -1,7 +1,6 @@
 import { heightUI, mapUI, widthUI, listUI } from './chooseUI.js'
 import { gameMaps } from './maps.js'
 import { custom } from './custom.js'
-import { terrain } from './Shape.js'
 import { SavedCustomMap } from './map.js'
 
 export function removeShortcuts () {
@@ -94,10 +93,19 @@ export function setupTabs (huntMode) {
   if (huntMode !== 'list')
     document.getElementById('tab-list')?.addEventListener('click', switchToList)
 
-  if (huntMode !== 'import')
+  if (huntMode !== 'import') {
     document
       .getElementById('tab-import')
       ?.addEventListener('click', switchToImport)
+  }
+
+  document.getElementById('tab-about')?.addEventListener('click', function () {
+    window.location.href =
+      'https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html'
+  })
+  document.getElementById('tab-source')?.addEventListener('click', function () {
+    window.location.href = 'https://github.com/GeoffBurns/battleship'
+  })
 }
 
 function setupMapControl (mapName, boardSetup, refresh) {
