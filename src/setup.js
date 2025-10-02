@@ -99,6 +99,14 @@ export function setupTabs (huntMode) {
       ?.addEventListener('click', switchToImport)
   }
 
+  if (huntMode !== 'print') {
+    document
+      .getElementById('tab-print')
+      ?.addEventListener('click', function () {
+        window.print()
+      })
+  }
+
   document.getElementById('tab-about')?.addEventListener('click', function () {
     window.location.href =
       'https://geoffburns.blogspot.com/2015/10/pencil-and-paper-battleships.html'
