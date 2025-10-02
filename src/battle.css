@@ -100,6 +100,22 @@ select {
     margin: 5px;
 }
 
+.rules-container.sea span.heading {
+    background-color: #abe7ff;
+}
+
+.rules-container.land span.heading {
+    background-color: #acdfbe;
+}
+
+.rules-container.air span.heading {
+    background-color: #f7e4a6;
+}
+
+.rules-container.special span.heading {
+    background-color: #e4c6f7;
+}
+
 .rules-container .tray {
     display: flex;
     gap: 40px;

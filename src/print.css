@@ -161,6 +161,11 @@
         break-inside: avoid;
     }
 
+    .rules-container span.heading {
+        font-weight: 800;
+        font-size: 130%
+    }
+
     #shipTray .cell:not(.empty),
     div.tally-row.sea div.tally-box,
     .cell.sea.light {
