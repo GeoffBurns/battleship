@@ -436,6 +436,9 @@ class HillFort extends Building {
     )
     this.validator = HillFort.validator
     this.zoneDetail = HillFort.zoneDetail
+    this.notes = [
+      `${description} can not touch sea squares; must be surrounded by land squares.`
+    ]
   }
   static validator = zoneInfo => zoneInfo[0] === land && zoneInfo[1] === inland
   static zoneDetail = 2
@@ -452,6 +455,8 @@ class CoastalPort extends Building {
     )
     this.validator = CoastalPort.validator
     this.zoneDetail = CoastalPort.zoneDetail
+
+    this.notes = [`${description} must be touching sea squares.`]
   }
   static validator = zoneInfo => zoneInfo[0] === land && zoneInfo[1] === coast
   static zoneDetail = 2
@@ -525,6 +530,9 @@ class DeepSeaVessel extends SeaVessel {
     )
     this.validator = SeaVessel.validator
     this.zoneDetail = SeaVessel.zoneDetail
+    this.notes = [
+      `${description} can not touch land squares; must be surrounded by sea squares.`
+    ]
   }
   static validator = zoneInfo => zoneInfo[0] === sea && zoneInfo[1] === deep
   static zoneDetail = 2
@@ -536,11 +544,12 @@ class ShallowDock extends SeaVessel {
       letter,
       symmetry,
       cells,
-      `place ${description} in the deep sea`,
+      `place ${description} in the shallow sea`,
       racks
     )
     this.validator = ShallowDock.validator
     this.zoneDetail = ShallowDock.zoneDetail
+    this.notes = [`${description} must be touching land squares.`]
   }
   static validator = zoneInfo => zoneInfo[0] === sea && zoneInfo[1] === littoral
   static zoneDetail = 2
@@ -553,8 +562,11 @@ class SubShape {
     this.subterrain = subterrain
     this.faction = 1
   }
-}
 
+  clone () {
+    return new SubShape(this.validator, this.zoneDetail, this.subterrain)
+  }
+}
 class StandardCells extends SubShape {
   constructor (validator, zoneDetail, subterrain) {
     super(validator, zoneDetail, subterrain)
@@ -706,6 +718,9 @@ const supplyDepot = new Hybrid(
   'place Supply Depot on the coast.'
 )
 supplyDepot.subterrain = land
+supplyDepot.notes = [
+  `the dotted parts of the ${supplyDepot.descriptionText} must be placed adjacent to sea.`
+]
 const pier = new Hybrid(
   'Pier',
   'I',
@@ -726,6 +741,10 @@ const pier = new Hybrid(
   'place Pier adjacent to the coast.'
 )
 pier.subterrain = sea
+pier.notes = [
+  `the dotted parts of the ${pier.descriptionText} must be placed adjacent to land.`
+]
+
 const navalBase = new Hybrid(
   'Naval Base',
   'N',
@@ -750,7 +769,9 @@ const navalBase = new Hybrid(
   ],
   'place Naval Base half on land and half on sea.'
 )
-
+navalBase.notes = [
+  `the dotted parts of the ${navalBase.descriptionText} must be placed on sea, while the undotted parts on the land`
+]
 const jetFighterCraft = new Plane('Jet Fighter', 'J', 'H', [
   [0, 1],
   [1, 1],

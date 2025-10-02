@@ -30,6 +30,14 @@ function refresh () {
       if (shipInfo)
         friendUI.buildTrayItemPrint(shipInfo, friendUI.getTrayOfType(type))
     }
+    const notes = [...Object.values(shipsInfo)].flatMap(info => {
+      return info.shape.notes || []
+    })
+    const notesEl = friendUI.getNotesOfType(type)
+    if (notesEl && notes.length > 0) {
+      notesEl.classList.remove('hidden')
+      notesEl.innerHTML = `<p><b>Notes : </b> ${notes.join('<br>')} </p>`
+    }
   }
 }
 const printMap = setupPrintOptions(resetBoardSize, refresh, 'print')

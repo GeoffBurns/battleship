@@ -931,6 +931,7 @@ export class PlacementUI extends WatersUI {
         throw new Error('Unknown type for ' + type)
     }
   }
+
   getContainerOfType (type) {
     switch (type) {
       case 'A':
@@ -943,6 +944,22 @@ export class PlacementUI extends WatersUI {
         return document.getElementById('special-container')
       case 'G':
         return document.getElementById('land-container')
+      default:
+        throw new Error('Unknown type for ' + type)
+    }
+  }
+  getNotesOfType (type) {
+    switch (type) {
+      case 'A':
+        return document.getElementById('planeNotes')
+      case 'S':
+        return document.getElementById('shipNotes')
+      case 'M':
+      case 'T':
+      case 'X':
+        return document.getElementById('specialNotes')
+      case 'G':
+        return document.getElementById('buildingNotes')
       default:
         throw new Error('Unknown type for ' + type)
     }
