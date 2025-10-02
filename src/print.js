@@ -20,11 +20,23 @@ function refresh () {
   friendUI.score.buildTally(friend.ships, 0)
   enemyUI.score.buildTally(enemy.ships, 0)
   document.title = "Geoff's Battleship - " + gameMaps.current.title
+  friendUI.hideEmptyUnits(friend.ships)
+  //friendUI.buildTrays(friend.ships)
+  const groups = friendUI.splitUnits(friend.ships)
+  for (let type in groups) {
+    const shipsInfo = groups[type]
+    for (let letter in shipsInfo) {
+      const shipInfo = shipsInfo[letter]
+      if (shipInfo)
+        friendUI.buildTrayItemPrint(shipInfo, friendUI.getTrayOfType(type))
+    }
+  }
 }
 const printMap = setupPrintOptions(resetBoardSize, refresh, 'print')
 
 resetBoardSize()
 refresh()
+
 if (printMap) {
   window.print()
 }

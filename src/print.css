@@ -156,6 +156,11 @@
 
     }
 
+    .rules-container {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
     #shipTray .cell:not(.empty),
     div.tally-row.sea div.tally-box,
     .cell.sea.light {

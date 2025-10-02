@@ -811,6 +811,33 @@ export class PlacementUI extends WatersUI {
     const cell = this.gridCellAt(r, c)
     this.displayAsPlaced(cell, letter)
   }
+
+  buildTrayItemPrint (shipInfo, tray) {
+    const shape = shipInfo.shape
+
+    const dragShipContainer = document.createElement('div')
+
+    dragShipContainer.className = 'drag-ship-container'
+
+    const dragShip = document.createElement('div')
+    dragShip.className = 'drag-ship'
+    this.setDragShipContents(
+      dragShip,
+      shape.cells,
+      shape.letter,
+      shape.variants().special()
+    )
+    dragShipContainer.appendChild(dragShip)
+
+    const label = document.createElement('div')
+    label.textContent =
+      shape.descriptionText +
+      (shipInfo.count === 1 ? '' : ` x ${shipInfo.count}`)
+
+    dragShipContainer.appendChild(label)
+    tray.appendChild(dragShipContainer)
+  }
+
   buildTrayItem (ships, ship, tray) {
     const shape = ship.shape()
 
@@ -881,26 +908,85 @@ export class PlacementUI extends WatersUI {
     this.checkTrays()
   }
 
-  addShipToTrays (ships, ship) {
+  getUnitType (ship) {
     const type = ship.type()
+    if (type === 'M' || type === 'T') return 'X'
+
+    return type
+  }
+
+  getTrayOfType (type) {
     switch (type) {
       case 'A':
-        this.buildTrayItem(ships, ship, this.planeTray)
-        break
+        return this.planeTray
       case 'S':
-        this.buildTrayItem(ships, ship, this.shipTray)
-        break
+        return this.shipTray
       case 'M':
       case 'T':
       case 'X':
-        this.buildTrayItem(ships, ship, this.specialTray)
-        break
+        return this.specialTray
       case 'G':
-        this.buildTrayItem(ships, ship, this.buildingTray)
-        break
+        return this.buildingTray
       default:
-        throw new Error('Unknown type for ' + JSON.stringify(ship, null, 2))
+        throw new Error('Unknown type for ' + type)
     }
+  }
+  getContainerOfType (type) {
+    switch (type) {
+      case 'A':
+        return document.getElementById('air-container')
+      case 'S':
+        return document.getElementById('sea-container')
+      case 'M':
+      case 'T':
+      case 'X':
+        return document.getElementById('special-container')
+      case 'G':
+        return document.getElementById('land-container')
+      default:
+        throw new Error('Unknown type for ' + type)
+    }
+  }
+
+  addToGroup (group, ship) {
+    const key = ship.letter
+    let value = group[key] || { shape: ship.shape(), count: 0 }
+    value.count++
+    group[key] = value
+  }
+
+  splitUnits (ships) {
+    return ships.reduce((acc, ship) => {
+      const key = this.getUnitType(ship)
+      const group = acc[key] || {}
+      this.addToGroup(group, ship)
+      acc[key] = group
+      return acc
+    }, {})
+  }
+
+  hideEmptyUnits (ships) {
+    const counts = ships.reduce((acc, ship) => {
+      const key = this.getUnitType(ship)
+      acc[key] = (acc[key] || 0) + 1
+      return acc
+    }, {})
+
+    for (let key in counts) {
+      if (counts[key] === 0) {
+        const emptyGroup = this.getContainerOfType(key)
+        if (emptyGroup) {
+          emptyGroup.classList.add('hidden')
+        } else {
+          emptyGroup.classList.remove('hidden')
+        }
+      }
+    }
+  }
+
+  addShipToTrays (ships, ship) {
+    const type = ship.type()
+    this.buildTrayItem(ships, ship, this.getTrayOfType(type))
   }
 
   placeShipBox (ship) {

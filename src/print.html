@@ -109,6 +109,177 @@
           </div>
         </div>
       </div>
+
+      <div class="page-break"></div>
+      <div class="info-wrap" id="rules">
+        <h2>How to Play</h2>
+        <h2>Step 1: Place Your Units</h2>
+        <p>
+          Each player starts by placing their units on their
+          <b>“Your Ships” </b>map.
+        </p>
+        <ul id="l1">
+          <li data-list-text="•">
+            <p>
+              Use the <b>Tally Boxes </b>on the right to see how many of each
+              unit to place.
+            </p>
+          </li>
+          <li data-list-text="•">
+            <p>
+              Use the small reference icons on the left as a guide for each
+              unit’s shape.
+            </p>
+          </li>
+          <li data-list-text="•">
+            <p>
+              As you place each unit, mark a small tick in the corner of its
+              tally box.
+            </p>
+          </li>
+          <li data-list-text="•">
+            <p>
+              Units can be rotated or reflected (placed vertically or
+              horizontally), but <b>not diagonally</b>.
+            </p>
+          </li>
+          <li data-list-text="•">
+            <p>
+              Units <b>must not touch</b>: leave at least one square of space
+              between any two units—
+            </p>
+          </li>
+        </ul>
+        <h4>orthogonally and diagonally<span class="p">.</span></h4>
+        <h3>Unit Categories:</h3>
+
+        <div class="rules-container" id="sea-container">
+          <span class="sea" style="background-color: #abf7f6">Sea Units</span>
+          <br />
+          These are added to the blue areas (sea) of the map
+          <br />
+          <br />
+
+          <div class="tray" id="shipTray" class="tray"></div>
+          <div class="notes hidden" id="shipNotes"></div>
+        </div>
+        <br />
+        <div class="rules-container" id="land-container">
+          <span style="background-color: #acdfbe">Land Units</span>
+          <p>These are added to the greens areas (land) of the map</p>
+          <br />
+          <div class="tray" id="buildingTray" class="tray"></div>
+          <div class="notes hidden" id="buildingNotes"></div>
+        </div>
+        <br />
+        <div class="rules-container" id="air-container">
+          <span style="background-color: #f7e4a6">Air Units</span>
+          <p>These are added to the any area (sea or land) of the map</p>
+          <br />
+
+          <div class="tray" id="planeTray"></div>
+          <div class="notes hidden" id="planeNotes"></div>
+        </div>
+        <br />
+        <div class="rules-container" id="special-container">
+          <span style="background-color: #e4a6f7"> Special Units</span>
+          <p>These have special rules about where they are placed on the map</p>
+          <br />
+          <div class="tray" id="specialTray"></div>
+          <div class="notes hidden" id="specialNotes"></div>
+        </div>
+
+        <br />
+        <br />
+        <h2>Step 2. Attack Your Opponent</h2>
+        <p>
+          Once all units are placed, players take turns trying to destroy their
+          opponent’s units.
+        </p>
+        <h3>On your turn, you can do one of the following:</h3>
+        <ol id="l2">
+          <li data-list-text="1.">
+            <h4>Standard Attack:</h4>
+            <ul id="l3">
+              <li data-list-text="◦">
+                <p>Announce a grid location (e.g., “B4”).</p>
+              </li>
+              <li data-list-text="◦">
+                <p>Your opponent replies with:</p>
+                <ul id="l4">
+                  <li data-list-text="▪">
+                    <h4>
+                      “Miss” <span class="p">– if there’s nothing there.</span>
+                    </h4>
+                  </li>
+                  <li data-list-text="▪">
+                    <h4>
+                      “Hit”
+                      <span class="p"
+                        >– if part of a unit is located at that square.</span
+                      >
+                    </h4>
+                  </li>
+                </ul>
+              </li>
+              <li data-list-text="◦">
+                <p>Mark your “Opponent’s Ships” grid with:</p>
+                <ul id="l5">
+                  <li data-list-text="▪">
+                    <p>A <b>slash ( / ) </b>for a miss.</p>
+                  </li>
+                  <li data-list-text="▪">
+                    <p>A <b>cross ( X ) </b>for a hit.</p>
+                  </li>
+                </ul>
+              </li>
+              <li data-list-text="◦">
+                <p>
+                  When all squares of a unit are hit, your opponent must
+                  announce the unit’s name (e.g., “Cruiser destroyed”). Cross it
+                  off in the tally box.
+                </p>
+              </li>
+            </ul>
+          </li>
+          <li data-list-text="2.">
+            <h4>Mega Bomb (Special Move):</h4>
+            <ul id="l6">
+              <li data-list-text="◦">
+                <p>Announce a target square.</p>
+              </li>
+              <li data-list-text="◦">
+                <p>
+                  The bomb hits that square
+                  <b>plus all eight adjacent squares </b>(the surrounding 3x3
+                  area).
+                </p>
+              </li>
+              <li data-list-text="◦">
+                <p>Your opponent announces:</p>
+                <ul id="l7">
+                  <li data-list-text="▪">
+                    <p>Any hits, along with their locations.</p>
+                  </li>
+                  <li data-list-text="▪">
+                    <p>Names of any destroyed units.</p>
+                  </li>
+                </ul>
+              </li>
+              <li data-list-text="◦">
+                <p>
+                  Record the use of a mega bomb by marking an <b>‘M’ </b>in the
+                  tally box.
+                </p>
+              </li>
+            </ul>
+          </li>
+        </ol>
+        <h2>Winning the Game:</h2>
+        <p>
+          The first player to destroy <b>all </b>of their opponent’s units wins.
+        </p>
+      </div>
     </div>
 
     <script type="module" src="./Shape.js"></script>
