@@ -134,7 +134,6 @@ export class Map {
     throw new Error('Unknown subterrain')
   }
   zone (r, c) {
-    /* todo more logic for zone restrictions */
     return this.zoneDetail(r, c)[1]
   }
 
@@ -157,16 +156,19 @@ export class Map {
   savedMap (newTitle) {
     newTitle = newTitle || makeTitle(this.terrain, this.cols, this.rows)
 
-    const clone = new SavedCustomMap({ ...this })
-    for (let i; i < this.rows; i++) {
-      for (let j; j < this.cols; j++) {
+    const clone = new EditedCustomMap({ ...this })
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
         if (this.isLand(i, j)) clone.addLand(i, j)
       }
     }
     clone.title = newTitle
     return clone
   }
+
   clone (newTitle) {
+    newTitle = newTitle || makeTitle(this.terrain, this.cols, this.rows)
+
     const clonedMap = this.savedMap(newTitle)
     clonedMap.saveToLocalStorage(newTitle)
   }
@@ -241,9 +243,7 @@ export class CustomMap extends Map {
 
     localStorage.setItem(key, this.jsonString())
 
-    if (this instanceof CustomBlankMap) {
-      this.terrain.updateCustomMaps(title)
-    }
+    this.terrain.updateCustomMaps(title)
   }
 
   localStorageKey (title) {

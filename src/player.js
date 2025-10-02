@@ -4,6 +4,7 @@ import { Score } from './Score.js'
 import { terrain } from './Shape.js'
 import { Ship } from './Ship.js'
 import { placedShipsInstance } from './selection.js'
+import { randomPlaceShape } from './utils.js'
 
 function popFirst (arr, predicate, obj) {
   // find index of first match
@@ -53,11 +54,36 @@ export class Waters {
       JSON.stringify(this.placedShips())
     )
   }
-
+  autoPlace () {
+    const ships = this.ships
+    for (let attempt = 0; attempt < 100; attempt++) {
+      let ok = true
+      for (const ship of ships) {
+        const placed = randomPlaceShape(ship, this.shipCellGrid)
+        if (!placed) {
+          this.resetShipCells()
+          this.UI.clearVisuals()
+          placedShipsInstance.reset()
+          this.UI.placeTally(ships)
+          this.UI.displayShipInfo(ships)
+          ok = false
+          break
+        }
+        placedShipsInstance.push(ship, ship.cells)
+        ship.addToGrid(this.shipCellGrid)
+        this.UI.placement(placed, ships, ship)
+      }
+      if (ok) return true
+    }
+  }
   loadForEdit (map) {
     map = map || gameMaps.current
     const placedShips = map.example
-    if (!placedShips) return
+    if (!placedShips) {
+      this.autoPlace()
+      return
+    }
+
     const matchableShips = [...this.ships]
     for (const ship of placedShips.ships) {
       const matchingShip = popFirst(
