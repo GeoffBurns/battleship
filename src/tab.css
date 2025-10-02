@@ -78,7 +78,7 @@
     }
 
     .tab-bar a:hover:not(.you-are-here),
-    .tab-bar button:hover {
+    .tab-bar button:hover:not(.you-are-here) {
       background-color: #334155;
       color: #fff;
     }
@@ -92,10 +92,8 @@
       padding: 2rem;
     }
 
-    .tab-bar button.you-are-here,
+    .tab-bar button.tab-link.you-are-here,
     .tab-bar a.you-are-here {
-      padding: 1rem 1.5rem 0 1.5rem;
-      margin-bottom: -2rem;
       border-radius: 15px 15px 0 0;
       font-size: 110%;
       font-weight: 900;
@@ -106,11 +104,18 @@
       color: #334155;
     }
 
+    .tab-bar button.tab-link.you-are-here {
+      padding: 0 1.5rem 1.5rem 1.5rem;
+      margin-bottom: -1.6rem;
+    }
+
+    .tab-bar a.you-are-here {
+      padding: 1rem 1.5rem 0 1.5rem;
+      margin-bottom: -2rem;
+    }
+
     .tab-bar button.you-are-here.first,
     .tab-bar a.you-are-here.first {
       margin-left: -0.2rem;
       border-radius: 0 15px 0 10px;
     }
-
-
-    /* --- IGNORE ---      // color: #380101;*/
