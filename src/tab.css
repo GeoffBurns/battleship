@@ -1,8 +1,9 @@
     /* Tab Bar */
     .tab-bar-container {
       display: flex;
+      flex-direction: row;
       border-radius: 15px 15px 0 0;
-      justify-content: left;
+      justify-content: flex-start;
       gap: 8px;
       padding: 0.5rem 1rem 0 1rem;
       align-items: center;
@@ -34,18 +35,43 @@
       align-items: stretch;
     }
 
+    .logo-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      color: #f1f5f9;
+      font-weight: 700;
+      text-align: left;
+      width: auto;
+      flex: 0 0 auto;
+      font-size: 120%;
+    }
+
+    .tab-bar-container .logo {
+      margin: 0;
+      width: auto;
+      align-self: flex-start;
+      flex: 0 0 auto;
+    }
 
     .tab-bar-container .title-header {
       color: #f1f5f9;
-      font-weight: 500;
+      font-weight: 700;
       text-align: left;
-      vertical-align: top;
-      margin: 0;
+      width: auto;
+      align-self: center;
+      flex: 0 0 auto;
+      font-size: 160%;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
     }
 
     .tab-bar {
       display: flex;
       justify-content: center;
+      width: auto;
+      flex: 0 0 auto;
     }
 
     .tab-bar a {
