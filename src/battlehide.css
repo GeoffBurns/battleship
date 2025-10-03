@@ -1,16 +1,8 @@
 .centered-title {
-    text-align: center;
-    margin-top: 12px;
-    margin-bottom: 12px;
+    margin-top: 6px;
+    margin-bottom: 6px;
 }
 
-/* 
-.draggable {
-    user-select: none;
-   Prevents text highlighting 
-    -webkit-user-drag: none;
-}
-*/
 [draggable="true"] {
     cursor: grab;
     /* before drag */

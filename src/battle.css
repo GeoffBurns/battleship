@@ -222,7 +222,13 @@ select {
     /* Standard */
 }
 
+
+.centered-title {
+    text-align: center;
+}
+
 @media (max-width: 600px) {
+
     .game-container:not(.print-preview) {
         width: var(--content-width);
 
@@ -234,7 +240,7 @@ select {
 }
 
 @media (max-width: 1023px) {
-    .battleship:not(.print-preview) .title-wrap .battleship:not(.print-preview) .center-title {
+    .battleship:not(.print-preview) .title-wrap {
         width: var(--content-width);
     }
 
@@ -255,13 +261,14 @@ select {
 @media (min-width: 1200px) {
 
     .battleship:not(.print-preview),
-    .battleship:not(.print-preview) .title-wrap,
-    .battleship:not(.print-preview) .center-title {
+    .battleship:not(.print-preview) .title-wrap {
         width: 1200px !important;
     }
 
     .title-wrap,
-    .center-title {
+    .centered-title {
         margin: 0 auto;
     }
+
+
 }

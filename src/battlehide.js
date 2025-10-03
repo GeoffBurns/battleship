@@ -1,4 +1,4 @@
-import { setupGameOptions, setupTabs } from './navbar.js'
+import { setupGameOptions, fetchNavBar } from './navbar.js'
 import { friendUI } from './friendUI.js'
 import {
   dragOverPlacingHandlerSetup,
@@ -217,27 +217,19 @@ wireupButtons()
 dragOverPlacingHandlerSetup(friend, friendUI)
 removeHideShorcuts = setupHideShortcuts()
 
-fetch('./navbars.html')
-  .then(res => res.text())
-  .then(html => {
-    document.getElementById('navbar').innerHTML = html
+fetchNavBar('hide', function () {
+  document.getElementById('choose-map-container').classList.remove('hidden')
 
-    document.getElementById('choose-map-container').classList.remove('hidden')
-    //  document.getElementById("tab-seek").classList.add('you-are-here')
-    setupTabs('hide')
+  const placedShips = setupGameOptions(
+    friendUI.resetBoardSize.bind(friendUI),
+    newPlacement
+  )
+  // initial
+  newPlacement()
 
-    const placedShips = setupGameOptions(
-      friendUI.resetBoardSize.bind(friendUI),
-      newPlacement
-    )
-    // initial
-    newPlacement()
-
-    if (placedShips) {
-      friend.load()
-      friend.updateUI(friend.ships)
-      friendUI.readyMode()
-    }
-  })
-
-  .catch(err => console.error('Failed to load navbar:', err))
+  if (placedShips) {
+    friend.load()
+    friend.updateUI(friend.ships)
+    friendUI.readyMode()
+  }
+})

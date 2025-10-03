@@ -298,3 +298,18 @@ export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   }
   return targetMap
 }
+
+export function fetchNavBar (tab, callback) {
+  fetch('./navbars.html')
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById('navbar').innerHTML = html
+
+      setupTabs(tab)
+      if (typeof callback === 'function') callback()
+    })
+    .catch(err => {
+      console.error('Failed to load navbars:', err)
+      if (typeof callback === 'function') callback(err)
+    })
+}
