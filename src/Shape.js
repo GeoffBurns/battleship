@@ -135,14 +135,24 @@ class SubTerrain {
     this.margin = zones.filter(z => z.isMarginal)[0]
     this.core = zones.filter(z => !z.isMarginal)[0]
   }
+
+  clone () {
+    return new SubTerrain(
+      this.title,
+      this.lightColor,
+      this.darkColor,
+      this.letter,
+      this.isDefault,
+      this.isTheLand,
+      this.zones
+    )
+  }
 }
 
-class Zone {
-  constructor (title, letter, isMarginal) {
-    this.title = title
-    this.letter = letter
-    this.isMarginal = isMarginal
-  }
+function Zone (title, letter, isMarginal) {
+  this.title = title
+  this.letter = letter
+  this.isMarginal = isMarginal
 }
 
 class ShipCatelogue {

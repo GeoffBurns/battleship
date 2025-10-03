@@ -1,4 +1,4 @@
-import { heightUI, mapUI, widthUI, listUI } from './chooseUI.js'
+import { ChooseFromListUI, ChooseNumberUI } from './chooseUI.js'
 import { gameMaps } from './maps.js'
 import { custom } from './custom.js'
 import { SavedCustomMap } from './map.js'
@@ -29,6 +29,25 @@ export function switchTo (target, huntMode, mapName) {
   const location = `./${target}.html?${params.toString()}`
   window.location.href = location
 }
+
+const widthUI = new ChooseNumberUI(
+  gameMaps.minWidth,
+  gameMaps.maxWidth,
+  1,
+  'chooseWidth'
+)
+const heightUI = new ChooseNumberUI(
+  gameMaps.minHeight,
+  gameMaps.maxHeight,
+  1,
+  'chooseHeight'
+)
+
+const listUI = new ChooseFromListUI(
+  ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
+  'chooseList'
+)
+
 export function setupTabs (huntMode) {
   function switchToSeek () {
     switchTo('battleseek', huntMode)
@@ -135,7 +154,16 @@ export function setupTabs (huntMode) {
 
 function setupMapControl (mapName, boardSetup, refresh) {
   mapName = mapName || gameMaps.getLastMapTitle()
+  const mapTitles = (() => {
+    try {
+      return gameMaps.mapTitles()
+    } catch (error) {
+      console.error('An error occurred:', error.message, gameMaps.mapTitles)
+      return []
+    }
+  })()
 
+  const mapUI = new ChooseFromListUI(mapTitles, 'chooseMap')
   mapUI.setup(
     function (_index, title) {
       gameMaps.setTo(title)
@@ -245,11 +273,10 @@ export function setupMapListOptions (refresh) {
   }, 0)
 }
 
-export function setupGameOptions (boardSetup, refresh, huntMode) {
+export function setupGameOptions (boardSetup, refresh) {
   // Define urlParams using the current window's search string
   const placedShips = setupMapSelection(boardSetup, refresh)
   boardSetup()
-  setupTabs(huntMode)
   return placedShips
 }
 export function setupPrintOptions (boardSetup, refresh, huntMode) {

@@ -56,34 +56,3 @@ export class ChooseNumberUI extends ChooseUI {
     this.onChange(callback)
   }
 }
-const mapTitles = (() => {
-  try {
-    return gameMaps.mapTitles()
-  } catch (error) {
-    console.error('An error occurred:', error.message, gameMaps.mapTitles)
-    return []
-  }
-})()
-
-export const mapUI = new ChooseFromListUI(mapTitles, 'chooseMap')
-
-export const huntUI = new ChooseFromListUI(['hide', 'seek'], 'chooseHunt')
-
-export const widthUI = new ChooseNumberUI(
-  gameMaps.minWidth,
-  gameMaps.maxWidth,
-  1,
-  'chooseWidth'
-)
-
-export const heightUI = new ChooseNumberUI(
-  gameMaps.minHeight,
-  gameMaps.maxHeight,
-  1,
-  'chooseHeight'
-)
-
-export const listUI = new ChooseFromListUI(
-  ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
-  'chooseList'
-)
