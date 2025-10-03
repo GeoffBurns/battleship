@@ -17,7 +17,8 @@ import {
   setupBuildOptions,
   validateHeight,
   validateWidth,
-  switchTo
+  switchTo,
+  fetchNavBar
 } from './navbar.js'
 
 customUI.resetBoardSize()
@@ -186,17 +187,24 @@ function newPlacement () {
 wireupButtons()
 
 setupBuildShortcuts()
-const editing = setupBuildOptions(
-  customUI.resetBoardSize.bind(customUI),
-  newPlacement,
-  'build',
-  onClickAccept.bind(null, true)
-)
 
-if (editing) {
-  custom.loadForEdit(editing)
-} else {
-  setupDragBrushHandlers(customUI)
-  // initial
-  newPlacement()
-}
+fetchNavBar('build', function () {
+  document.getElementById('second-tab-bar').classList.remove('hidden')
+  document.getElementById('height-container').classList.remove('hidden')
+  document.getElementById('width-container').classList.remove('hidden')
+
+  const editing = setupBuildOptions(
+    customUI.resetBoardSize.bind(customUI),
+    newPlacement,
+    'build',
+    onClickAccept.bind(null, true)
+  )
+
+  if (editing) {
+    custom.loadForEdit(editing)
+  } else {
+    setupDragBrushHandlers(customUI)
+    // initial
+    newPlacement()
+  }
+})

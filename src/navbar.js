@@ -30,19 +30,6 @@ export function switchTo (target, huntMode, mapName) {
   window.location.href = location
 }
 
-const widthUI = new ChooseNumberUI(
-  gameMaps.minWidth,
-  gameMaps.maxWidth,
-  1,
-  'chooseWidth'
-)
-const heightUI = new ChooseNumberUI(
-  gameMaps.minHeight,
-  gameMaps.maxHeight,
-  1,
-  'chooseHeight'
-)
-
 const listUI = new ChooseFromListUI(
   ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
   'chooseList'
@@ -196,6 +183,8 @@ function setupMapSelection (boardSetup, refresh) {
 
   return placedShips
 }
+let widthUI = null
+let heightUI = null
 
 export function validateWidth () {
   let width = parseInt(widthUI.choose.value, 10)
@@ -222,6 +211,19 @@ export function validateHeight () {
 function setupMapOptions (boardSetup, refresh, huntMode) {
   const urlParams = new URLSearchParams(window.location.search)
   huntMode = huntMode || 'build'
+
+  widthUI = new ChooseNumberUI(
+    gameMaps.minWidth,
+    gameMaps.maxWidth,
+    1,
+    'chooseWidth'
+  )
+  heightUI = new ChooseNumberUI(
+    gameMaps.minHeight,
+    gameMaps.maxHeight,
+    1,
+    'chooseHeight'
+  )
   const targetMap = gameMaps.getEditableMap(urlParams.getAll('edit')[0])
 
   const templateMap =
@@ -274,22 +276,17 @@ export function setupMapListOptions (refresh) {
 }
 
 export function setupGameOptions (boardSetup, refresh) {
-  // Define urlParams using the current window's search string
   const placedShips = setupMapSelection(boardSetup, refresh)
   boardSetup()
   return placedShips
 }
 export function setupPrintOptions (boardSetup, refresh, huntMode) {
-  // Define urlParams using the current window's search string
   const targetMap = setupMapSelectionPrint(boardSetup, refresh)
   boardSetup()
   setupTabs(huntMode)
   return targetMap
 }
 export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
-  // Define urlParams using the current window's search string
-
-  setupTabs(huntMode)
   const targetMap = setupMapOptions(boardSetup, refresh, huntMode)
   if (targetMap && editHandler) {
     editHandler(targetMap)
