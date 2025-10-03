@@ -2,7 +2,7 @@ import { gameMaps } from './maps.js'
 import { WatersUI } from './playerUI.js'
 import { Waters } from './player.js'
 import { ScoreUI } from './ScoreUI.js'
-import { switchToEdit, switchTo, setupMapListOptions } from './setup.js'
+import { switchToEdit, switchTo, setupMapListOptions } from './navbar.js'
 
 class MapList {
   constructor (id) {

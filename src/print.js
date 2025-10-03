@@ -1,4 +1,4 @@
-import { setupPrintOptions } from './setup.js'
+import { setupPrintOptions } from './navbar.js'
 import { friendUI } from './friendUI.js'
 import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'

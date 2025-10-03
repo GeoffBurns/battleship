@@ -18,7 +18,7 @@ import {
   validateHeight,
   validateWidth,
   switchTo
-} from './setup.js'
+} from './navbar.js'
 
 customUI.resetBoardSize()
 

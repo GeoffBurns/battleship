@@ -1,5 +1,5 @@
-import { setupGameOptions } from './setup.js'
-import { setupEnemy, newGame } from './enemySetup.js'
+import { setupGameOptions } from './navbar.js'
+import { setupEnemy, newGame } from './enemysetup.js'
 import { enemyUI } from './enemyUI.js'
 
 setupGameOptions(enemyUI.resetBoardSize.bind(enemyUI), newGame, 'seek')

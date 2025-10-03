@@ -1,4 +1,4 @@
-import { setupGameOptions } from './setup.js'
+import { setupGameOptions } from './navbar.js'
 import { friendUI } from './friendUI.js'
 import {
   dragOverPlacingHandlerSetup,
