@@ -79,33 +79,50 @@ export function setupTabs (huntMode) {
     // Trigger the file dialog
     input.click()
   }
-  if (huntMode !== 'build')
+  if (huntMode === 'build') {
+    document.getElementById('tab-build').classList.add('you-are-here')
+    document.getElementById('tab-add').classList.add('you-are-here')
+  } else {
     document
       .getElementById('tab-build')
       ?.addEventListener('click', switchToBuild)
 
-  if (huntMode !== 'hide')
+    document.getElementById('tab-add')?.addEventListener('click', function () {
+      window.location.href = './battlebuild.html'
+    })
+  }
+
+  if (huntMode === 'hide') {
+    document.getElementById('tab-hide').classList.add('you-are-here')
+  } else {
     document.getElementById('tab-hide')?.addEventListener('click', switchToHide)
+  }
 
-  if (huntMode !== 'seek')
+  if (huntMode === 'seek') {
+    document.getElementById('tab-seek').classList.add('you-are-here')
+  } else {
     document.getElementById('tab-seek')?.addEventListener('click', switchToSeek)
+  }
 
-  if (huntMode !== 'list')
+  if (huntMode === 'list') {
+    document.getElementById('tab-build').classList.add('you-are-here')
+    document.getElementById('tab-list').classList.add('you-are-here')
+  } else {
     document.getElementById('tab-list')?.addEventListener('click', switchToList)
+  }
 
   if (huntMode !== 'import') {
     document
       .getElementById('tab-import')
       ?.addEventListener('click', switchToImport)
   }
-
-  if (huntMode !== 'print') {
-    document
-      .getElementById('tab-print')
-      ?.addEventListener('click', function () {
-        window.print()
-      })
+  if (huntMode === 'print') {
+    document.getElementById('tab-build').classList.add('you-are-here')
+    document.getElementById('tab-print').classList.add('you-are-here')
   }
+  document.getElementById('tab-print')?.addEventListener('click', function () {
+    window.print()
+  })
 
   document.getElementById('tab-about')?.addEventListener('click', function () {
     window.location.href =

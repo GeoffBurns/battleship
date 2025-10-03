@@ -368,9 +368,6 @@ export class SavedCustomMap extends CustomMap {
   }
 }
 export class EditedCustomMap extends withModifyable(SavedCustomMap) {
-  constructor (data) {
-    super(data)
-  }
   static load (title) {
     const obj = SavedCustomMap.loadObj(title)
     return new EditedCustomMap(obj)
