@@ -188,7 +188,7 @@ wireupButtons()
 
 setupBuildShortcuts()
 
-fetchNavBar('build', function () {
+fetchNavBar('build', 'Create Your Own BattleShip Game', function () {
   document.getElementById('second-tab-bar').classList.remove('hidden')
   document.getElementById('height-container').classList.remove('hidden')
   document.getElementById('width-container').classList.remove('hidden')

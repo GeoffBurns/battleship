@@ -29,8 +29,13 @@
         break-before: page;
     }
 
-    .battleship.print-preview .print-only {
+    .print-only {
         display: block !important;
+    }
+
+    #print-title {
+        font-weight: 900;
+        font-size: 180%
     }
 
     #choose-controls {

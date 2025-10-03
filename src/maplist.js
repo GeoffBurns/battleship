@@ -2,7 +2,12 @@ import { gameMaps } from './maps.js'
 import { WatersUI } from './playerUI.js'
 import { Waters } from './player.js'
 import { ScoreUI } from './ScoreUI.js'
-import { switchToEdit, switchTo, setupMapListOptions } from './navbar.js'
+import {
+  switchToEdit,
+  switchTo,
+  setupMapListOptions,
+  fetchNavBar
+} from './navbar.js'
 
 class MapList {
   constructor (id) {
@@ -226,11 +231,6 @@ class MapList {
   }
 }
 
-const mapList = new MapList()
-
-setupMapListOptions(mapList.makeList.bind(mapList))
-mapList.makeList('0')
-
 function saveAsJson (json, filename = 'data.json') {
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
@@ -285,3 +285,14 @@ async function saveToFile (map, suggestedName) {
     return { success: true, fallback: true }
   }
 }
+
+const mapList = new MapList()
+
+fetchNavBar('list', 'List of Battleship Maps', function () {
+  document.getElementById('second-tab-bar').classList.remove('hidden')
+  document.getElementById('choose-include').classList.remove('hidden')
+
+  setupMapListOptions(mapList.makeList.bind(mapList))
+
+  mapList.makeList('0')
+})

@@ -217,7 +217,7 @@ wireupButtons()
 dragOverPlacingHandlerSetup(friend, friendUI)
 removeHideShorcuts = setupHideShortcuts()
 
-fetchNavBar('hide', function () {
+fetchNavBar('hide', "Geoff's Battleship (Hide & Seek)", function () {
   document.getElementById('choose-map-container').classList.remove('hidden')
 
   const placedShips = setupGameOptions(

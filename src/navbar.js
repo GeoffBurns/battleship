@@ -30,11 +30,6 @@ export function switchTo (target, huntMode, mapName) {
   window.location.href = location
 }
 
-const listUI = new ChooseFromListUI(
-  ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
-  'chooseList'
-)
-
 export function setupTabs (huntMode) {
   function switchToSeek () {
     switchTo('battleseek', huntMode)
@@ -268,7 +263,10 @@ function setupMapOptions (boardSetup, refresh, huntMode) {
 }
 
 export function setupMapListOptions (refresh) {
-  setupTabs('list')
+  const listUI = new ChooseFromListUI(
+    ['Custom Maps Only', 'All Maps', 'Pre-Defined Maps Only'],
+    'chooseList'
+  )
 
   listUI.setup(function (index, text) {
     refresh(index, text)
@@ -280,11 +278,13 @@ export function setupGameOptions (boardSetup, refresh) {
   boardSetup()
   return placedShips
 }
-export function setupPrintOptions (boardSetup, refresh, huntMode) {
+
+export function setupPrintOptions (boardSetup, refresh) {
   const targetMap = setupMapSelectionPrint(boardSetup, refresh)
   boardSetup()
   return targetMap
 }
+
 export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   const targetMap = setupMapOptions(boardSetup, refresh, huntMode)
   if (targetMap && editHandler) {
@@ -295,11 +295,12 @@ export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {
   return targetMap
 }
 
-export function fetchNavBar (tab, callback) {
+export function fetchNavBar (tab, title, callback) {
   fetch('./navbars.html')
     .then(res => res.text())
     .then(html => {
       document.getElementById('navbar').innerHTML = html
+      document.getElementById('print-title').textContent = title
 
       setupTabs(tab)
       if (typeof callback === 'function') callback()
