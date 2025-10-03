@@ -283,7 +283,6 @@ export function setupGameOptions (boardSetup, refresh) {
 export function setupPrintOptions (boardSetup, refresh, huntMode) {
   const targetMap = setupMapSelectionPrint(boardSetup, refresh)
   boardSetup()
-  setupTabs(huntMode)
   return targetMap
 }
 export function setupBuildOptions (boardSetup, refresh, huntMode, editHandler) {

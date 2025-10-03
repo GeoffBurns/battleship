@@ -59,6 +59,7 @@ select {
 .choose-container {
     margin-bottom: 13px;
     margin-top: 13px;
+    margin-left: 25px;
 }
 
 .choose-map-container {
@@ -170,7 +171,7 @@ select {
     display: block;
 }
 
-.battleship.print-preview .print-only {
+.battleship .print-only {
     display: none;
 }
 
@@ -181,6 +182,7 @@ select {
     box-sizing: border-box;
     width: 780px !important;
 }
+
 
 .info-wrap.info-top.print-preview {
     padding: 0 0;

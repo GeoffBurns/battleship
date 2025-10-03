@@ -1,4 +1,4 @@
-import { setupPrintOptions } from './navbar.js'
+import { setupPrintOptions, setupTabs, fetchNavBar } from './navbar.js'
 import { friendUI } from './friendUI.js'
 import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'
@@ -21,7 +21,7 @@ function refresh () {
   enemyUI.score.buildTally(enemy.ships, 0)
   document.title = "Geoff's Battleship - " + gameMaps.current.title
   friendUI.hideEmptyUnits(friend.ships)
-  //friendUI.buildTrays(friend.ships)
+
   const groups = friendUI.splitUnits(friend.ships)
   for (let type in groups) {
     const shipsInfo = groups[type]
@@ -40,6 +40,11 @@ function refresh () {
     }
   }
 }
+
+//fetchNavBar('build', function () {
+// document.getElementById('second-tab-bar').classList.remove('hidden')
+
+setupTabs('print')
 const printMap = setupPrintOptions(resetBoardSize, refresh, 'print')
 
 resetBoardSize()
@@ -48,5 +53,4 @@ refresh()
 if (printMap) {
   window.print()
 }
-
-// initial
+//})
