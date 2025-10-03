@@ -67,6 +67,14 @@ select {
     text-align: left;
 }
 
+.choose-map-container.right {
+    display: flex;
+    float: none;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 .choose-hunt-container {
     float: right;
     text-align: right;

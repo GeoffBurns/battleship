@@ -41,16 +41,18 @@ function refresh () {
   }
 }
 
-//fetchNavBar('build', function () {
-// document.getElementById('second-tab-bar').classList.remove('hidden')
+fetchNavBar('print', 'Battleship', function () {
+  document.getElementById('second-tab-bar').classList.remove('hidden')
+  const select = document.getElementById('choose-map-container')
+  select.classList.remove('hidden')
+  select.classList.add('right')
 
-setupTabs('print')
-const printMap = setupPrintOptions(resetBoardSize, refresh, 'print')
+  const printMap = setupPrintOptions(resetBoardSize, refresh, 'print')
 
-resetBoardSize()
-refresh()
+  resetBoardSize()
+  refresh()
 
-if (printMap) {
-  window.print()
-}
-//})
+  if (printMap) {
+    window.print()
+  }
+})
