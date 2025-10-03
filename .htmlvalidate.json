@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "html-validate:recommended",
+    "html-validate:prettier"
+  ],
+  "rules": { 
+    "no-dup-id": "error",
+    "no-missing-references": "error",
+    "no-unknown-elements": "error",
+    "element-required-attributes": "error", 
+    "void-style": "off",
+    "attr-quotes": "off"
+  }
+}
