@@ -234,7 +234,7 @@ select {
 }
 
 @media (max-width: 1023px) {
-    .battleship:not(.print-preview) .title-wrap {
+    .battleship:not(.print-preview) .title-wrap .battleship:not(.print-preview) .center-title {
         width: var(--content-width);
     }
 
