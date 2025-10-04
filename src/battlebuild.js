@@ -43,7 +43,7 @@ function onClickAccept (editingMap) {
   const ships = custom.createCandidateShips()
   custom.candidateShips = ships
   if (editingMap) {
-    custom.ships = custom.createShips()
+    custom.setMap()
   }
   custom.resetShipCells()
   customUI.buildBoard()

@@ -190,11 +190,10 @@ class Enemy extends Waters {
   resetModel () {
     this.setCarpetMode(false)
     this.carpetBombsUsed = 0
-    this.boardDestroyed = false
-    this.isRevealed = false
     this.score.reset()
-    this.ships = this.createShips()
+    this.resetMap()
   }
+
   buildBoard () {
     this.UI.buildBoard(this.onClickCell, this)
 

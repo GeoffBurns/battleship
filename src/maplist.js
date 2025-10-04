@@ -164,11 +164,10 @@ class MapList {
 
   fillTallyBox (idx, map, tallybox, boardViewModel) {
     const model = new Waters()
-    const ships = model.createShips(map)
-    model.ships = ships
+    model.setMap(map)
     boardViewModel.score = new ScoreUI(idx.toString())
     boardViewModel.score.tallyBox = tallybox
-    boardViewModel.score.buildTally(ships, 0, null, true)
+    boardViewModel.score.buildTally(model.ships, 0, null, true)
   }
 
   addEntry (map, idx) {

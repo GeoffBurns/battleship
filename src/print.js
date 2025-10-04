@@ -13,8 +13,8 @@ function resetBoardSize () {
 }
 
 function refresh () {
-  friend.ships = friend.createShips()
-  enemy.ships = enemy.createShips()
+  friend.setMap()
+  enemy.setMap()
   friendUI.buildBoardPrint()
   enemyUI.buildBoardPrint()
   friendUI.score.buildTally(friend.ships, 0)

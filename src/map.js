@@ -107,11 +107,6 @@ export class Map {
   }
 
   subterrain (r, c) {
-    /* todo more logic if more than default and land 
-        e.g. rock, caverns and lava in UnderDark Terrains */
-    //  const isLand = this.isLand(r, c)
-    //  return isLand ? this.terrain.landSubterrain : this.terrain.defaultSubterrain
-
     for (const tracker of this.subterrainTrackers) {
       if (tracker.total.has(locationKey(r, c))) return tracker.subterrain
     }

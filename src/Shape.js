@@ -538,8 +538,8 @@ class DeepSeaVessel extends SeaVessel {
       `place ${description} in the deep sea`,
       racks
     )
-    this.validator = SeaVessel.validator
-    this.zoneDetail = SeaVessel.zoneDetail
+    this.validator = DeepSeaVessel.validator
+    this.zoneDetail = DeepSeaVessel.zoneDetail
     this.notes = [
       `${description} can not touch land squares; must be surrounded by sea squares.`
     ]

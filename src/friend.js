@@ -192,8 +192,7 @@ export class Friend extends Waters {
 
   resetModel () {
     this.score.reset()
-    this.ships = this.createShips()
-    this.boardDestroyed = false
+    this.resetMap()
     this.carpetBombsUsed = 0
   }
   buildBoard () {

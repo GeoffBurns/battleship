@@ -1,7 +1,7 @@
 import { gameMaps } from './maps.js'
 import { gameStatus } from './playerUI.js'
 import { Score } from './Score.js'
-import { terrain } from './Shape.js'
+import { LoadOut, terrain } from './Shape.js'
 import { Ship } from './Ship.js'
 import { placedShipsInstance } from './selection.js'
 import { randomPlaceShape } from './utils.js'
@@ -134,7 +134,17 @@ export class Waters {
       this.UI.resetTrays()
     }
   }
+  resetMap (map) {
+    this.boardDestroyed = false
+    this.isRevealed = false
+    this.setMap(map)
+  }
 
+  setMap (map) {
+    map = map || gameMaps.current
+    this.ships = this.createShips(map)
+    this.loadOut = new LoadOut(map.weapons)
+  }
   createShips (map) {
     map = map || gameMaps.current
     const ships = []
