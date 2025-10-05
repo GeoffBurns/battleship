@@ -1,10 +1,12 @@
 export class Score {
   constructor () {
     this.shot = new Set()
+    this.semi = new Set()
     this.autoMisses = 0
   }
   reset () {
     this.shot.clear()
+    this.semi.clear()
     this.autoMisses = 0
   }
   newShotKey (r, c) {
@@ -12,6 +14,12 @@ export class Score {
     if (this.shot.has(key)) return null
     return key
   }
+
+  shotReveal (key) {
+    this.shot.delete(key)
+    this.semi.add(key)
+  }
+
   createShotKey (r, c) {
     const key = this.newShotKey(r, c)
     if (key) {

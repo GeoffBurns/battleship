@@ -37,10 +37,7 @@ class EnemyUI extends WatersUI {
   }
   clearVisuals () {
     for (const cell of this.board.children) {
-      cell.textContent = ''
-      cell.style.background = ''
-      cell.style.color = ''
-      cell.classList.remove('hit', 'frd-hit', 'miss', 'placed')
+      this.clearCellVisuals(cell)
     }
   }
   reset () {

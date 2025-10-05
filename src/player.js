@@ -144,6 +144,20 @@ export class Waters {
     map = map || gameMaps.current
     this.ships = this.createShips(map)
     this.loadOut = new LoadOut(map.weapons)
+    if (this.cursorChange)
+      this.loadOut.onCursorChange = this.cursorChange.bind(this)
+  }
+  shipsSunk () {
+    return this.ships.filter(s => s.sunk)
+  }
+  shipsUnsunk () {
+    return this.ships.filter(s => !s.sunk)
+  }
+  shapesUnsunk () {
+    return [...new Set(this.shipsUnsunk().map(s => s.shape()))]
+  }
+  shapesCanBeOn (subterrain, zone) {
+    return this.shapesUnsunk().filter(s => s.canBeOn(subterrain, zone))
   }
   createShips (map) {
     map = map || gameMaps.current

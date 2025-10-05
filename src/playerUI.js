@@ -66,9 +66,29 @@ export class WatersUI {
     }
   }
 
+  clearCellContent (cell) {
+    cell.textContent = ''
+    this.clearCell(cell)
+  }
+  clearCellVisuals (cell) {
+    cell.textContent = ''
+    cell.style.background = ''
+    cell.style.color = ''
+    this.clearCell(cell)
+  }
+  clearCell (cell) {
+    cell.classList.remove(
+      'hit',
+      'frd-hit',
+      'miss',
+      'semi',
+      'semi-miss',
+      'placed'
+    )
+  }
   clearClasses () {
     for (const cell of this.board.children) {
-      cell.classList.remove('hit', 'frd-hit', 'frd-sunk', 'miss', 'placed')
+      this.clearCell(cell)
     }
   }
   displayAsSunk (cell, _letter) {
@@ -87,6 +107,19 @@ export class WatersUI {
   cellHit (r, c) {
     const cell = this.gridCellAt(r, c)
     cell.classList.add('hit')
+  }
+
+  cellSemiReveal (r, c) {
+    const cell = this.gridCellAt(r, c)
+
+    if (
+      cell.classList.contains('placed') ||
+      cell.classList.contains('miss') ||
+      cell.classList.contains('hit')
+    )
+      return { hit: false, sunk: '', reveal: false }
+    cell.classList.add('semi')
+    return { hit: false, sunk: '', reveal: true }
   }
   cellMiss (r, c) {
     const cell = this.gridCellAt(r, c)

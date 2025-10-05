@@ -15,7 +15,7 @@ export function locationKey (r, c) {
 }
 
 export class Map {
-  constructor (title, size, shipNum, landArea, name, mapTerrain, land, weapons) {
+  constructor (title, size, shipNum, landArea, name, mapTerrain, land) {
     this.title = title
     this.name = name
     this.rows = size[0]
@@ -42,7 +42,7 @@ export class Map {
     })
     this.calcTrackers()
     this.isPreGenerated = true
-    this.weapons = weapons || [standardShot, new Megabomb(3)]
+    this.weapons = [standardShot, new Megabomb(3)]
   }
   recalcTracker (subterrain, tracker) {
     tracker.total.clear()

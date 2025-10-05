@@ -39,6 +39,7 @@ export class Shape {
     this.canAttachWeapons = racks && racks.length > 0
     this.isAttachedToRack = false
     this.terrain = terrain.current
+    this.subterrain = null
     this.validator = Function.prototype
     this.zoneDetail = 0
     this.tip = tip
@@ -51,8 +52,17 @@ export class Shape {
     this.displacement = (area + footPrint.size) / 2
     this.vulnerable = []
     this.hardened = []
+    this.immune = []
   }
-
+  canBeOn (subterrain) {
+    return this.subterrain === subterrain
+  }
+  protectionAgainst (weapon) {
+    if (this.immune.find(w => w === weapon)) return 3
+    if (this.hardened.find(w => w === weapon)) return 2
+    if (this.vulnerable.find(w => w === weapon)) return 0
+    return 1
+  }
   attachWeapon (ammoBuilder) {
     if (!this.canAttachWeapons) {
       throw new Error('Cannot attach weapon to shape ' + this.letter)
@@ -417,12 +427,13 @@ class Building extends Shape {
 
     this.validator = Building.validator
     this.zoneDetail = Building.zoneDetail
+    this.canBeOn = HillFort.canBe
   }
-  static validator = zoneInfo => {
-    return zoneInfo[0] === land
+  static canBe (subterrain) {
+    return subterrain === land
   }
+  static validator = zoneInfo => Building.canBe(zoneInfo[0])
   static zoneDetail = 1
-
   type () {
     return 'G'
   }
@@ -446,11 +457,15 @@ class HillFort extends Building {
     )
     this.validator = HillFort.validator
     this.zoneDetail = HillFort.zoneDetail
+    this.canBeOn = HillFort.canBe
     this.notes = [
       `${description} can not touch sea squares; must be surrounded by land squares.`
     ]
   }
-  static validator = zoneInfo => zoneInfo[0] === land && zoneInfo[1] === inland
+  static canBe (subterrain, zone) {
+    return subterrain === land && zone === inland
+  }
+  static validator = zoneInfo => HillFort.canBe(zoneInfo[0], zoneInfo[1])
   static zoneDetail = 2
 }
 class CoastalPort extends Building {
@@ -465,10 +480,14 @@ class CoastalPort extends Building {
     )
     this.validator = CoastalPort.validator
     this.zoneDetail = CoastalPort.zoneDetail
-
+    this.canBeOn = CoastalPort.canBe
     this.notes = [`${description} must be touching sea squares.`]
   }
-  static validator = zoneInfo => zoneInfo[0] === land && zoneInfo[1] === coast
+
+  static canBe (subterrain, zone) {
+    return subterrain === land && zone === coast
+  }
+  static validator = zoneInfo => CoastalPort.canBe(zoneInfo[0], zoneInfo[1])
   static zoneDetail = 2
 }
 class Plane extends Shape {
@@ -484,7 +503,12 @@ class Plane extends Shape {
     this.descriptionText = description
     this.terrain = seaAndLand
     this.subterrain = all
+    this.canBeOn = Plane.canBe
   }
+
+  static canBe = Function.prototype
+  static validator = Plane.canBe
+  static zoneDetail = 0
 
   type () {
     return 'A'
@@ -494,6 +518,10 @@ class Plane extends Shape {
   }
   description () {
     return this.descriptionText
+  }
+
+  canBeOn () {
+    return true
   }
 }
 
@@ -513,8 +541,12 @@ class SeaVessel extends Shape {
 
     this.validator = SeaVessel.validator
     this.zoneDetail = SeaVessel.zoneDetail
+    this.canBeOn = SeaVessel.canBe
   }
-  static validator = zoneInfo => zoneInfo[0] === sea
+  static canBe (subterrain) {
+    return subterrain === sea
+  }
+  static validator = zoneInfo => SeaVessel.canBe(zoneInfo[0])
   static zoneDetail = 1
 
   type () {
@@ -543,8 +575,12 @@ class DeepSeaVessel extends SeaVessel {
     this.notes = [
       `${description} can not touch land squares; must be surrounded by sea squares.`
     ]
+    this.canBeOn = DeepSeaVessel.canBe
   }
-  static validator = zoneInfo => zoneInfo[0] === sea && zoneInfo[1] === deep
+  static canBe (subterrain, zone) {
+    return subterrain === sea && zone === deep
+  }
+  static validator = zoneInfo => DeepSeaVessel.canBe(zoneInfo[0], zoneInfo[1])
   static zoneDetail = 2
 }
 class ShallowDock extends SeaVessel {
@@ -559,9 +595,14 @@ class ShallowDock extends SeaVessel {
     )
     this.validator = ShallowDock.validator
     this.zoneDetail = ShallowDock.zoneDetail
+
     this.notes = [`${description} must be touching land squares.`]
+    this.canBeOn = ShallowDock.canBe
   }
-  static validator = zoneInfo => zoneInfo[0] === sea && zoneInfo[1] === littoral
+  static canBe (subterrain, zone) {
+    return subterrain === sea && zone === littoral
+  }
+  static validator = zoneInfo => ShallowDock.canBe(zoneInfo[0], zoneInfo[1])
   static zoneDetail = 2
 }
 
@@ -616,6 +657,7 @@ class Hybrid extends Shape {
     this.descriptionText = description
     this.terrain = seaAndLand
     this.subterrain = mixed
+    this.canBeOn = Function.prototype
   }
   displacementFor (subterrain) {
     const groups = this.subGroups.filter(g => g.subterrain === subterrain)
@@ -728,6 +770,7 @@ const supplyDepot = new Hybrid(
   'place Supply Depot on the coast.'
 )
 supplyDepot.subterrain = land
+supplyDepot.canBeOn = Building.canBe
 supplyDepot.notes = [
   `the dotted parts of the ${supplyDepot.descriptionText} must be placed adjacent to sea.`
 ]
@@ -750,6 +793,7 @@ const pier = new Hybrid(
   ],
   'place Pier adjacent to the coast.'
 )
+pier.canBeOn = SeaVessel.canBe
 pier.subterrain = sea
 pier.notes = [
   `the dotted parts of the ${pier.descriptionText} must be placed adjacent to land.`
@@ -796,6 +840,7 @@ const helicopter = new Plane('Helicopter', 'H', 'S', [
   [1, 2],
   [2, 1]
 ])
+helicopter.vulnerable = ['R']
 const airplane = new Plane('Airplane', 'P', 'H', [
   [0, 1],
   [1, 0],
@@ -880,6 +925,9 @@ const submarine = new SeaVessel(
   ]
 )
 submarine.vulnerable = ['E']
+submarine.hardened = ['M']
+submarine.immune = ['R']
+
 seaAndLandShips.addShapes([
   undergroundBunker,
   antiAircraftGun,
@@ -906,20 +954,31 @@ terrain.setCurrent(seaAndLand)
 export class Weapon {
   constructor (name, letter, isLimited, destroys, points) {
     this.name = name
+    this.plural = name + 's'
     this.letter = letter
     this.isLimited = isLimited
     this.destroys = destroys
     this.points = points
+    this.hasFlash = false
+  }
+
+  info () {
+    return `${this.name} (${this.letter})`
   }
 }
+
 export class StandardShot extends Weapon {
   constructor () {
     super('Standard Shot', '-', false, true, 1)
     this.cursors = ['']
     this.hint = 'Click On Square To Fire'
+    this.buttonHtml = '<span class="shortcut">S</span>ingle Shot'
   }
   aoe (coords) {
-    return [coords[0][0], coords[0][1], 2]
+    return [[coords[0][0], coords[0][1], 2]]
+  }
+  ammoStatus () {
+    return `Single Shot Mode`
   }
 }
 
@@ -931,15 +990,22 @@ export class Megabomb extends Weapon {
     this.ammo = ammo
     this.cursors = ['bomb']
     this.hint = 'Click On Square To Drop Bomb'
+
+    this.buttonHtml = '<span class="shortcut">M</span>ega Bomb'
+    this.hasFlash = true
+  }
+
+  ammoStatus (ammoLeft) {
+    return `Bomb Mode (${ammoLeft} left)`
   }
 
   aoe (coords) {
     const r = coords[0][0]
     const c = coords[0][1]
-    let result = [r, c, 2]
+    let result = [[r, c, 2]]
     for (let i = -1; i < 2; i++) {
       for (let j = -1; j < 2; j++) {
-        if (i !== 0 && j !== 0) {
+        if (i !== 0 || j !== 0) {
           result.push([r + i, c + j, 1])
         }
       }
@@ -956,6 +1022,22 @@ export class Megabomb extends Weapon {
   }
 }
 
+export class WeaponSystem {
+  constructor (ammo, weapon) {
+    this.ammo = weapon.isLimited ? null : this.ammo
+    this.weapon = weapon
+  }
+  ammoLeft () {
+    return this.ammo
+  }
+  ammoTotal () {
+    return this.weapon.ammo
+  }
+
+  ammoUsed () {
+    return this.weapon.ammo - this.ammo
+  }
+}
 export class LoadOut {
   constructor (weapons) {
     this.weapons = weapons
@@ -973,7 +1055,7 @@ export class LoadOut {
 
   static wps (weapons) {
     return weapons.map(w => {
-      return { ammo: w.isLimited ? null : this.ammo, weapon: w }
+      return { ammo: w.isLimited ? null : w.ammo, weapon: w }
     })
   }
   limitedSystems () {
@@ -983,10 +1065,10 @@ export class LoadOut {
     return this.weapons.filter(w => w.isLimited)
   }
   totalAmmo () {
-    return LoadOut.wps(this.limitedWeapons())
+    return this.limitedSystems().reduce((acc, w) => acc + w.ammo, 0)
   }
   ammoLeft () {
-    return this.limitedSystems()
+    return this.limitedSystems().reduce((acc, w) => acc + w.ammoLeft(), 0)
   }
   reload (weapons) {
     weapons = weapons || this.weapons
@@ -995,25 +1077,47 @@ export class LoadOut {
   weaponSystem () {
     return this.weaponSystems[this.index]
   }
+
+  nextWeaponSystem () {
+    return this.weaponSystems[this.nextIndex()]
+  }
   weapon () {
     return this.weaponSystem().weapon
   }
 
+  nextWeapon () {
+    return this.nextWeaponSystem().weapon
+  }
+  removeWeaponSystem () {
+    const i = this.index
+    this.weaponSystems = this.weaponSystems.splice(i, i)
+
+    if (i >= this.weaponSystems.length) {
+      this.index = 0
+    }
+  }
+  isOutOfAmmo () {
+    return 1 >= this.weaponSystems.length
+  }
+  currentAmmo () {
+    return this.weaponSystem().ammo
+  }
+  hasNoCurrentAmmo () {
+    return this.currentAmmo() === 0
+  }
+  hasCurrentAmmo () {
+    return this.currentAmmo() !== 0
+  }
   useAmmo () {
     if (!this.weapon().isLimited) return
 
     this.weaponSystem().ammo--
 
-    if (this.weaponSystem().ammo === 0) {
-      const i = this.index
+    if (this.hasNoCurrentAmmo()) {
       const oldWeapon = this.weapon()
-      this.weaponSystems = this.weaponSystems.splice(i, i)
-
-      if (i >= this.weaponSystems.length) {
-        this.index = 0
-      }
+      this.removeWeaponSystem()
       this.OutOfAmmo(oldWeapon, this.weapon())
-      if (1 <= this.weaponSystems.length) {
+      if (this.isOutOfAmmo()) {
         this.OutOfAllAmmo()
       }
     }
@@ -1028,17 +1132,26 @@ export class LoadOut {
 
   cursor () {
     const weapon = this.weapon()
-    const index = Math.Min(this.coords.length, weapon.point - 1)
+    const index = Math.min(this.coords.length, weapon.points - 1)
     return weapon.cursors[index]
   }
 
+  nextIndex () {
+    let idx = this.index
+    idx++
+    if (idx >= this.weaponSystems.length) {
+      idx = 0
+    }
+    return idx
+  }
+  switchToNextWPS () {
+    this.index = this.nextIndex()
+    this.coords = []
+  }
   switch () {
     const oldCursor = this.cursor()
-    this.index++
-    this.coords = []
-    if (this.index >= this.weaponsSystems.length) {
-      this.index = 0
-    }
+    this.switchToNextWPS()
+
     this.onCursorChange(oldCursor, this.cursor())
     return this.weapon()
   }

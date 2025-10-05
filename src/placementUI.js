@@ -131,16 +131,14 @@ export class PlacementUI extends WatersUI {
 
   makeDroppable (model) {
     for (const cell of this.board.children) {
-      cell.textContent = ''
-      cell.classList.remove('hit', 'miss', 'placed')
+      this.clearCellContent(cell)
       this.drop(cell, model)
       this.dragEnter(cell, model)
     }
   }
   makeAddDroppable (model) {
     for (const cell of this.board.children) {
-      cell.textContent = ''
-      cell.classList.remove('hit', 'miss', 'placed')
+      this.clearCellContent(cell)
       this.addDrop(cell, model)
       this.dragEnter(cell, model)
     }
@@ -249,6 +247,8 @@ export class PlacementUI extends WatersUI {
   dragEnter (cell, model) {
     cell.addEventListener('dragenter', e => {
       e.preventDefault()
+      const isShip = e.dataTransfer.types.includes('ship')
+      if (!isShip) return
 
       const el = e.target
       const r = parseInt(el.dataset.r)
@@ -260,8 +260,6 @@ export class PlacementUI extends WatersUI {
     })
   }
   dragBrushEnter (cell) {
-    /// this.brushlistenCancellables = []
-
     function setLandCells (r, c, min, max, map, subterrain) {
       for (let i = min; i < max; i++) {
         for (let j = min; j < max; j++) {
@@ -284,6 +282,8 @@ export class PlacementUI extends WatersUI {
 
     const handler = e => {
       e.preventDefault()
+      const isBrush = e.dataTransfer.types.includes('brush')
+      if (!isBrush) return
       const el = e.target
       const r = parseInt(el.dataset.r)
       const c = parseInt(el.dataset.c)
@@ -588,11 +588,15 @@ export class PlacementUI extends WatersUI {
   }
   dragEnd (div, callback) {
     const handler = e => {
+      const isShip = e.dataTransfer.types.includes('ship')
+      if (!isShip) return
+
       const shipElement = e.target
       if (shipElement?.style) shipElement.style.opacity = ''
       for (const el of this.board.children) {
         el.classList.remove('good', 'bad')
       }
+
       cursor.isDragging = false
       if (e.dataTransfer.dropEffect !== 'none') {
         // The item was successfully dropped on a valid drop target
@@ -612,7 +616,10 @@ export class PlacementUI extends WatersUI {
     })
   }
   dragBrushEnd (div, callback) {
-    const dragBrushEndHandler = _e => {
+    const dragBrushEndHandler = e => {
+      const isBrush = e.dataTransfer.types.includes('brush')
+      if (!isBrush) return
+
       this.refreshAllColor()
 
       if (callback) callback()
@@ -620,19 +627,6 @@ export class PlacementUI extends WatersUI {
     div.addEventListener('dragend', dragBrushEndHandler)
     this.brushlistenCancellables.push(() => {
       div.removeEventListener('dragend', dragBrushEndHandler)
-    })
-  }
-  dragLeave (div) {
-    const handler = e => {
-      e.preventDefault()
-      for (const el of this.board.children) {
-        el.classList.remove('good', 'bad')
-      }
-    }
-    div.addEventListener('dragleave', handler)
-
-    this.brushlistenCancellables.push(() => {
-      div.removeEventListener('dragleave', handler)
     })
   }
   makeBrushDraggable (brush, size, subterrain) {
@@ -667,7 +661,7 @@ export class PlacementUI extends WatersUI {
       if (e.target !== shipElement && !shipId) {
         return
       }
-
+      e.dataTransfer.setData('ship', shipId.toString())
       const ship = ships.find(s => s.id === shipId)
 
       this.showNotice(ship.shape().tip)
@@ -701,19 +695,13 @@ export class PlacementUI extends WatersUI {
       if (e.target !== e.currentTarget) {
         return
       }
+      e.dataTransfer.setData('brush', subterrain + size.toString())
       const shipElement = e.currentTarget
 
       e.dataTransfer.effectAllowed = 'all'
 
       cursor.isDragging = true
-      selection = new Brush(
-        size,
-        subterrain
-        // this.cellSize(),
-        //  shipElement,
-        //   this.setBrushContents.bind(this)
-      )
-      //   selection.moveTo(e.clientX, e.clientY)
+      selection = new Brush(size, subterrain)
       shipElement.style.opacity = '0.6'
     })
   }
@@ -1157,6 +1145,8 @@ export function setupDragHandlers (viewModel) {
   })
 
   viewModel.board.addEventListener('dragenter', e => {
+    const isShip = e.dataTransfer.types.includes('ship')
+    if (!isShip) return
     e.preventDefault()
 
     dragCounter++
@@ -1165,6 +1155,8 @@ export function setupDragHandlers (viewModel) {
   })
 
   viewModel.board.addEventListener('dragleave', e => {
+    const isShip = e.dataTransfer.types.includes('ship')
+    if (!isShip) return
     e.preventDefault()
     dragCounter--
     if (dragCounter > 0) return
@@ -1186,11 +1178,7 @@ export function dragOverPlacingHandlerSetup (model, viewModel) {
   document.addEventListener('dragover', e => {
     e.preventDefault()
 
-    //const isBuilding = model instanceof Custom
-    //const isPlacing = model instanceof Friend
-
     if (!selection) return
-    //const effect = e.dataTransfer.dropEffect
     const allow = e.dataTransfer.effectAllowed
 
     let changed = false
