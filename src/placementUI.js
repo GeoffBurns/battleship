@@ -3,7 +3,7 @@ import { WatersUI, gameStatus } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
 import { ClickedShip, DraggedShip, Brush } from './selection.js'
 import { cursor } from './cursor.js'
-import { CustomBlankMap } from './map.js'
+import { CustomMap } from './map.js'
 import { Ship } from './Ship.js'
 
 let lastEntered = [-1, -1]
@@ -295,8 +295,7 @@ export class PlacementUI extends WatersUI {
       const subterrain = selection?.subterrain
       const map = gameMaps.current
 
-      if (!(selection?.size && subterrain && map instanceof CustomBlankMap))
-        return
+      if (!(selection?.size && subterrain && map instanceof CustomMap)) return
 
       let min = size > 2 ? -1 : 0
       let max = size < 2 ? 1 : 2
