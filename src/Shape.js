@@ -300,14 +300,14 @@ const seaAndLandShips = new ShipCatelogue(
     S: 'Sunk'
   },
   {
-    A: '#ff6666',
+    A: '#ff6666', //  coral red
     T: '#ffccff',
     B: '#66ccff',
-    C: '#66ff66',
-    D: '#99ff33',
+    C: '#55cc59',
+    D: '#99ff33', // Bright Lime
     O: '#33cc99',
-    S: '#3399cc',
-    Q: '#ffcc66',
+    S: '#3399cc', // Teal Blue
+    Q: '#ffcc66', // Amber Orange
     H: '#ff6699',
     J: '#ff884d',
     P: '#cc99ff',
@@ -315,10 +315,16 @@ const seaAndLandShips = new ShipCatelogue(
     R: '#6699ff',
     U: '#ffff66',
     L: '#ff9933',
-    N: '#33ffcc',
-    I: '#cc33cc',
+    N: '#33ffcc', //Turquoise Mint
+    I: '#cc33cc', // Deep Magenta
     Y: '#7799ee',
-    M: '#ffd166'
+    M: '#000',
+    K: '#fff',
+    W: '#fff',
+    '+': '#000',
+    E: '#000',
+    F: '#000',
+    Z: '#000'
   },
   {
     A: 'Aircraft Carrier',
@@ -358,7 +364,14 @@ const seaAndLandShips = new ShipCatelogue(
     L: 'G',
     N: 'X',
     I: 'X',
-    Y: 'X'
+    Y: 'X',
+    M: 'W',
+    K: 'W',
+    W: 'W',
+    '+': 'W',
+    E: 'W',
+    F: 'W',
+    Z: 'W'
   },
   {
     A: 'rgba(255,102,102,0.3)',
@@ -377,7 +390,14 @@ const seaAndLandShips = new ShipCatelogue(
     L: 'rgba(255, 153, 51,0.3)',
     N: 'rgba(51, 255, 204,0.3)',
     I: 'rgba(204, 51, 204,0.3)',
-    Y: 'rgba(51, 51, 204,0.3)'
+    Y: 'rgba(51, 51, 204,0.3)',
+    M: '#ffd866',
+    K: '#cc3333',
+    W: '#3333cc',
+    '+': '#66ffcc', // Seafoam Green
+    E: '#9966ff',
+    F: '#33ccff',
+    Z: '#33cc33'
   }
 )
 

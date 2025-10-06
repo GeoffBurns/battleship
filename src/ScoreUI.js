@@ -229,13 +229,16 @@ export class ScoreUI {
     for (let i = 0; i < ammoTotal; i++) {
       const box = document.createElement('div')
       box.className = 'tally-box'
-
+      box.style.fontSize = '105%'
       if (i < ammoUsed) {
         box.textContent = 'X'
-        box.style.background = '#999'
+        box.style.background = gameMaps.shipColors[weaponSystem.weapon.letter]
+        box.style.opacity = 0.45
+        box.style.color = '#000'
       } else {
-        box.textContent = 'M'
-        box.style.background = gameMaps.shipLetterColors['M']
+        box.textContent = weaponSystem.weapon.letter
+        box.style.background = gameMaps.shipColors[weaponSystem.weapon.letter]
+        box.style.color = gameMaps.shipLetterColors[weaponSystem.weapon.letter]
       }
       row.appendChild(box)
     }
