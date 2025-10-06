@@ -77,14 +77,32 @@
     transition: opacity 0.1s ease-in-out;
 }
 
+.cell.semi {
+    position: relative;
+    /* positioning context for the pseudo */
+}
+
 .cell.semi::after {
     content: '?';
-    font-size: 90%;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    /* vertical center the '?' */
+    justify-content: center;
+    /* horizontal center the '?' */
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: 150%;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: 900;
-    color: #666;
+    color: #334;
+    pointer-events: none;
+    /* clicks go through to underlying content */
     transition: opacity 0.1s ease-in-out;
+    z-index: 2;
+    /* sits above cell content */
 }
+
 
 .cell.frd-hit::after {
     content: 'X';

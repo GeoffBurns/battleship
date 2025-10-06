@@ -41,10 +41,6 @@ export class Custom extends Waters {
   displacementRatio () {
     return this.shipDisplacement() / this.displacedArea()
   }
-
-  updateUI (ships) {
-    this.updateTally(ships, this.carpetBombsUsed, this.score.noOfShots())
-  }
 }
 
 export const custom = new Custom(customUI)

@@ -9,36 +9,41 @@ class Enemy extends Waters {
     super(enemyUI)
     this.preamble0 = 'Enemy'
     this.preamble = 'The enemy was '
-    this.carpetMode = false
     this.isRevealed = false
     this.timeoutId = null
+    this.weaponHander = null
+    this.revealHander = null
   }
-  toggleCarpetMode () {
-    this.setCarpetMode(!this.carpetMode)
+
+  cursorChange (oldCursor, newCursor) {
+    if (newCursor === oldCursor) return
+    if (oldCursor !== '') this.UI.board.classList.remove(oldCursor)
+    if (newCursor !== '') this.UI.board.classList.add(newCursor)
   }
-  setCarpetMode (mode) {
-    const newMode =
-      !(this.isRevealed || this.carpetBombsUsed >= gameMaps.maxBombs) && mode
-    if (newMode === this.carpetMode) return
-    this.carpetMode = newMode
-    if (this.carpetMode) {
-      this.UI.board.classList.add('bomb')
-    } else {
-      this.UI.board.classList.remove('bomb')
-    }
+  hasAmmo () {
+    return !this.hasNoAmmo()
+  }
+
+  hasNoAmmo () {
+    return this.loadOut.isOutOfAmmo()
+  }
+  switchMode () {
+    if (this.isRevealed || this.hasNoAmmo()) return
+
+    this.loadOut.switch()
+
     this.updateUI(enemy.ships)
   }
-
-  isCarpetMode () {
-    return this.carpetMode && this.carpetBombsUsed >= gameMaps.maxBombs
+  disableBtn (disabled) {
+    document.getElementById('newPlace2').disabled = disabled
+    document.getElementById('newGame').disabled = disabled
+    document.getElementById('weaponBtn').disabled = disabled
+    document.getElementById('revealBtn').disabled = disabled
   }
-  placeAll (ships) {
-    ships = ships || this.ships
-
-    // attempt whole-board placement; retry if any shape fails
-    for (let attempt = 0; attempt < 100; attempt++) {
+  placeStep (ships, attempt1) {
+    this.disableBtn(true)
+    for (let attempt2 = 0; attempt2 < 25; attempt2++) {
       this.resetShipCells()
-
       let ok = true
       for (const ship of ships) {
         const placed = randomPlaceShape(ship, this.shipCellGrid)
@@ -47,10 +52,38 @@ class Enemy extends Waters {
           break
         }
       }
-      if (ok) return true
+      if (ok) {
+        gameStatus.info('Click On Square To Fire')
+        this.disableBtn(false)
+        return
+      }
     }
 
+    gameStatus.info(
+      `Having difficulty placing all ships (${(attempt1 + 1) * 25} attempts)`
+    )
+
+    if (attempt1 < 10) {
+      setTimeout(() => {
+        this.placeStep(ships, attempt1 + 1)
+      }, 0)
+      return
+    }
+
+    this.disableBtn(false)
+
+    gameStatus.info('Failed to place all ships after many attempts')
+    this.boardDestroyed = true
     throw new Error('Failed to place all ships after many attempts')
+  }
+  placeAll (ships) {
+    ships = ships || this.ships
+
+    this.disableBtn(true)
+
+    setTimeout(() => {
+      this.placeStep(ships, 0, true)
+    }, 0)
   }
   revealAll () {
     this.UI.clearClasses()
@@ -63,16 +96,11 @@ class Enemy extends Waters {
     if (this.isRevealed || this.boardDestroyed) {
       return
     }
-    if (this.carpetMode) {
-      gameStatus.displayBombStatus(
-        this.carpetBombsUsed,
-        'Click On Square To Drop Bomb'
-      )
-      this.UI.carpetBtn.innerHTML = '<span class="shortcut">S</span>ingle Shot'
-    } else {
-      this.UI.carpetBtn.innerHTML = '<span class="shortcut">M</span>ega Bomb'
-      gameStatus.display('Single Shot Mode', 'Click On Square To Fire')
-    }
+
+    const wps = this.loadOut.weaponSystem()
+    const next = this.loadOut.nextWeapon()
+    this.UI.weaponBtn.innerHTML = next.buttonHtml
+    gameStatus.displayAmmoStatus(wps)
   }
   updateUI (ships) {
     ships = ships || this.ships
@@ -81,19 +109,21 @@ class Enemy extends Waters {
     // mode
 
     // buttons
-    this.UI.carpetBtn.disabled =
-      this.boardDestroyed ||
-      this.isRevealed ||
-      this.carpetBombsUsed >= gameMaps.maxBombs
+    this.UI.weaponBtn.disabled =
+      this.boardDestroyed || this.isRevealed || this.hasNoAmmo()
     this.UI.revealBtn.disabled = this.boardDestroyed || this.isRevealed
-    this.updateTally(this.ships, this.carpetBombsUsed, this.score.noOfShots())
+    super.updateUI(this.ships)
   }
   onClickCell (r, c) {
-    if (this.boardDestroyed || this.isRevealed) return // no action if game over
-    if (this.carpetMode && this.carpetBombsUsed >= gameMaps.maxBombs) {
-      gameStatus.info('No Mega Bombs Left - Switch To Single Shot')
+    if (this.boardDestroyed || this.isRevealed) return
+    if (this.loadOut.hasNoCurrentAmmo()) {
+      gameStatus.info(
+        `No ${this.loadOut.weapon().plural} Left - Switching To   ${
+          this.loadOut.nextWeapon().name
+        }`
+      )
 
-      this.setCarpetMode(false)
+      this.switchMode()
       return
     }
     if (this.timeoutId) {
@@ -104,14 +134,16 @@ class Enemy extends Waters {
       gameStatus.info('Game Over - No More Shots Allowed')
       return
     }
-    this.tryFireAt(r, c)
+
+    this.loadOut.destroy = this.tryFireAt2.bind(this)
+    this.loadOut.aim(r, c)
   }
   tryFireAt (r, c) {
-    if (!this.score.newShotKey(r, c) && !this.carpetMode) {
+    if (!this.score.newShotKey(r, c)) {
       gameStatus.info('Already Shot Here - Try Again')
       return false
     }
-    this.fireAt(r, c)
+    this.processShot(r, c, false)
     this.updateUI()
     if (this?.opponent && !this.opponent.boardDestroyed) {
       this.timeoutId = setTimeout(() => {
@@ -122,31 +154,60 @@ class Enemy extends Waters {
     }
     return true
   }
-  fireAt (r, c) {
-    if (this.carpetMode) {
-      // Mega Bomb mode: affect 3x3 area centered on (r,c)
-      this.updateMode()
-      if (this.carpetBombsUsed >= gameMaps.maxBombs) {
-        return
-      }
-      this.processCarpetBomb(r, c)
+  tryFireAt2 (weapon, effect) {
+    if (!weapon.isLimited && effect.length === 1) {
+      this.tryFireAt(effect[0][0], effect[0][1])
       return
     }
-    this.processShot(r, c, false)
+    this.fireAt2(weapon, effect)
+    this.updateUI()
+    if (this?.opponent && !this.opponent.boardDestroyed) {
+      this.timeoutId = setTimeout(() => {
+        this.timeoutId = null
+        this.opponent.seekStep()
+      }, 1000)
+      //
+    }
+    return true
+  }
+  fireAt2 (weapon, effect) {
+    // Mega Bomb mode: affect 3x3 area centered on (r,c)
+    this.updateMode()
+    this.processCarpetBomb2(weapon, effect)
   }
 
-  processCarpetBomb (r, c) {
+  processCarpetBomb2 (weapon, effect) {
     let hits = 0
+    let reveals = 0
     let sunks = ''
-    this.carpetBombsUsed++
-    this.updateMode()
-    ;({ hits, sunks } = this.dropBomb(r, c, hits, sunks))
+    ;({ hits, sunks, reveals } = this.dropBomb2(
+      weapon,
+      effect,
+      hits,
+      sunks,
+      reveals
+    ))
     // update status
-    this.updateResultsOfBomb(hits, sunks)
+    this.updateResultsOfBomb(hits, sunks, reveals)
 
     this.updateBombStatus()
     this.flash()
   }
+
+  dropBomb2 (weapon, effect, hits, sunks, reveals) {
+    for (const position of effect) {
+      const [r, c, power] = position
+
+      if (gameMaps.inBounds(r, c)) {
+        const result = this.processShot2(weapon, r, c, power)
+        if (result?.hit) hits++
+        if (result?.sunkLetter) sunks += result.sunkLetter
+        if (result?.reveal) reveals++
+      }
+    }
+    return { hits, sunks, reveals }
+  }
+
   dropBomb (r, c, hits, sunks) {
     for (let dr = -1; dr <= 1; dr++) {
       for (let dc = -1; dc <= 1; dc++) {
@@ -163,15 +224,15 @@ class Enemy extends Waters {
   }
 
   updateBombStatus () {
-    gameStatus.displayBombStatus(this.carpetBombsUsed)
-    if (this.carpetBombsUsed >= gameMaps.maxBombs) {
-      this.setCarpetMode(false)
+    gameStatus.displayAmmoStatus(this.loadOut.weaponSystem())
+    if (this.loadOut.hasNoCurrentAmmo()) {
+      this.switchMode()
       gameStatus.display('Single Shot Mode')
     }
   }
 
-  onClickCarpetMode () {
-    this.toggleCarpetMode()
+  onClickWeaponMode () {
+    this.switchMode()
     this.updateMode()
   }
   onClickReveal () {
@@ -180,18 +241,25 @@ class Enemy extends Waters {
       this.updateUI(enemy.ships)
     }
   }
+
   wireupButtons () {
-    this.UI.carpetBtn.addEventListener(
-      'click',
-      enemy.onClickCarpetMode.bind(enemy)
-    )
-    this.UI.revealBtn.addEventListener('click', enemy.onClickReveal.bind(enemy))
+    if (!this.weaponHander)
+      this.weaponHander = enemy.onClickWeaponMode.bind(enemy)
+    if (!this.revealHander) this.revealHander = enemy.onClickReveal.bind(enemy)
+    this.UI.weaponBtn.addEventListener('click', this.weaponHander)
+    this.UI.revealBtn.addEventListener('click', this.revealHander)
   }
   resetModel () {
-    this.setCarpetMode(false)
-    this.carpetBombsUsed = 0
     this.score.reset()
     this.resetMap()
+
+    this.loadOut.OutOfAllAmmo = () => {
+      this.UI.weaponBtn.disabled = true
+      this.UI.weaponBtn.textcontent = 'single shot'
+      this.UI.board.classList.remove('bomb')
+    }
+    this.loadOut.OutOfAmmo = this.updateMode.bind(this)
+    this.updateUI(enemy.ships)
   }
 
   buildBoard () {
@@ -202,8 +270,6 @@ class Enemy extends Waters {
   }
   resetUI (ships) {
     this.UI.reset()
-    // this.UI.clearVisuals()
-
     this.buildBoard()
     this.placeAll(ships)
     this.updateUI(ships)

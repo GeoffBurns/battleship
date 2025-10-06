@@ -220,15 +220,17 @@ export class ScoreUI {
 
     rowList.appendChild(row)
   }
-  buildBombRow (rowList, carpetBombsUsed) {
+  buildBombRow (rowList, weaponSystem) {
+    const ammoTotal = weaponSystem.ammoTotal()
+    const ammoUsed = weaponSystem.ammoUsed()
     const row = document.createElement('div')
     row.className = 'tally-row'
     row.classList.add('weapon')
-    for (let i = 0; i < gameMaps.maxBombs; i++) {
+    for (let i = 0; i < ammoTotal; i++) {
       const box = document.createElement('div')
       box.className = 'tally-box'
 
-      if (i < carpetBombsUsed) {
+      if (i < ammoUsed) {
         box.textContent = 'X'
         box.style.background = '#999'
       } else {
@@ -240,16 +242,16 @@ export class ScoreUI {
     rowList.appendChild(row)
   }
   buildShipTally (ships, boxer) {
-    this.altBuildTally(ships, boxer, false)
+    this.altBuildTally(ships, [], boxer, false)
   }
-  buildTally (ships, carpetBombsUsed) {
-    this.altBuildTally(ships, carpetBombsUsed, null, true)
+  buildTally (ships, weaponSystems) {
+    this.altBuildTally(ships, weaponSystems, null, true)
   }
   addShipTally (ships) {
-    this.altBuildTally(ships, 0, null, false)
+    this.altBuildTally(ships, [], null, false)
   }
 
-  altBuildTally (ships, carpetBombsUsed, boxer, withWeapons) {
+  altBuildTally (ships, weaponSystems, boxer, withWeapons) {
     function shipLetters (tallyGroup) {
       return [
         ...new Set(
@@ -296,7 +298,9 @@ export class ScoreUI {
       this.buildTallyRow(ships, letter, landColumn, boxer, 'G')
     }
     if (withWeapons) {
-      this.buildBombRow(landColumn, carpetBombsUsed)
+      for (const wps of weaponSystems) {
+        this.buildBombRow(landColumn, wps)
+      }
     }
     surfaceContainer.appendChild(seaColumn)
     surfaceContainer.appendChild(landColumn)

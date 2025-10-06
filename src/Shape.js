@@ -504,6 +504,7 @@ class Plane extends Shape {
     this.terrain = seaAndLand
     this.subterrain = all
     this.canBeOn = Plane.canBe
+    this.immune = ['Z']
   }
 
   static canBe = Function.prototype
@@ -748,6 +749,10 @@ const bombShelter = new HillFort('Bomb Shelter', 'L', 'H', [
   [0, 2]
 ])
 bombShelter.hardened = ['M']
+bombShelter.notes = [
+  `The ${bombShelter.descriptionText} is hardened against Mega bombs.`,
+  `Only the center square of the bomb will destroy the ${bombShelter.descriptionText} the surrounding squares will only reveal the ${bombShelter.descriptionText} `
+]
 
 const supplyDepot = new Hybrid(
   'Supply Depot',
@@ -833,6 +838,8 @@ const jetFighterCraft = new Plane('Jet Fighter', 'J', 'H', [
   [2, 1],
   [2, 2]
 ])
+
+jetFighterCraft.vulnerable = ['F']
 const helicopter = new Plane('Helicopter', 'H', 'S', [
   [0, 1],
   [1, 0],
@@ -840,13 +847,14 @@ const helicopter = new Plane('Helicopter', 'H', 'S', [
   [1, 2],
   [2, 1]
 ])
-helicopter.vulnerable = ['R']
+helicopter.vulnerable = ['W', 'F']
 const airplane = new Plane('Airplane', 'P', 'H', [
   [0, 1],
   [1, 0],
   [1, 1],
   [1, 2]
 ])
+airplane.vulnerable = ['W', 'F']
 const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
   [0, 0],
   [1, 0],
@@ -876,7 +884,7 @@ const tanker = new SeaVessel('Tanker', 'T', 'L', [
   [0, 4],
   [0, 5]
 ])
-tanker.vulnerable = ['Z']
+tanker.vulnerable = ['Z', '+']
 const battleship = new SeaVessel('Battleship', 'B', 'L', [
   [0, 0],
   [0, 1],
@@ -891,6 +899,10 @@ const oilRig = new DeepSeaVessel('Oil Rig', 'O', 'S', [
   [1, 1]
 ])
 oilRig.vulnerable = ['M']
+oilRig.notes = [
+  `The ${oilRig.descriptionText} is vulnerable against Mega bombs.`,
+  `The squares of the ${oilRig.descriptionText} adjacent to the bomb will also be destroyed.`
+]
 const cruiser = new SeaVessel('Cruiser', 'C', 'L', [
   [0, 0],
   [0, 1],
@@ -927,6 +939,10 @@ const submarine = new SeaVessel(
 submarine.vulnerable = ['E']
 submarine.hardened = ['M']
 submarine.immune = ['R']
+submarine.notes = [
+  `The ${submarine.descriptionText} is hardened against Mega bombs.`,
+  `Only the center square of the bomb will destroy the ${submarine.descriptionText} the surrounding squares will only reveal the ${submarine.descriptionText}.`
+]
 
 seaAndLandShips.addShapes([
   undergroundBunker,
@@ -975,7 +991,7 @@ export class StandardShot extends Weapon {
     this.buttonHtml = '<span class="shortcut">S</span>ingle Shot'
   }
   aoe (coords) {
-    return [[coords[0][0], coords[0][1], 2]]
+    return [[coords[0][0], coords[0][1], 4]]
   }
   ammoStatus () {
     return `Single Shot Mode`
@@ -986,7 +1002,7 @@ export const standardShot = new StandardShot()
 
 export class Megabomb extends Weapon {
   constructor (ammo) {
-    super('Megabomb', '-', false, true, 1)
+    super('Megabomb', 'M', true, true, 1)
     this.ammo = ammo
     this.cursors = ['bomb']
     this.hint = 'Click On Square To Drop Bomb'
@@ -1023,8 +1039,8 @@ export class Megabomb extends Weapon {
 }
 
 export class WeaponSystem {
-  constructor (ammo, weapon) {
-    this.ammo = weapon.isLimited ? null : this.ammo
+  constructor (weapon) {
+    this.ammo = weapon.isLimited ? weapon.ammo : null
     this.weapon = weapon
   }
   ammoLeft () {
@@ -1042,7 +1058,7 @@ export class LoadOut {
   constructor (weapons) {
     this.weapons = weapons
     this.weaponSystems = LoadOut.wps(weapons)
-
+    this.allSystems = [...this.weaponSystems]
     this.OutOfAllAmmo = Function.prototype
     this.OutOfAmmo = Function.prototype
     this.destroy = Function.prototype
@@ -1055,11 +1071,14 @@ export class LoadOut {
 
   static wps (weapons) {
     return weapons.map(w => {
-      return { ammo: w.isLimited ? null : w.ammo, weapon: w }
+      return new WeaponSystem(w)
     })
   }
   limitedSystems () {
     return this.weaponSystems.filter(w => w.weapon.isLimited)
+  }
+  limitedAllSystems () {
+    return this.allSystems.filter(w => w.weapon.isLimited)
   }
   limitedWeapons () {
     return this.weapons.filter(w => w.isLimited)
@@ -1084,13 +1103,24 @@ export class LoadOut {
   weapon () {
     return this.weaponSystem().weapon
   }
-
+  switchTo (wletter) {
+    const idx = this.weaponSystems.findIndex(
+      w => w.weapon.letter === wletter && w.ammo > 0
+    )
+    if (idx < 0) return false
+    this.index = idx
+    return true
+  }
+  switchToSShot () {
+    this.index = 0
+    return true
+  }
   nextWeapon () {
     return this.nextWeaponSystem().weapon
   }
   removeWeaponSystem () {
     const i = this.index
-    this.weaponSystems = this.weaponSystems.splice(i, i)
+    this.weaponSystems.splice(i, 1)
 
     if (i >= this.weaponSystems.length) {
       this.index = 0
@@ -1103,10 +1133,10 @@ export class LoadOut {
     return this.weaponSystem().ammo
   }
   hasNoCurrentAmmo () {
-    return this.currentAmmo() === 0
+    return !this.hasCurrentAmmo()
   }
   hasCurrentAmmo () {
-    return this.currentAmmo() !== 0
+    return !this.weapon().isLimited || this.currentAmmo() !== 0
   }
   useAmmo () {
     if (!this.weapon().isLimited) return
@@ -1181,6 +1211,7 @@ export class LoadOut {
   fire () {
     const weapon = this.weapon()
     const effected = weapon.aoe(this.coords)
+    this.useAmmo()
     if (weapon.destroys) {
       this.destroy(weapon, effected)
     } else {

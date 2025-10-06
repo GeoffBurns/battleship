@@ -167,7 +167,12 @@ class MapList {
     model.setMap(map)
     boardViewModel.score = new ScoreUI(idx.toString())
     boardViewModel.score.tallyBox = tallybox
-    boardViewModel.score.buildTally(model.ships, 0, null, true)
+    boardViewModel.score.buildTally(
+      model.ships,
+      model.loadOut.weaponSystems,
+      null,
+      true
+    )
   }
 
   addEntry (map, idx) {

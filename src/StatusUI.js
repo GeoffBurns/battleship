@@ -16,11 +16,9 @@ export class StatusUI {
       this.info(game)
     }
   }
-  bombStatus (carpetBombsUsed) {
-    return `Bomb Mode (${gameMaps.maxBombs - carpetBombsUsed} left)`
-  }
-  displayBombStatus (carpetBombsUsed, game) {
-    return this.display(this.bombStatus(carpetBombsUsed), game)
+  displayAmmoStatus (wps) {
+    const { ammo, weapon } = wps
+    return this.display(weapon.ammoStatus(ammo), weapon.hint)
   }
   info (game) {
     this.game.textContent = game

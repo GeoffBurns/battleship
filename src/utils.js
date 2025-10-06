@@ -7,7 +7,7 @@ export function randomPlaceShape (ship, shipCellGrid) {
   let placeables = shape.placeables()
 
   // try random placements
-  const maxAttempts = 20000
+  const maxAttempts = 5000
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     for (const placeable of placeables) {
       // compute bounds for random origin so variant fits

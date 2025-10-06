@@ -7,7 +7,7 @@ class EnemyUI extends WatersUI {
     super()
     this.board = document.getElementById('enemy-board')
     this.score = new ScoreUI('enemy')
-    this.carpetBtn = document.getElementById('carpetBtn')
+    this.weaponBtn = document.getElementById('weaponBtn')
     this.revealBtn = document.getElementById('revealBtn')
   }
   displayFleetSunk () {
@@ -28,17 +28,11 @@ class EnemyUI extends WatersUI {
     cell.style.color = gameMaps.shipLetterColors[letter] || '#fff'
     cell.style.background =
       gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
-    cell.classList.remove('hit')
-    cell.classList.remove('miss')
+    this.clearCell(cell)
   }
   cellSunkAt (r, c, letter) {
     const cell = this.gridCellAt(r, c)
     this.displayAsSunk(cell, letter)
-  }
-  clearVisuals () {
-    for (const cell of this.board.children) {
-      this.clearCellVisuals(cell)
-    }
   }
   reset () {
     this.board.innerHTML = ''

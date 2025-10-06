@@ -86,6 +86,7 @@ function onClickSeek () {
 
   removeSeekShorcuts = setupEnemy(onClickReturnToPlacement, resetFriendBoard)
   enemy.UI.resetBoardSize()
+  friend.setupUntried()
   newGame()
 }
 function onClickAuto () {

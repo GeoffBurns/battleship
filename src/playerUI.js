@@ -80,6 +80,7 @@ export class WatersUI {
     cell.classList.remove(
       'hit',
       'frd-hit',
+      'frd-sunk',
       'miss',
       'semi',
       'semi-miss',
@@ -92,12 +93,9 @@ export class WatersUI {
     }
   }
   displayAsSunk (cell, _letter) {
-    // cell.textContent = ''
+    this.clearCell(cell)
     cell.classList.add('frd-sunk')
-    //  cell.style.background = gameMaps.shipColors[letter] || 'rgba(0,0,0,0.8)'
-    // cell.style.color = gameMaps.shipLetterColors[letter] || '#000'
-    //cell.classList.remove('hit')
-    cell.classList.remove('miss')
+    cell.classList.add('frd-hit')
   }
   cellSunkAt (r, c, letter) {
     const cell = this.gridCellAt(r, c)
@@ -106,6 +104,8 @@ export class WatersUI {
 
   cellHit (r, c) {
     const cell = this.gridCellAt(r, c)
+
+    cell.classList.remove('semi', 'semi-miss')
     cell.classList.add('hit')
   }
 
@@ -119,6 +119,7 @@ export class WatersUI {
     )
       return { hit: false, sunk: '', reveal: false }
     cell.classList.add('semi')
+    cell.textContent = ''
     return { hit: false, sunk: '', reveal: true }
   }
   cellMiss (r, c) {
@@ -280,10 +281,7 @@ export class WatersUI {
   }
   clearVisuals () {
     for (const el of this.board.children) {
-      el.textContent = ''
-      el.style.background = ''
-      el.style.color = ''
-      el.classList.remove('hit', 'miss', 'frd-hit', 'frd-sunk', 'placed')
+      this.clearCellVisuals(el)
     }
   }
 }

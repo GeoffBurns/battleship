@@ -34,7 +34,7 @@ export function enterCursor (event, viewModel, ships, shipCellGrid) {
   if (!cursor.isGrid) return
   event.preventDefault()
   const cell = viewModel.gridCellAt(cursor.x, cursor.y)
-  viewModel.handleDropEvent(cell, shipCellGrid, ships)
+  viewModel.handleDropEvent(cell, viewModel)
   selection = null
   createSelection(viewModel, ships, shipCellGrid, null)
 }
@@ -481,9 +481,18 @@ export class PlacementUI extends WatersUI {
       tray.classList.remove('empty')
       tray.classList.remove('hidden')
     }
-    this.brushTray.innerHTML = ''
-    this.brushTray.classList.add('hidded')
+    if (this.brushTray) {
+      this.brushTray.innerHTML = ''
+      this.brushTray.classList.add('hidded')
+    }
     this.trays.classList.remove('hidden')
+  }
+  hideShipTrays () {
+    let trays = this.getTrays()
+    for (const tray of trays) {
+      tray.classList.add('hidden')
+    }
+    this.trays.classList.add('hidden')
   }
   showBrushTrays () {
     let trays = this.getTrays()
@@ -791,8 +800,8 @@ export class PlacementUI extends WatersUI {
     cell.style.background =
       gameMaps.shipColors[letter] || 'rgba(255,255,255,0.2)'
 
+    this.clearCell(cell)
     cell.classList.add('placed')
-    cell.classList.remove('miss')
   }
   cellPlacedAt (r, c, letter) {
     const cell = this.gridCellAt(r, c)
@@ -1118,18 +1127,12 @@ export class PlacementUI extends WatersUI {
   }
   reset (ships) {
     this.board.innerHTML = ''
-    this.shipTray.innerHTML = ''
-    this.planeTray.innerHTML = ''
-    this.specialTray.innerHTML = ''
-    this.buildingTray.innerHTML = ''
+    this.clearTrays()
     this.displayShipInfo(ships)
   }
   resetAdd (model) {
     this.board.innerHTML = ''
-    this.shipTray.innerHTML = ''
-    this.planeTray.innerHTML = ''
-    this.specialTray.innerHTML = ''
-    this.buildingTray.innerHTML = ''
+    this.clearTrays()
     this.displayAddInfo(model)
   }
 }

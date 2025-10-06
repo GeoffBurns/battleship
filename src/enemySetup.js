@@ -30,11 +30,11 @@ function setupSeekShortcuts (placement) {
         break
       case 'm':
       case 'M':
-        if (!enemy.carpetMode) enemy.onClickCarpetMode()
+        enemy.onClickWeaponMode()
         break
       case 's':
       case 'S':
-        if (enemy.carpetMode) enemy.onClickCarpetMode()
+        enemy.onClickWeaponMode()
         break
     }
   }

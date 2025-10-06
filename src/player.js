@@ -29,7 +29,6 @@ export class Waters {
     this.UI = ui
     this.shipCellGrid = []
     this.boardDestroyed = false
-    this.carpetBombsUsed = 0
     this.nextId = 1
     this.preamble0 = 'Your'
     this.preamble = 'You were '
@@ -124,7 +123,7 @@ export class Waters {
         if (dragship) {
           this.UI.removeDragShip(dragship)
         } else {
-          console.log('drag ship not found : ', JSON.stringify(ship))
+          //    console.log('drag ship not found : ', JSON.stringify(ship))
         }
       }
     }
@@ -139,13 +138,16 @@ export class Waters {
     this.isRevealed = false
     this.setMap(map)
   }
-
-  setMap (map) {
+  armWeapons (map) {
     map = map || gameMaps.current
-    this.ships = this.createShips(map)
     this.loadOut = new LoadOut(map.weapons)
     if (this.cursorChange)
       this.loadOut.onCursorChange = this.cursorChange.bind(this)
+  }
+  setMap (map) {
+    map = map || gameMaps.current
+    this.ships = this.createShips(map)
+    this.armWeapons()
   }
   shipsSunk () {
     return this.ships.filter(s => s.sunk)
@@ -236,13 +238,17 @@ export class Waters {
   }
 
   checkForHit (r, c, key, shipCell) {
+    if (!shipCell) {
+      return
+    }
+
     const hitShip = this.ships.find(s => s.id === shipCell.id)
     if (!hitShip) {
       this.UI.cellMiss(r, c)
       return { hit: false, sunk: '' }
     }
     hitShip.hits.add(key)
-
+    this.score.semi.delete(key)
     this.UI.cellHit(r, c)
 
     if (hitShip.hits.size === hitShip.cells.length) {
@@ -253,6 +259,54 @@ export class Waters {
     return { hit: true, sunkLetter: '' }
   }
 
+  checkForHit2 (weapon, r, c, power, key, shipCell) {
+    if (!shipCell) {
+      return
+    }
+
+    const hitShip = this.ships.find(s => s.id === shipCell.id)
+
+    if (!hitShip) {
+      this.UI.cellMiss(r, c)
+      return { hit: false, sunk: '', reveal: false }
+    }
+
+    const shape = gameMaps.shapesByLetter[shipCell.letter]
+    const protection = shape.protectionAgainst(weapon.letter)
+    if (power === 1 && protection === 2 && hitShip) {
+      this.score.shotReveal(key)
+      return this.UI.cellSemiReveal(r, c)
+    }
+
+    if (protection > power) {
+      return { hit: false, sunk: '', reveal: false }
+    }
+
+    if (power < 1) {
+      this.score.shot.add(key)
+    }
+    hitShip.hits.add(key)
+    this.score.semi.delete(key)
+    this.UI.cellHit(r, c)
+
+    if (hitShip.hits.size === hitShip.cells.length) {
+      // ship sunk
+      this.markSunk(hitShip)
+      return { hit: true, sunkLetter: hitShip.letter }
+    }
+    return { hit: true, sunkLetter: '' }
+  }
+  fireShot2 (weapon, r, c, power, key) {
+    const shipCell = this.shipCellAt(r, c)
+    if (!shipCell) {
+      if (power > 0) {
+        this.UI.cellMiss(r, c)
+      }
+      return { hit: false, sunk: '' }
+    }
+    return this.checkForHit2(weapon, r, c, power, key, shipCell)
+  }
+
   fireShot (r, c, key) {
     const shipCell = this.shipCellAt(r, c)
     if (!shipCell) {
@@ -261,6 +315,7 @@ export class Waters {
     }
     return this.checkForHit(r, c, key, shipCell)
   }
+
   hitDescription (hits) {
     if (this.opponent) {
       return this.preamble + ' Hit (x' + hits.toString() + ')'
@@ -268,9 +323,20 @@ export class Waters {
       return hits.toString() + ' Hits'
     }
   }
-  updateResultsOfBomb (hits, sunks) {
+  revealDescription (reveals) {
+    if (this.opponent) {
+      return this.preamble + ' positions revealed (x' + reveals.toString() + ')'
+    } else {
+      return reveals.toString() + ' positions revealed'
+    }
+  }
+
+  updateResultsOfBomb (hits, sunks, reveals) {
+    reveals = reveals || 0
     if (this.boardDestroyed) {
       // already handled  in updateUI
+    } else if (hits === 0 && reveals > 0) {
+      this.displayInfo(this.revealDescription(reveals))
     } else if (hits === 0) {
       if (this.opponent) {
         this.displayInfo('The Mega Bomb missed ' + this.preamble0 + ' ships')
@@ -278,7 +344,11 @@ export class Waters {
         this.displayInfo('The Mega Bomb missed everything!')
       }
     } else if (sunks.length === 0) {
-      this.displayInfo(this.hitDescription(hits))
+      let message = this.hitDescription(hits)
+      if (reveals > 0) {
+        message += ` and ${this.revealDescription(reveals)}`
+      }
+      this.displayInfo(message)
     } else if (sunks.length === 1) {
       this.displayInfo(
         this.hitDescription(hits) + ' and ' + this.sunkLetterDescription(sunks)
@@ -322,6 +392,21 @@ export class Waters {
       this.effect(cell, 'flames')
     }
   }
+  processShot2 (weapon, r, c, power) {
+    if (power > 0) this.flame(r, c, weapon.hasFlash)
+
+    const key =
+      power > 0 ? this.score.createShotKey(r, c) : this.score.newShotKey(r, c)
+    if (key === null) {
+      // if we are here, it is because of carpet bomb, so we can just
+      return { hit: false, sunk: '' }
+    }
+
+    const result = this.fireShot2(weapon, r, c, power, key)
+
+    this.updateUI(this.ships)
+    return result
+  }
   processShot (r, c, bomb) {
     this.flame(r, c, bomb)
 
@@ -336,13 +421,21 @@ export class Waters {
     this.updateUI(this.ships)
     return result
   }
-  updateTally (ships, carpetBombsUsed, noOfShots) {
+
+  updateUI (ships) {
+    this.updateTally(
+      ships,
+      this.loadOut.limitedAllSystems(),
+      this.score.noOfShots()
+    )
+  }
+  updateTally (ships, weaponSystems, noOfShots) {
     ships = ships || this.ships
     if (this.UI.placing && this.UI.placeTally) {
       this.UI.placeTally(ships)
     } else {
       this.UI.score.display(ships, noOfShots)
-      this.UI.score.buildTally(ships, carpetBombsUsed)
+      this.UI.score.buildTally(ships, weaponSystems)
     }
   }
 }

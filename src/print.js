@@ -17,8 +17,8 @@ function refresh () {
   enemy.setMap()
   friendUI.buildBoardPrint()
   enemyUI.buildBoardPrint()
-  friendUI.score.buildTally(friend.ships, 0)
-  enemyUI.score.buildTally(enemy.ships, 0)
+  friendUI.score.buildTally(friend.ships, friend.loadOut.weaponSystems)
+  enemyUI.score.buildTally(enemy.ships, enemy.loadOut.weaponSystems)
   document.title = "Geoff's Battleship - " + gameMaps.current.title
   friendUI.hideEmptyUnits(friend.ships)
 

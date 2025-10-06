@@ -24,6 +24,7 @@ export class FriendUI extends PlacementUI {
 
   cellHit (r, c) {
     const cell = this.gridCellAt(r, c)
+    cell.classList.remove('semi', 'semi-miss')
     cell.classList.add('frd-hit')
     cell.textContent = ''
     gameStatus.info('You where hit!')
@@ -48,7 +49,7 @@ export class FriendUI extends PlacementUI {
     this.undoBtn.classList.remove('hidden')
     this.autoBtn.classList.remove('hidden')
     this.stopBtn.classList.add('hidden')
-    this.trays.classList.remove('hidden')
+    this.showShipTrays()
     this.shipTray.setAttribute('style', flexStyle)
     this.planeTray.setAttribute('style', flexStyle)
     this.specialTray.setAttribute('style', flexStyle)
@@ -77,10 +78,7 @@ export class FriendUI extends PlacementUI {
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
     this.stopBtn.classList.add('hidden')
-    this.shipTray.classList.add('hidden')
-    this.planeTray.classList.add('hidden')
-    this.buildingTray.classList.add('hidden')
-    this.trays.classList.add('hidden')
+    this.hideShipTrays()
     for (const cell of this.board.children) {
       cell.classList.remove('hit', 'placed')
     }
@@ -112,10 +110,7 @@ export class FriendUI extends PlacementUI {
     this.flipBtn.classList.add('hidden')
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
-    this.shipTray.classList.add('hidden')
-    this.planeTray.classList.add('hidden')
-    this.buildingTray.classList.add('hidden')
-    this.trays.classList.add('hidden')
+    this.hideShipTrays()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('hidden')
@@ -138,10 +133,7 @@ export class FriendUI extends PlacementUI {
     this.flipBtn.classList.add('hidden')
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
-    this.shipTray.classList.add('hidden')
-    this.planeTray.classList.add('hidden')
-    this.buildingTray.classList.add('hidden')
-    this.trays.classList.add('hidden')
+    this.hideShipTrays()
     const panels = document.getElementsByClassName('panel')
     for (const panel of panels) {
       panel.classList.add('alt')

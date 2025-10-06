@@ -8,10 +8,6 @@ export class Friend extends Waters {
     this.testContinue = true
   }
 
-  updateUI (ships) {
-    this.updateTally(ships, this.carpetBombsUsed, this.score.noOfShots())
-  }
-
   randomHit (hits) {
     const len = hits.length
     if (len < 1) return null
@@ -31,10 +27,10 @@ export class Friend extends Waters {
       }
     }
   }
-  seekHit (r, c, bomb) {
+  seekHit (r, c) {
     if (!gameMaps.inBounds(r, c)) return false
 
-    this.flame(r, c, bomb)
+    this.flame(r, c, false)
     const key = this.score.createShotKey(r, c)
     if (key === null) {
       // if we are here, it is because of carpet bomb, so we can just
@@ -42,10 +38,26 @@ export class Friend extends Waters {
     }
 
     this.fireShot(r, c, key)
-
     this.updateUI(this.ships)
     return true
   }
+
+  seekHit2 (weapon, r, c, power) {
+    if (!gameMaps.inBounds(r, c)) return false
+
+    if (power > 0) this.flame(r, c, weapon.hasFlash)
+    const key =
+      power > 0 ? this.score.createShotKey(r, c) : this.score.newShotKey(r, c)
+    if (key === null) {
+      // if we are here, it is because of carpet bomb, so we can just
+      return false
+    }
+
+    const { hit } = this.fireShot2(weapon, r, c, power, key)
+    this.updateUI(this.ships)
+    return hit
+  }
+
   walkShot (r, c) {
     const dir = gameMaps.isLand(r, c) ? 5 : 4
     const p = Math.floor(Math.random() * dir)
@@ -71,36 +83,22 @@ export class Friend extends Waters {
         }
     }
   }
-  bombImpact (r, c) {
-    let i = 0
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        const nr = r + dr
-        const nc = c + dc
-        if (
-          gameMaps.inBounds(nr, nc) &&
-          this.score.newShotKey(nr, nc) !== null
-        ) {
-          i++
-        }
+  seekBomb (weapon, effect) {
+    this.updateUI()
+    let hit = false
+    for (const position of effect) {
+      const [r, c, power] = position
+
+      if (gameMaps.inBounds(r, c)) {
+        if (this.seekHit2(weapon, r, c, power)) hit = true
       }
     }
-    return i
-  }
-  seekBomb (r, c) {
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        const nr = r + dr
-        const nc = c + dc
-        if (gameMaps.inBounds(nr, nc)) {
-          this.seekHit(nr, nc, true)
-        }
-      }
-    }
-    return true
+    if (hit) this.flash()
   }
 
   randomBomb (seeking) {
+    this.loadOut.destroy = this.seekBomb.bind(this)
+
     for (let impact = 9; impact > 1; impact--)
       for (let attempt = 0; attempt < 12; attempt++) {
         if (seeking && (!this.testContinue || this.boardDestroyed)) {
@@ -109,16 +107,15 @@ export class Friend extends Waters {
         }
         const r = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
         const c = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
-
-        if (this.bombImpact(r, c) >= impact && this.seekBomb(r, c)) {
-          this.flash()
-          this.carpetBombsUsed++
+        if (this.score.newShotKey(r, c)) {
+          this.loadOut.aim(r, c)
           return
         }
       }
   }
-  randomSeek (seeking) {
+  randomSeekOld (seeking) {
     const maxAttempts = 130
+
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (seeking && (!this.testContinue || this.boardDestroyed)) {
         clearInterval(seeking)
@@ -132,12 +129,33 @@ export class Friend extends Waters {
       }
     }
   }
+  randomSeek (seeking) {
+    const maxAttempts = 13
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      if (seeking && (!this.testContinue || this.boardDestroyed)) {
+        clearInterval(seeking)
+        return
+      }
+      const loc = this.randomLoc()
+
+      if (!loc) {
+        this.UI.showNotice('something went wrong!')
+        clearInterval(seeking)
+        this.boardDestroyed = true
+        this.testContinue = false
+        return
+      }
+      if (this.seekHit(loc[0], loc[1], false)) {
+        return
+      }
+    }
+  }
   restartBoard () {
     this.boardDestroyed = false
     this.UI.board.classList.remove('destroyed')
-    this.carpetBombsUsed = 0
+    this.armWeapons()
     this.score.reset()
-    ///this.UI.clearClasses()
     this.UI.clearVisuals()
     for (const ship of this.ships) {
       ship.sunk = false
@@ -156,11 +174,41 @@ export class Friend extends Waters {
 
     this.seek()
   }
+  setupUntried () {
+    this.untried = new Set()
+    for (let r = 0; gameMaps.current.rows > r; r++) {
+      for (let c = 0; gameMaps.current.cols > c; c++) {
+        const key = `${r},${c}`
+
+        this.untried.add(key)
+      }
+    }
+  }
+  syncUntried () {
+    this.untried = new Set(
+      [...this.untried].filter(x => !this.score.shot.has(x))
+    )
+  }
+
+  randomLoc () {
+    this.syncUntried()
+    const locs = [...this.untried]
+    const noOfLocs = locs.length
+
+    if (noOfLocs === 0) return null
+    if (noOfLocs === 1) return locs[0].split(',').map(x => parseInt(x))
+
+    const idx = Math.floor(Math.random() * locs.length)
+
+    return locs[idx].split(',').map(x => parseInt(x))
+  }
   seek () {
     this.testContinue = true
     this.boardDestroyed = false
-    this.carpetBombsUsed = 0
+    this.armWeapons()
     this.score.shot = new Set()
+    this.setupUntried()
+
     let seeking = setInterval(() => {
       if (seeking && (!this.testContinue || this.boardDestroyed)) {
         clearInterval(seeking)
@@ -174,32 +222,43 @@ export class Friend extends Waters {
       }
     }, 270)
   }
-  seekStep (seeking) {
-    const hitss = this.ships.filter(s => !s.sunk).flatMap(s => [...s.hits])
-    const hits = hitss.map(h => {
+  selectShot (semis, hits, seeking) {
+    if (semis.length > 0) {
+      this.loadOut.switchToSShot()
+      const [r, c] = semis[0].split(',').map(x => parseInt(x))
+      this.seekHit(r, c, false)
+    } else if (hits.length > 0) {
+      this.loadOut.switchToSShot()
+      this.chase(hits, seeking)
+    } else if (this.loadOut.switchTo('M')) {
+      this.randomBomb(seeking)
+    } else {
+      this.loadOut.switchToSShot()
+      this.randomSeek(seeking)
+    }
+  }
+
+  getHits () {
+    const hitss = this.shipsUnsunk().flatMap(s => [...s.hits])
+    return hitss.map(h => {
       const [r, c] = h.split(',').map(n => parseInt(n))
       return [r, c]
     })
+  }
+  seekStep (seeking) {
+    const hits = this.getHits()
 
-    if (hits.length > 0) {
-      this.chase(hits, seeking)
-    } else if (this.carpetBombsUsed < gameMaps.maxBombs) {
-      this.randomBomb(seeking)
-    } else {
-      this.randomSeek(seeking)
-    }
+    this.selectShot([...this.score.semi], hits, seeking)
   }
 
   resetModel () {
     this.score.reset()
     this.resetMap()
-    this.carpetBombsUsed = 0
   }
   buildBoard () {
     this.UI.buildBoard()
     this.resetShipCells()
     this.UI.makeDroppable(this)
-    //  this.UI.dragLeave(this.UI.board)
   }
 
   resetUI (ships) {
