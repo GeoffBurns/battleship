@@ -328,31 +328,32 @@ export class PlacementUI extends WatersUI {
       this.shipTray.children[0] ||
       this.planeTray.children[0] ||
       this.specialTray.children[0] ||
-      this.buildingTray.children[0]
+      this.buildingTray.children[0] ||
+      this.weaponTray.children[0]
     )
   }
-
+  getFirstTrayItemBottomUp () {
+    return (
+      this.weaponTray.children[0] ||
+      this.buildingTray.children[0] ||
+      this.specialTray.children[0] ||
+      this.planeTray.children[0] ||
+      this.shipTray.children[0]
+    )
+  }
   clickAssignByCursor (arrowkey) {
     let shipnode = null
     switch (arrowkey) {
       case 'ArrowDown':
       case 'ArrowRight':
-        shipnode =
-          this.shipTray.children[0] ||
-          this.planeTray.children[0] ||
-          this.specialTray.children[0] ||
-          this.buildingTray.children[0]
-
+        shipnode = this.getFirstTrayItem()
         break
       case 'ArrowUp':
-        shipnode =
-          this.buildingTray.children[0] ||
-          this.specialTray.children[0] ||
-          this.planeTray.children[0] ||
-          this.shipTray.children[0]
+        shipnode = this.getFirstTrayItemBottomUp()
         break
       case 'ArrowLeft':
         shipnode =
+          this.lastItem(this.weaponTray) ||
           this.lastItem(this.buildingTray) ||
           this.lastItem(this.specialTray) ||
           this.lastItem(this.planeTray) ||
@@ -451,7 +452,13 @@ export class PlacementUI extends WatersUI {
     }
   }
   getTrays () {
-    return [this.shipTray, this.planeTray, this.buildingTray, this.specialTray]
+    return [
+      this.shipTray,
+      this.planeTray,
+      this.specialTray,
+      this.buildingTray,
+      this.weaponTray
+    ]
   }
 
   resetTrays () {
