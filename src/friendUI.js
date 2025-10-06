@@ -31,9 +31,6 @@ export class FriendUI extends PlacementUI {
   }
   placeMode () {
     this.placingShips = true
-    const flexStyle =
-      'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
-
     const chooseControls = document.getElementById('choose-controls')
     chooseControls.classList.remove('hidden')
     this.newPlacementBtn.classList.remove('hidden')
@@ -50,10 +47,6 @@ export class FriendUI extends PlacementUI {
     this.autoBtn.classList.remove('hidden')
     this.stopBtn.classList.add('hidden')
     this.showShipTrays()
-    this.shipTray.setAttribute('style', flexStyle)
-    this.planeTray.setAttribute('style', flexStyle)
-    this.specialTray.setAttribute('style', flexStyle)
-    this.buildingTray.setAttribute('style', flexStyle)
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('hidden')

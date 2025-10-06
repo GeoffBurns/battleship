@@ -91,6 +91,14 @@ select {
     font-weight: bold
 }
 
+.tray {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+
 .trays,
 .player-container,
 .rules-container .tray .drag-ship-container {

@@ -20,9 +20,6 @@ export class CustomUI extends PlacementUI {
     }
     this.placelistenCancellables = []
     this.placingShips = false
-    const flexStyle =
-      'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
-
     const height = document.getElementById('height-container')
     height.classList.remove('hidden')
     const width = document.getElementById('width-container')
@@ -42,8 +39,6 @@ export class CustomUI extends PlacementUI {
     this.seekBtn.classList.add('hidden')
     this.score.placed.textContent = 'None Yet'
     this.stopBtn.classList.add('hidden')
-
-    this.brushTray.setAttribute('style', flexStyle)
     for (const cell of this.board.children) {
       cell.classList.remove('hit', 'placed')
     }
@@ -68,9 +63,6 @@ export class CustomUI extends PlacementUI {
     }
     this.brushlistenCancellables = []
     this.placingShips = true
-    const flexStyle =
-      'display: flex; flex-flow: row wrap;gap: 8px; margin-bottom: 8px'
-
     this.showShipTrays()
     const height = document.getElementById('height-container')
     height.classList.add('hidden')
@@ -87,13 +79,6 @@ export class CustomUI extends PlacementUI {
     this.undoBtn.classList.remove('hidden')
     this.autoBtn.classList.add('hidden')
     this.publishBtn.classList.remove('hidden')
-    this.trays.classList.remove('hidden')
-
-    this.shipTray.setAttribute('style', flexStyle)
-    this.planeTray.setAttribute('style', flexStyle)
-    this.specialTray.setAttribute('style', flexStyle)
-    this.buildingTray.setAttribute('style', flexStyle)
-
     this.buildTrays(ships)
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
