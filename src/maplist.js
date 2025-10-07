@@ -129,8 +129,19 @@ class MapList {
         })
       )
     }
+    controls.push(
+      this.addEntryButton('play', idx, map, buttons, function (map) {
+        switchTo('index', 'list', map.title)
+      })
+    )
+
+    controls.push(
+      this.addEntryButton('seek', idx, map, buttons, function (map) {
+        switchTo('battleseek', 'list', map.title)
+      })
+    )
     const printer = map.isPreGenerated
-      ? goto
+      ? printGameSheet
       : function (map) {
           switchTo('print', 'print', map.title)
         }
@@ -249,7 +260,7 @@ function saveAsJson (json, filename = 'data.json') {
   setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
-function goto (map) {
+function printGameSheet (map) {
   const location = `../paper/${map.terrain.tag}/${map.name}.pdf`
   window.location.href = location
 }
