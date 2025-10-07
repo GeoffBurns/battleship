@@ -1,4 +1,5 @@
 import { customUI } from './customUI.js'
+import { moveCursorBase } from './placementUI.js'
 import {
   dragOverAddingHandlerSetup,
   onClickRotate,
@@ -8,8 +9,8 @@ import {
   enterCursor,
   setupDragHandlers,
   setupDragBrushHandlers,
-  moveCursorBase
-} from './placementUI.js'
+  dragNDrop
+} from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
 import { custom } from './custom.js'
 import { gameMaps } from './maps.js'
@@ -98,7 +99,8 @@ function wireupButtons () {
   customUI.rotateLeftBtn.addEventListener('click', onClickRotateLeft)
   customUI.flipBtn.addEventListener('click', onClickFlip)
   customUI.undoBtn.addEventListener('click', onClickUndo)
-  // customUI.autoBtn.addEventListener('click', onClickAuto)
+
+  dragNDrop.takeDrop(customUI, custom)
 }
 
 function moveCursor (event) {
@@ -147,10 +149,10 @@ function setupBuildShortcuts () {
         moveCursor(event)
         break
       case 'Tab':
-        tabCursor(event, customUI, custom.ships, custom.shipCellGrid)
+        tabCursor(event, customUI, custom)
         break
       case 'Enter':
-        enterCursor(event, customUI, custom.ships, custom.shipCellGrid)
+        enterCursor(event, customUI, custom)
         break
     }
   }
@@ -171,7 +173,7 @@ function newPlacement () {
   customUI.resetAdd(custom)
   customUI.buildBoard((_r, _c) => {})
   customUI.showBrushTrays()
-  customUI.makeBrushable(custom)
+  customUI.makeBrushable()
   customUI.buildBrushTray(gameMaps.terrain)
   customUI.brushMode()
   customUI.acceptBtn.disabled = false

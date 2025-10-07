@@ -1,14 +1,14 @@
 import { setupGameOptions, fetchNavBar } from './navbar.js'
 import { friendUI } from './friendUI.js'
+import { moveCursorBase } from './placementUI.js'
 import {
   dragOverPlacingHandlerSetup,
   onClickRotate,
   onClickFlip,
   onClickRotateLeft,
   tabCursor,
-  enterCursor,
-  moveCursorBase
-} from './placementUI.js'
+  enterCursor
+} from './dragndrop.js'
 import { placedShipsInstance } from './selection.js'
 import { Friend } from './friend.js'
 import { enemy } from './enemy.js'
@@ -103,7 +103,7 @@ function onClickAuto () {
         ok = false
         break
       }
-      friendUI.placement(placed, ships, ship)
+      friendUI.placement(placed, friend, ship)
     }
     if (ok) return true
   }
@@ -121,7 +121,7 @@ function onClickUndo () {
       friendUI.addShipToTrays(friend.ships, ship)
     }
   )
-  friendUI.unplacement(friend.ships, ship)
+  friendUI.unplacement(friend, ship)
 }
 
 function onClickStop () {
@@ -184,10 +184,10 @@ function setupHideShortcuts () {
         moveCursor(event)
         break
       case 'Tab':
-        tabCursor(event, friendUI, friend.ships, friend.shipCellGrid)
+        tabCursor(event, friendUI, friend)
         break
       case 'Enter':
-        enterCursor(event, friendUI, friend.ships, friend.shipCellGrid)
+        enterCursor(event, friendUI, friend)
         break
     }
   }

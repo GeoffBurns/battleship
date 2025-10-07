@@ -1,4 +1,4 @@
-import { setupPrintOptions, setupTabs, fetchNavBar } from './navbar.js'
+import { setupPrintOptions, fetchNavBar } from './navbar.js'
 import { friendUI } from './friendUI.js'
 import { Friend } from './friend.js'
 import { enemyUI } from './enemyUI.js'
@@ -17,10 +17,21 @@ function refresh () {
   enemy.setMap()
   friendUI.buildBoardPrint()
   enemyUI.buildBoardPrint()
-  friendUI.score.buildTally(friend.ships, friend.loadOut.weaponSystems)
-  enemyUI.score.buildTally(enemy.ships, enemy.loadOut.weaponSystems)
+  friendUI.score.buildTally(
+    friend.ships,
+    friend.loadOut.weaponSystems,
+    friendUI
+  )
+  enemyUI.score.buildTally(enemy.ships, enemy.loadOut.weaponSystems, enemyUI)
   document.title = "Geoff's Battleship - " + gameMaps.current.title
   friendUI.hideEmptyUnits(friend.ships)
+
+  for (const weapon of gameMaps.terrain.weapons.weapons) {
+    if (!friend.loadOut.hasWeapon(weapon.letter)) {
+      const el = document.getElementById('weapon-info-' + weapon.letter)
+      if (el) el.classList.add('hidden')
+    }
+  }
 
   const groups = friendUI.splitUnits(friend.ships)
   for (let type in groups) {

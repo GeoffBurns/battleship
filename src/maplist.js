@@ -170,8 +170,7 @@ class MapList {
     boardViewModel.score.buildTally(
       model.ships,
       model.loadOut.weaponSystems,
-      null,
-      true
+      boardViewModel
     )
   }
 

@@ -70,7 +70,7 @@ export class Waters {
         }
         placedShipsInstance.push(ship, ship.cells)
         ship.addToGrid(this.shipCellGrid)
-        this.UI.placement(placed, ships, ship)
+        this.UI.placement(placed, this, ship)
       }
       if (ok) return true
     }
@@ -93,7 +93,7 @@ export class Waters {
       if (matchingShip) {
         placedShipsInstance.push(matchingShip, ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
-        this.UI.placement(ship.cells, this.ships, matchingShip)
+        this.UI.placement(ship.cells, this, matchingShip)
       }
     }
     if (matchableShips.length !== 0) {
@@ -118,7 +118,7 @@ export class Waters {
         matchingShip.place(ship.cells)
         matchingShip.addToGrid(this.shipCellGrid)
 
-        this.UI.placement(ship.cells, this.ships, matchingShip)
+        this.UI.placement(ship.cells, this, matchingShip)
         const dragship = this.UI.getTrayItem(ship.id)
         if (dragship) {
           this.UI.removeDragShip(dragship)
@@ -173,6 +173,11 @@ export class Waters {
       }
     }
     return ships
+  }
+  createCandidateWeapons () {
+    const candidates = gameMaps.terrain.weapons.weapons
+
+    return candidates
   }
   createCandidateShips () {
     const candidates = []
@@ -435,7 +440,7 @@ export class Waters {
       this.UI.placeTally(ships)
     } else {
       this.UI.score.display(ships, noOfShots)
-      this.UI.score.buildTally(ships, weaponSystems)
+      this.UI.score.buildTally(ships, weaponSystems, this.UI)
     }
   }
 }

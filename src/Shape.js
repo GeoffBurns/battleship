@@ -165,6 +165,51 @@ function Zone (title, letter, isMarginal) {
   this.isMarginal = isMarginal
 }
 
+export class Weapon {
+  constructor (name, letter, isLimited, destroys, points) {
+    this.name = name
+    this.plural = name + 's'
+    this.letter = letter
+    this.isLimited = isLimited
+    this.destroys = destroys
+    this.points = points
+    this.hasFlash = false
+    this.tip = `drag on to the map to increase the tally of ${this.name}`
+    this.isOneAndDone = false
+  }
+
+  info () {
+    return `${this.name} (${this.letter})`
+  }
+}
+
+export class StandardShot extends Weapon {
+  constructor () {
+    super('Standard Shot', '-', false, true, 1)
+    this.cursors = ['']
+    this.hints = ['Click On Square To Fire']
+    this.buttonHtml = '<span class="shortcut">S</span>ingle Shot'
+  }
+  aoe (coords) {
+    return [[coords[0][0], coords[0][1], 4]]
+  }
+  ammoStatus () {
+    return `Single Shot Mode`
+  }
+}
+
+export const standardShot = new StandardShot()
+
+class WeaponCatelogue {
+  constructor (weapons) {
+    this.weapons = weapons
+    this.defaultWeapon = standardShot
+  }
+  addWeapons (weapons) {
+    this.weapons = weapons
+    this.weaponsByLetter = Object.fromEntries(weapons.map(w => [w.letter, w]))
+  }
+}
 class ShipCatelogue {
   constructor (
     baseShapes,
@@ -201,10 +246,11 @@ class ShipCatelogue {
 }
 
 class Terrain {
-  constructor (title, ShipCatelogue, subterrains, tag) {
+  constructor (title, shipCatelogue, subterrains, tag, weaponsCatelogue) {
     this.title = title || 'Unknown'
     this.key = title.toLowerCase().replace(/\s+/g, '-')
-    this.ships = ShipCatelogue
+    this.ships = shipCatelogue
+    this.weapons = weaponsCatelogue
     this.minWidth = MIN_CUSTOM_WIDTH
     this.maxWidth = MAX_CUSTOM_WIDTH
     this.minHeight = MIN_CUSTOM_HEIGHT
@@ -218,6 +264,15 @@ class Terrain {
     this.tag = tag
   }
 
+  getWeapon (letter) {
+    return this.weapons.weapons.find(w => w.letter === letter)
+  }
+  getNewWeapon (letter, ammo) {
+    const weapon = this.getWeapon(letter)
+    if (weapon) return weapon.clone(ammo)
+
+    return null
+  }
   customMapsLocalStorageKey () {
     return `geoffs-battleship.${this.key}-custom-maps`
   }
@@ -288,6 +343,7 @@ class Terrain {
     return this.ships.sunkDescription(letter, middle)
   }
 }
+const seaAndLandWeapons = new WeaponCatelogue([])
 
 const seaAndLandShips = new ShipCatelogue(
   [],
@@ -428,7 +484,8 @@ export const seaAndLand = new Terrain(
   'Sea and Land',
   seaAndLandShips,
   [sea, land],
-  'SeaAndLand'
+  'SeaAndLand',
+  seaAndLandWeapons
 )
 
 class Building extends Shape {
@@ -987,50 +1044,31 @@ seaAndLandShips.addShapes([
 
 terrain.setCurrent(seaAndLand)
 
-export class Weapon {
-  constructor (name, letter, isLimited, destroys, points) {
-    this.name = name
-    this.plural = name + 's'
-    this.letter = letter
-    this.isLimited = isLimited
-    this.destroys = destroys
-    this.points = points
-    this.hasFlash = false
-  }
-
-  info () {
-    return `${this.name} (${this.letter})`
-  }
-}
-
-export class StandardShot extends Weapon {
-  constructor () {
-    super('Standard Shot', '-', false, true, 1)
-    this.cursors = ['']
-    this.hint = 'Click On Square To Fire'
-    this.buttonHtml = '<span class="shortcut">S</span>ingle Shot'
-  }
-  aoe (coords) {
-    return [[coords[0][0], coords[0][1], 4]]
-  }
-  ammoStatus () {
-    return `Single Shot Mode`
-  }
-}
-
-export const standardShot = new StandardShot()
-
 export class Megabomb extends Weapon {
   constructor (ammo) {
     super('Megabomb', 'M', true, true, 1)
     this.ammo = ammo
     this.cursors = ['bomb']
-    this.hint = 'Click On Square To Drop Bomb'
-
+    this.hints = ['Click On Square To Drop Bomb']
     this.buttonHtml = '<span class="shortcut">M</span>ega Bomb'
+    this.tip = ''
     this.hasFlash = true
+    this.dragShape = [
+      [0, 0, 0],
+      [0, 1, 0],
+      [0, 2, 0],
+      [1, 0, 0],
+      [1, 1, 1],
+      [1, 2, 0],
+      [2, 0, 0],
+      [2, 1, 0],
+      [2, 2, 0]
+    ]
   }
-
+  clone (ammo) {
+    ammo = ammo || this.ammo
+    return new Megabomb(ammo)
+  }
   ammoStatus (ammoLeft) {
     return `Bomb Mode (${ammoLeft} left)`
   }
@@ -1057,6 +1095,73 @@ export class Megabomb extends Weapon {
     return result
   }
 }
+export class Kinetic extends Weapon {
+  constructor (ammo) {
+    super('Kinetic Strike', 'K', true, true, 2)
+    this.ammo = ammo
+    this.cursors = ['satelite', 'strike']
+    this.hints = [
+      'Click on square to start kinetic strike',
+      'Click on square end kinetic strike'
+    ]
+    this.buttonHtml = '<span class="shortcut">K</span>inetic Strike'
+    this.tip = ''
+    this.isOneAndDone = true
+    this.hasFlash = false
+    this.dragShape = [
+      [0, 0, 1],
+      [0, 1, 0],
+      [0, 2, 0],
+      [0, 3, 0],
+      [0, 4, 1]
+    ]
+  }
+  clone (ammo) {
+    ammo = ammo || this.ammo
+    return new Kinetic(ammo)
+  }
+  ammoStatus (ammoLeft) {
+    return `Strike Mode (${ammoLeft} left)`
+  }
+  getLinePoints (x1, y1, x2, y2) {
+    const points = []
+
+    const dx = Math.abs(x2 - x1)
+    const dy = Math.abs(y2 - y1)
+    const sx = x1 < x2 ? 1 : -1
+    const sy = y1 < y2 ? 1 : -1
+    let err = dx - dy
+
+    while (true) {
+      points.push([x1, y1])
+
+      if (x1 === x2 && y1 === y2) break
+
+      const e2 = 2 * err
+      if (e2 > -dy) {
+        err -= dy
+        x1 += sx
+      }
+      if (e2 < dx) {
+        err += dx
+        y1 += sy
+      }
+    }
+
+    return points
+  }
+
+  aoe (coords) {
+    const r = coords[0][0]
+    const c = coords[0][1]
+
+    const r1 = coords[1][0]
+    const c1 = coords[1][1]
+
+    return this.getLinePoints(r, c, r1, c1)
+  }
+}
+seaAndLandWeapons.addWeapons([new Megabomb(1)]) //, new Kinetic(1)])
 
 export class WeaponSystem {
   constructor (weapon) {
@@ -1122,6 +1227,9 @@ export class LoadOut {
   }
   weapon () {
     return this.weaponSystem().weapon
+  }
+  hasWeapon (wletter) {
+    return this.weapons.find(w => w.letter === wletter) !== undefined
   }
   switchTo (wletter) {
     const idx = this.weaponSystems.findIndex(
@@ -1205,10 +1313,11 @@ export class LoadOut {
     this.onCursorChange(oldCursor, this.cursor())
     return this.weapon()
   }
-
+  cursorIndex () {
+    return this.coords.length
+  }
   aim (r, c) {
     const oldCursor = this.cursor()
-    this.coords = []
     this.onCursorChange(oldCursor, this.cursor())
     this.coords.push([r, c])
     if (this.coords.length >= this.weapon().points) {
@@ -1233,7 +1342,11 @@ export class LoadOut {
     const effected = weapon.aoe(this.coords)
     this.useAmmo()
     if (weapon.destroys) {
-      this.destroy(weapon, effected)
+      if (weapon.isOneAndDone) {
+        this.destroyOne(weapon, effected)
+      } else {
+        this.destroy(weapon, effected)
+      }
     } else {
       this.reveal(weapon, effected)
     }

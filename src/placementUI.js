@@ -1,95 +1,10 @@
 import { gameMaps } from './maps.js'
-import { WatersUI, gameStatus } from './playerUI.js'
+import { WatersUI } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
-import { ClickedShip, DraggedShip, Brush } from './selection.js'
+import { ClickedShip } from './selection.js'
 import { cursor } from './cursor.js'
-import { CustomMap } from './map.js'
 import { Ship } from './Ship.js'
-
-let lastEntered = [-1, -1]
-let clickedShip = null
-let noticeTimerId = null
-let selection = null
-let tipsTimerId = null
-
-export function onClickRotate () {
-  if (clickedShip?.canRotate()) {
-    clickedShip.rotate()
-  }
-}
-export function onClickRotateLeft () {
-  if (clickedShip?.canRotate()) {
-    clickedShip.leftRotate()
-  }
-}
-export function onClickFlip () {
-  if (clickedShip) {
-    clickedShip.flip()
-  }
-}
-
-export function enterCursor (event, viewModel, ships, shipCellGrid) {
-  if (!viewModel.placingShips) return
-  if (cursor.isDragging) return
-  if (!cursor.isGrid) return
-  event.preventDefault()
-  const cell = viewModel.gridCellAt(cursor.x, cursor.y)
-  viewModel.handleDropEvent(cell, viewModel)
-  selection = null
-  createSelection(viewModel, ships, shipCellGrid, null)
-}
-
-function createSelection (viewModel, ships, shipCellGrid, shipId) {
-  const shipElement =
-    shipId === null
-      ? viewModel.getFirstTrayItem()
-      : viewModel.getTrayItem(shipId)
-
-  if (shipElement === null) return
-  const id = shipId === null ? parseInt(shipElement.dataset.id) : shipId
-  const ship = ships.find(s => s.id === id)
-  const variantIndex = parseInt(shipElement.dataset.variant) || 0
-
-  selection = new DraggedShip(
-    ship,
-    0,
-    0,
-    viewModel.cellSize(),
-    shipElement,
-    variantIndex,
-    viewModel.setDragShipContents.bind(viewModel)
-  )
-  selection.shown = false
-  cursor.y = 0
-  cursor.x = 0
-  viewModel.highlight(shipCellGrid, 0, 0)
-}
-export function tabCursor (event, viewModel, ships, shipCellGrid) {
-  if (!viewModel.placingShips) return
-  if (cursor.isDragging) return
-
-  event.preventDefault()
-
-  cursor.isGrid = !cursor.isGrid
-
-  if (cursor.isGrid) {
-    viewModel.disableRotateFlip()
-    const shipId = clickedShip?.ship.id
-    viewModel.removeClicked()
-    clickedShip = null
-    createSelection(viewModel, ships, shipCellGrid, shipId)
-  } else {
-    removeSelection()
-
-    viewModel.removeHighlight()
-    viewModel.assignByCursor('ArrowRight', ships)
-  }
-}
-function removeSelection () {
-  if (!selection) return
-  selection.remove()
-  selection = null
-}
+import { dragNDrop } from './dragndrop.js'
 
 export class PlacementUI extends WatersUI {
   constructor (terroritory) {
@@ -132,20 +47,20 @@ export class PlacementUI extends WatersUI {
   makeDroppable (model) {
     for (const cell of this.board.children) {
       this.clearCellContent(cell)
-      this.drop(cell, model)
-      this.dragEnter(cell, model)
+      dragNDrop.drop(cell, model, this)
+      dragNDrop.dragEnter(cell, model, this)
     }
   }
   makeAddDroppable (model) {
     for (const cell of this.board.children) {
       this.clearCellContent(cell)
-      this.addDrop(cell, model)
-      this.dragEnter(cell, model)
+      dragNDrop.addDrop(cell, model, this)
+      dragNDrop.dragEnter(cell, model, this)
     }
   }
-  makeBrushable (model) {
+  makeBrushable () {
     for (const cell of this.board.children) {
-      this.dragBrushEnter(cell, model)
+      dragNDrop.dragBrushEnter(cell, this)
     }
   }
   removeDragShip (dragShip) {
@@ -159,58 +74,6 @@ export class PlacementUI extends WatersUI {
 
     this.checkTrays()
   }
-  handleDropEvent (cell, model, e) {
-    if (e) e.preventDefault()
-    this.removeHighlight()
-    cursor.isDragging = false
-    if (!selection) return
-
-    const r = parseInt(cell.dataset.r)
-    const c = parseInt(cell.dataset.c)
-
-    const placed = selection.place(r, c, model.shipCellGrid)
-    if (placed) {
-      this.placement(placed, model.ships, selection.ship)
-
-      if (selection?.source) {
-        this.removeDragShip(selection?.source)
-      }
-      clickedShip = null
-    }
-
-    removeSelection()
-  }
-  handleAddDropEvent (cell, model, e) {
-    if (e) e.preventDefault()
-
-    this.removeHighlight()
-    cursor.isDragging = false
-    if (!selection) return
-
-    const r = parseInt(cell.dataset.r)
-    const c = parseInt(cell.dataset.c)
-
-    const placed = selection.place(r, c, model.shipCellGrid)
-    if (placed) {
-      const newId = this.addition(placed, model, selection.ship)
-      selection.source.dataset.id = newId
-      clickedShip = null
-    }
-    this.displayShipTrackingInfo(model)
-    removeSelection()
-
-    this.checkTrays()
-  }
-
-  addDrop (cell, model) {
-    cell.addEventListener(
-      'drop',
-      this.handleAddDropEvent.bind(this, cell, model)
-    )
-  }
-  drop (cell, model) {
-    cell.addEventListener('drop', this.handleDropEvent.bind(this, cell, model))
-  }
 
   removeHighlight () {
     for (const el of this.board.children) {
@@ -218,94 +81,6 @@ export class PlacementUI extends WatersUI {
     }
   }
 
-  highlight (shipCellGrid, r, c) {
-    if (!selection?.ghost) return
-    if (r === null) r = lastEntered[0]
-    if (c === null) c = lastEntered[1]
-    const [r0, c0] = selection.offsetCell(r, c)
-    if (!gameMaps.inBounds(r0, c0)) return
-
-    this.removeHighlight()
-
-    const placing = selection.placeable().placeAt(r0, c0)
-
-    const canPlace = placing.canPlace(shipCellGrid)
-    const cells = placing.cells
-    for (const [rr, cc, dm] of cells) {
-      if (gameMaps.inBounds(rr, cc)) {
-        const cell = this.gridCellAt(rr, cc)
-        let cellClass = 'bad'
-        if (canPlace) {
-          cellClass = 'good'
-        } else if (dm === 1) {
-          cellClass = 'notgood'
-        }
-        cell.classList.add(cellClass)
-      }
-    }
-  }
-  dragEnter (cell, model) {
-    cell.addEventListener('dragenter', e => {
-      e.preventDefault()
-      const isShip = e.dataTransfer.types.includes('ship')
-      if (!isShip) return
-
-      const el = e.target
-      const r = parseInt(el.dataset.r)
-      const c = parseInt(el.dataset.c)
-      if (lastEntered[0] === r && lastEntered[1] === c) return
-
-      lastEntered = [r, c]
-      this.highlight(model.shipCellGrid, r, c)
-    })
-  }
-  dragBrushEnter (cell) {
-    function setLandCells (r, c, min, max, map, subterrain) {
-      for (let i = min; i < max; i++) {
-        for (let j = min; j < max; j++) {
-          if (gameMaps.inBounds(r + i, c + j)) {
-            map.setLand(r + i, c + j, subterrain)
-          }
-        }
-      }
-    }
-
-    function recolorCells (r, c, min, max) {
-      for (let i = min - 1; i < max + 1; i++) {
-        for (let j = min - 1; j < max + 1; j++) {
-          if (gameMaps.inBounds(r + i, c + j)) {
-            this.recolor(r + i, c + j)
-          }
-        }
-      }
-    }
-
-    const handler = e => {
-      e.preventDefault()
-      const isBrush = e.dataTransfer.types.includes('brush')
-      if (!isBrush) return
-      const el = e.target
-      const r = parseInt(el.dataset.r)
-      const c = parseInt(el.dataset.c)
-      if (lastEntered[0] === r && lastEntered[1] === c) return
-
-      lastEntered = [r, c]
-
-      const size = selection?.size
-      const subterrain = selection?.subterrain
-      const map = gameMaps.current
-
-      if (!(selection?.size && subterrain && map instanceof CustomMap)) return
-
-      let min = size > 2 ? -1 : 0
-      let max = size < 2 ? 1 : 2
-
-      setLandCells(r, c, min, max, map, subterrain)
-      recolorCells.call(this, r, c, min, max)
-      this.score.displayZoneInfo()
-    }
-    cell.addEventListener('dragenter', handler)
-  }
   removeClicked () {
     const elements = document.getElementsByClassName('clicked')
     ;[...elements].forEach(element => {
@@ -570,8 +345,8 @@ export class PlacementUI extends WatersUI {
 
   assignByCursor (arrowkey, ships) {
     let shipElement = null
-    if (clickedShip)
-      shipElement = this.moveAssignByCursor(arrowkey, clickedShip)
+    const clicked = dragNDrop.getClickedShip()
+    if (clicked) shipElement = this.moveAssignByCursor(arrowkey, clicked)
     else shipElement = this.clickAssignByCursor(arrowkey)
 
     if (shipElement === null) return
@@ -590,135 +365,27 @@ export class PlacementUI extends WatersUI {
     this.removeClicked()
     const shape = ship.shape()
     this.showNotice(shape.tip)
-    clickedShip = new ClickedShip(
+    const clickedShip = new ClickedShip(
       ship,
       clicked,
       variantIndex,
       this.setDragShipContents.bind(this)
     )
+    dragNDrop.setClickedShip(clickedShip)
     clicked.classList.add('clicked')
     this.rotateBtn.disabled = !clickedShip.canRotate()
     this.flipBtn.disabled = !clickedShip.canFlip()
     this.rotateLeftBtn.disabled = !clickedShip.canRotate()
   }
-  dragEnd (div, callback) {
-    const handler = e => {
-      const isShip = e.dataTransfer.types.includes('ship')
-      if (!isShip) return
+  assignClickedWeapon (weapon, clicked) {
+    this.removeClicked()
+    this.showNotice(weapon.tip)
 
-      const shipElement = e.target
-      if (shipElement?.style) shipElement.style.opacity = ''
-      for (const el of this.board.children) {
-        el.classList.remove('good', 'bad')
-      }
-
-      cursor.isDragging = false
-      if (e.dataTransfer.dropEffect !== 'none') {
-        // The item was successfully dropped on a valid drop target
-        this.disableRotateFlip()
-      } else {
-        // The drag operation was canceled or dropped on an invalid target
-        this.assignClicked(selection.ship, shipElement)
-      }
-
-      removeSelection()
-      this.removeHighlight()
-      if (callback) callback()
-    }
-    div.addEventListener('dragend', handler)
-    this.placelistenCancellables.push(() => {
-      div.removeEventListener('dragend', handler)
-    })
-  }
-  dragBrushEnd (div, callback) {
-    const dragBrushEndHandler = e => {
-      const isBrush = e.dataTransfer.types.includes('brush')
-      if (!isBrush) return
-
-      this.refreshAllColor()
-
-      if (callback) callback()
-    }
-    div.addEventListener('dragend', dragBrushEndHandler)
-    this.brushlistenCancellables.push(() => {
-      div.removeEventListener('dragend', dragBrushEndHandler)
-    })
-  }
-  makeBrushDraggable (brush, size, subterrain) {
-    brush.className = 'draggable'
-    brush.setAttribute('draggable', 'true')
-    this.dragBrushStart(brush, size, subterrain)
-  }
-
-  makeDraggable (dragShip, ships) {
-    dragShip.className = 'draggable'
-    dragShip.setAttribute('draggable', 'true')
-    this.dragStart(dragShip, ships)
-    this.onClickTrayItem(dragShip, ships)
-  }
-  onClickTrayItem (dragShip, ships) {
-    dragShip.addEventListener('click', e => {
-      const shipElement = e.currentTarget
-      const shipId = parseInt(shipElement.dataset.id)
-      if (e.target !== shipElement && !shipId) {
-        return
-      }
-
-      const ship = ships.find(s => s.id === shipId)
-      this.assignClicked(ship, shipElement)
-    })
-  }
-
-  dragStart (dragShip, ships) {
-    dragShip.addEventListener('dragstart', e => {
-      const shipElement = e.currentTarget
-      const shipId = parseInt(shipElement.dataset.id)
-      if (e.target !== shipElement && !shipId) {
-        return
-      }
-      e.dataTransfer.setData('ship', shipId.toString())
-      const ship = ships.find(s => s.id === shipId)
-
-      this.showNotice(ship.shape().tip)
-
-      const rect = shipElement.getBoundingClientRect()
-      const offsetX = e.clientX - rect.left
-      const offsetY = e.clientY - rect.top
-
-      this.removeClicked()
-
-      e.dataTransfer.effectAllowed = 'all'
-
-      e.dataTransfer.setDragImage(new Image(), 0, 0)
-      const variantIndex = parseInt(shipElement.dataset.variant)
-      cursor.isDragging = true
-      selection = new DraggedShip(
-        ship,
-        offsetX,
-        offsetY,
-        this.cellSize(),
-        shipElement,
-        variantIndex,
-        this.setDragShipContents.bind(this)
-      )
-      selection.moveTo(e.clientX, e.clientY)
-      shipElement.style.opacity = '0.6'
-    })
-  }
-  dragBrushStart (brush, size, subterrain) {
-    brush.addEventListener('dragstart', e => {
-      if (e.target !== e.currentTarget) {
-        return
-      }
-      e.dataTransfer.setData('brush', subterrain + size.toString())
-      const shipElement = e.currentTarget
-
-      e.dataTransfer.effectAllowed = 'all'
-
-      cursor.isDragging = true
-      selection = new Brush(size, subterrain)
-      shipElement.style.opacity = '0.6'
-    })
+    dragNDrop.setClickedShip(null)
+    clicked.classList.add('clicked')
+    this.rotateBtn.disabled = true
+    this.flipBtn.disabled = true
+    this.rotateLeftBtn.disabled = true
   }
 
   setDragShipContents (dragShip, cells, letter, special) {
@@ -841,20 +508,12 @@ export class PlacementUI extends WatersUI {
     tray.appendChild(dragShipContainer)
   }
 
-  buildTrayItem (ships, ship, tray) {
+  buildDragShip (ships, ship, container) {
     const shape = ship.shape()
-
-    const dragShipContainer = document.createElement('div')
-
-    dragShipContainer.className = 'drag-ship-container'
-    dragShipContainer.dataset.id = ship.id
-    dragShipContainer.setAttribute(
-      'style',
-      'display: flex;justify-content: center;align-items: center;'
-    )
     const dragShip = document.createElement('div')
     dragShip.className = 'drag-ship'
     dragShip.dataset.variant = 0
+    dragShip.dataset.type = 'ship'
     dragShip.dataset.id = ship.id
     this.setDragShipContents(
       dragShip,
@@ -862,8 +521,41 @@ export class PlacementUI extends WatersUI {
       shape.letter,
       shape.variants().special()
     )
-    this.makeDraggable(dragShip, ships)
-    dragShipContainer.appendChild(dragShip)
+    dragNDrop.makeDraggable(this, dragShip, ships)
+    container.appendChild(dragShip)
+  }
+
+  buildDragWeapon (weapon, container) {
+    const cells = weapon.dragShape
+    const dragShip = document.createElement('div')
+    dragShip.className = 'drag-ship'
+    dragShip.dataset.letter = weapon.letter
+    dragShip.dataset.type = 'weapon'
+    const special = cells.filter(([_x, _y, z]) => z > 0)
+    this.setDragShipContents(dragShip, cells, weapon.letter, special)
+    dragNDrop.makeDraggable(this, dragShip, null, weapon)
+    container.appendChild(dragShip)
+  }
+
+  buildTrayItem (ships, ship, tray) {
+    const dragShipContainer = document.createElement('div')
+
+    dragShipContainer.className = 'drag-ship-container'
+    dragShipContainer.dataset.id = ship.id
+
+    this.buildDragShip(ships, ship, dragShipContainer)
+
+    tray.appendChild(dragShipContainer)
+    tray.classList.remove('empty')
+  }
+  buildTrayItemWeapon (weapon, tray) {
+    const dragShipContainer = document.createElement('div')
+
+    dragShipContainer.className = 'drag-ship-container'
+    dragShipContainer.dataset.letter = weapon.letter
+
+    this.buildDragWeapon(weapon, dragShipContainer)
+
     tray.appendChild(dragShipContainer)
     tray.classList.remove('empty')
   }
@@ -882,7 +574,7 @@ export class PlacementUI extends WatersUI {
     brush.dataset.size = size
     brush.dataset.id = subterrain + size.toString()
     this.setBrushContents(brush, size, subterrain)
-    this.makeBrushDraggable(brush, size, subterrain)
+    dragNDrop.makeBrushDraggable(brush, size, subterrain)
     brushContainer.appendChild(brush)
     tray.appendChild(brushContainer)
   }
@@ -910,7 +602,12 @@ export class PlacementUI extends WatersUI {
     }
     this.checkTrays()
   }
-
+  buildWeaponTray () {
+    const weapons = gameMaps.terrain.weapons.weapons
+    for (const weapon of weapons) {
+      this.buildTrayItemWeapon(weapon, this.weaponTray)
+    }
+  }
   getUnitType (ship) {
     const type = ship.type()
     if (type === 'M' || type === 'T') return 'X'
@@ -1028,15 +725,15 @@ export class PlacementUI extends WatersUI {
     // no bombs row
   }
 
-  placement (placed, ships, ship) {
+  placement (placed, model, ship) {
     this.showNotice(ship.description() + this.addText)
     this.markPlaced(placed, ship.letter)
-    this.placeTally(ships)
-    this.displayShipInfo(ships)
+    this.score.buildTallyFromModel(model, this)
+    this.displayShipInfo(model.ships)
   }
 
   displayShipTrackingInfo (model) {
-    this.score.addShipTally(model.ships)
+    this.score.buildTallyFromModel(model, this)
     this.displayAddInfo(model)
     this.score.displayAddZoneInfo(model)
   }
@@ -1061,56 +758,22 @@ export class PlacementUI extends WatersUI {
     const indexToRemove = model.ships.findIndex(s => s.id === ship.id)
     if (indexToRemove >= 0) model.ships.splice(indexToRemove, 1)
 
-    this.score.addShipTally(model.ships)
+    this.score.buildTallyFromModel(model, this)
     this.displayAddInfo(model)
     this.score.displayAddZoneInfo(model)
   }
 
-  unplacement (ships, ship) {
+  unplacement (model, ship) {
     this.showNotice(ship.description() + this.removeText)
-    this.placeTally(ships)
-    this.displayShipInfo(ships)
+    this.score.buildTallyFromModel(model, this)
+    this.displayShipInfo(model.ships)
   }
 
-  showNotice (notice) {
-    clearInterval(noticeTimerId)
-    noticeTimerId = null
-    gameStatus.info(notice)
-    // turn off tips
-    noticeTimerId = setInterval(() => {
-      // turn on tips
-      clearInterval(noticeTimerId)
-      noticeTimerId = null
-    }, 2000)
-  }
-
-  showTips () {
-    gameStatus.clear()
-
-    let index = 0
-
-    gameStatus.info(this.tips[0])
-    tipsTimerId = setInterval(() => {
-      if (tipsTimerId === false) {
-        clearInterval(tipsTimerId)
-        tipsTimerId = null
-      } else {
-        if (noticeTimerId) return
-        gameStatus.info(this.tips[index])
-        index = (index + 1) % this.tips.length
-      }
-    }, 13000)
-  }
-  hideTips () {
-    if (tipsTimerId) {
-      clearInterval(tipsTimerId)
-      tipsTimerId = null
-    }
-  }
   displayAddInfo (model) {
     if (!model.ships) return
     this.publishBtn.disabled = model.displacementRatio() < 0.35
     this.score.placed.textContent = model.ships.length.toString()
+    this.score.weaponsPlaced.textContent = model.loadOut.totalAmmo()
   }
   noOfShips () {
     return this.ships.length
@@ -1140,122 +803,9 @@ export class PlacementUI extends WatersUI {
   resetAdd (model) {
     this.board.innerHTML = ''
     this.clearTrays()
+    model.armWeapons()
     this.displayAddInfo(model)
   }
-}
-
-let lastmodifier = ''
-let dragCounter = 0
-
-export function setupDragHandlers (viewModel) {
-  viewModel.dragEnd(document, () => {
-    lastmodifier = ''
-    dragCounter = 0
-  })
-
-  viewModel.board.addEventListener('dragenter', e => {
-    const isShip = e.dataTransfer.types.includes('ship')
-    if (!isShip) return
-    e.preventDefault()
-
-    dragCounter++
-    if (dragCounter > 1 || !selection) return
-    selection.hide()
-  })
-
-  viewModel.board.addEventListener('dragleave', e => {
-    const isShip = e.dataTransfer.types.includes('ship')
-    if (!isShip) return
-    e.preventDefault()
-    dragCounter--
-    if (dragCounter > 0) return
-
-    viewModel.removeHighlight()
-
-    if (!selection) return
-    selection.show()
-  })
-}
-
-export function setupDragBrushHandlers (viewModel) {
-  viewModel.dragBrushEnd(document, () => {
-    lastmodifier = ''
-  })
-}
-
-export function dragOverPlacingHandlerSetup (model, viewModel) {
-  document.addEventListener('dragover', e => {
-    e.preventDefault()
-
-    if (!selection) return
-    const allow = e.dataTransfer.effectAllowed
-
-    let changed = false
-    if (lastmodifier !== allow) {
-      lastmodifier = allow
-      if (allow === 'link') {
-        // mac chrome uses control for rotate
-        selection.rotate() // rotate clockwise
-        changed = true
-      } else if (allow === 'copy') {
-        // mac chrome uses option  for flip
-        selection.flip()
-        changed = true
-      } else if (allow === 'none') {
-        // mac chrome uses command for rotate left
-        selection.leftRotate()
-        changed = true
-      }
-    }
-
-    // position highlight under cursor
-    if (changed && selection?.isNotShown()) {
-      viewModel.highlight(model.shipCellGrid)
-    }
-    // position ghost under cursor
-    if (selection?.shown) {
-      selection.move(e)
-    }
-  })
-}
-
-export function dragOverAddingHandlerSetup (model, viewModel) {
-  const handler = e => {
-    e.preventDefault()
-
-    if (!selection) return
-    //const effect = e.dataTransfer.dropEffect
-    const allow = e.dataTransfer.effectAllowed
-
-    let changed = false
-    if (lastmodifier !== allow) {
-      lastmodifier = allow
-      if (allow === 'link') {
-        // mac chrome uses control for rotate
-        selection.rotate() // rotate clockwise
-        changed = true
-      } else if (allow === 'copy') {
-        // mac chrome uses option  for flip
-        selection.flip()
-        changed = true
-      } else if (allow === 'none') {
-        // mac chrome uses command for rotate left
-        selection.leftRotate()
-        changed = true
-      }
-    }
-
-    // position highlight under cursor
-    if (changed && selection?.isNotShown()) {
-      viewModel.highlight(model.shipCellGrid)
-    }
-    // position ghost under cursor
-    if (selection?.shown) {
-      selection.move(e)
-    }
-  }
-  document.addEventListener('dragover', handler)
-  return () => document.removeEventListener('dragover', handler)
 }
 
 function moveGridCursor (event, shipCellGrid, viewModel) {
@@ -1264,22 +814,22 @@ function moveGridCursor (event, shipCellGrid, viewModel) {
     case 'ArrowUp':
       cursor.x--
       if (cursor.x < 0) cursor.x = gameMaps.current.rows - 1
-      viewModel.highlight(shipCellGrid, cursor.x, cursor.y)
+      dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
     case 'ArrowDown':
       cursor.x++
       if (cursor.x >= gameMaps.current.rows) cursor.x = 0
-      viewModel.highlight(shipCellGrid, cursor.x, cursor.y)
+      dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
     case 'ArrowLeft':
       cursor.y--
       if (cursor.y < 0) cursor.y = gameMaps.current.cols - 1
-      viewModel.highlight(shipCellGrid, cursor.x, cursor.y)
+      dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
     case 'ArrowRight':
       cursor.y++
       if (cursor.y >= gameMaps.current.cols) cursor.y = 0
-      viewModel.highlight(shipCellGrid, cursor.x, cursor.y)
+      dragNDrop.highlight(viewModel, shipCellGrid, cursor.x, cursor.y)
       break
   }
 }

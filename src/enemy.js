@@ -34,14 +34,18 @@ class Enemy extends Waters {
 
     this.updateUI(enemy.ships)
   }
-  disableBtn (disabled) {
-    document.getElementById('newPlace2').disabled = disabled
-    document.getElementById('newGame').disabled = disabled
-    document.getElementById('weaponBtn').disabled = disabled
-    document.getElementById('revealBtn').disabled = disabled
+  disableBtn (tag, disabled) {
+    const btn = document.getElementById(tag)
+    if (btn) btn.disabled = disabled
+  }
+  disableBtns (disabled) {
+    this.disableBtn('newPlace2', disabled)
+    this.disableBtn('newGame', disabled)
+    this.disableBtn('weaponBtn', disabled)
+    this.disableBtn('weaponBtn', disabled)
   }
   placeStep (ships, attempt1) {
-    this.disableBtn(true)
+    this.disableBtns(true)
     for (let attempt2 = 0; attempt2 < 25; attempt2++) {
       this.resetShipCells()
       let ok = true
@@ -54,7 +58,7 @@ class Enemy extends Waters {
       }
       if (ok) {
         gameStatus.info('Click On Square To Fire')
-        this.disableBtn(false)
+        this.disableBtns(false)
         return
       }
     }
@@ -70,7 +74,7 @@ class Enemy extends Waters {
       return
     }
 
-    this.disableBtn(false)
+    this.disableBtns(false)
 
     gameStatus.info('Failed to place all ships after many attempts')
     this.boardDestroyed = true
@@ -79,7 +83,7 @@ class Enemy extends Waters {
   placeAll (ships) {
     ships = ships || this.ships
 
-    this.disableBtn(true)
+    this.disableBtns(true)
 
     setTimeout(() => {
       this.placeStep(ships, 0, true)
@@ -100,7 +104,7 @@ class Enemy extends Waters {
     const wps = this.loadOut.weaponSystem()
     const next = this.loadOut.nextWeapon()
     this.UI.weaponBtn.innerHTML = next.buttonHtml
-    gameStatus.displayAmmoStatus(wps)
+    gameStatus.displayAmmoStatus(wps, this.loadOut.cursorIndex())
   }
   updateUI (ships) {
     ships = ships || this.ships
@@ -224,7 +228,10 @@ class Enemy extends Waters {
   }
 
   updateBombStatus () {
-    gameStatus.displayAmmoStatus(this.loadOut.weaponSystem())
+    gameStatus.displayAmmoStatus(
+      this.loadOut.weaponSystem(),
+      this.loadOut.cursorIndex()
+    )
     if (this.loadOut.hasNoCurrentAmmo()) {
       this.switchMode()
       gameStatus.display('Single Shot Mode')

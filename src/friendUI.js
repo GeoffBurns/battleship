@@ -1,5 +1,6 @@
 import { gameStatus } from './playerUI.js'
-import { PlacementUI, setupDragHandlers } from './placementUI.js'
+import { PlacementUI } from './placementUI.js'
+import { setupDragHandlers } from './dragndrop.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {

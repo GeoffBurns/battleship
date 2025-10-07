@@ -1,5 +1,7 @@
 import { gameMaps } from './maps.js'
 import { all, mixed } from './Shape.js'
+import { dragNDrop } from './dragndrop.js'
+
 export class ScoreUI {
   constructor (playerPrefix) {
     // Initialization logic
@@ -8,11 +10,13 @@ export class ScoreUI {
     this.hits = document.getElementById(playerPrefix + '-hits')
     this.sunk = document.getElementById(playerPrefix + '-sunk')
     this.placed = document.getElementById(playerPrefix + '-placed')
+    this.weaponsPlaced = document.getElementById(playerPrefix + '-weapons')
     this.zone = document.getElementById(playerPrefix + '-zone')
     this.shotsLabel = document.getElementById(playerPrefix + '-shots-label')
     this.hitsLabel = document.getElementById(playerPrefix + '-hits-label')
     this.sunkLabel = document.getElementById(playerPrefix + '-sunk-label')
     this.placedLabel = document.getElementById(playerPrefix + '-placed-label')
+    this.weaponsLabel = document.getElementById(playerPrefix + '-weapons-label')
     this.zoneLabel = document.getElementById(playerPrefix + '-zone-label')
     this.tallyBox = document.getElementById(playerPrefix + '-tallyBox')
     this.zoneSync = []
@@ -220,7 +224,8 @@ export class ScoreUI {
 
     rowList.appendChild(row)
   }
-  buildBombRow (rowList, weaponSystem) {
+
+  buildBombRow (rowList, viewModel, weaponSystem) {
     const ammoTotal = weaponSystem.ammoTotal()
     const ammoUsed = weaponSystem.ammoUsed()
     const row = document.createElement('div')
@@ -228,6 +233,7 @@ export class ScoreUI {
     row.classList.add('weapon')
     for (let i = 0; i < ammoTotal; i++) {
       const box = document.createElement('div')
+      dragNDrop.makeDraggable(viewModel, box, null, weaponSystem.weapon, true)
       box.className = 'tally-box'
       box.style.fontSize = '105%'
       if (i < ammoUsed) {
@@ -245,16 +251,26 @@ export class ScoreUI {
     rowList.appendChild(row)
   }
   buildShipTally (ships, boxer) {
-    this.altBuildTally(ships, [], boxer, false)
+    this.altBuildTally(ships, [], boxer)
   }
-  buildTally (ships, weaponSystems) {
-    this.altBuildTally(ships, weaponSystems, null, true)
+  buildTallyFromModel (model, viewModel) {
+    this.altBuildTally(
+      model.ships,
+      model.loadOut.weaponSystems,
+      null,
+      viewModel,
+      true
+    )
+  }
+
+  buildTally (ships, weaponSystems, viewModel) {
+    this.altBuildTally(ships, weaponSystems, null, viewModel, true)
   }
   addShipTally (ships) {
     this.altBuildTally(ships, [], null, false)
   }
 
-  altBuildTally (ships, weaponSystems, boxer, withWeapons) {
+  altBuildTally (ships, weaponSystems, boxer, viewModel, withWeapons) {
     function shipLetters (tallyGroup) {
       return [
         ...new Set(
@@ -300,9 +316,9 @@ export class ScoreUI {
     for (const letter of land) {
       this.buildTallyRow(ships, letter, landColumn, boxer, 'G')
     }
-    if (withWeapons) {
+    if (withWeapons && viewModel) {
       for (const wps of weaponSystems) {
-        this.buildBombRow(landColumn, wps)
+        this.buildBombRow(landColumn, viewModel, wps)
       }
     }
     surfaceContainer.appendChild(seaColumn)

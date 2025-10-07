@@ -38,6 +38,7 @@ export class CustomUI extends PlacementUI {
     this.testBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
     this.score.placed.textContent = 'None Yet'
+    this.score.weaponsPlaced.textContent = 'None Yet'
     this.stopBtn.classList.add('hidden')
     for (const cell of this.board.children) {
       cell.classList.remove('hit', 'placed')
@@ -73,6 +74,7 @@ export class CustomUI extends PlacementUI {
     this.acceptBtn.classList.add('hidden')
     this.newPlacementBtn.classList.remove('hidden')
     this.score.placedLabel.classList.remove('hidden')
+    this.score.weaponsLabel.classList.remove('hidden')
     this.rotateBtn.classList.remove('hidden')
     this.rotateLeftBtn.classList.remove('hidden')
     this.flipBtn.classList.remove('hidden')
@@ -80,6 +82,7 @@ export class CustomUI extends PlacementUI {
     this.autoBtn.classList.add('hidden')
     this.publishBtn.classList.remove('hidden')
     this.buildTrays(ships)
+    this.buildWeaponTray()
     gameStatus.game.classList.remove('hidden')
     gameStatus.mode.classList.remove('hidden')
     gameStatus.line.classList.remove('hidden')
@@ -92,7 +95,10 @@ export class CustomUI extends PlacementUI {
 
     gameStatus.clear()
     gameStatus.info('drag ships to the map grid to add them to your map')
-    this.tips = ['drag ships to the map grid to add them to your map']
+    this.tips = [
+      'drag ships to the map grid to add them to your map',
+      'drag weapons on to the map to increase the ammunition available'
+    ]
     this.showTips()
   }
 }

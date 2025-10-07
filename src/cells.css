@@ -47,6 +47,13 @@
     cursor: var(--bomb-cursor-image) 26 26, pointer;
 }
 
+.board.strike {
+    cursor: var(--strike-cursor-image) 6 26, pointer;
+}
+
+.board.satelite {
+    cursor: var(--satelite-cursor-image) 10 20, pointer;
+}
 
 /* destroyed (desaturated) board   */
 .board.destroyed .land.light,

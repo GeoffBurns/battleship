@@ -197,19 +197,11 @@ function makeTitle (terrain, cols, rows) {
 }
 
 export class CustomMap extends Map {
-  constructor (title, size, shipNum, land, mapTerrain, example, weapons) {
-    super(
-      title,
-      size,
-      shipNum,
-      [],
-      title,
-      mapTerrain || terrain.current,
-      land,
-      weapons
-    )
+  constructor (title, size, shipNum, land, mapTerrain, example) {
+    super(title, size, shipNum, [], title, mapTerrain || terrain.current, land)
     this.isPreGenerated = false
     this.example = example
+    this.weapons = [standardShot]
   }
 
   isLand (r, c) {
@@ -309,6 +301,11 @@ export class SavedCustomMap extends CustomMap {
     )
     this.terrain =
       terrain.terrains.find(t => t.title === data.terrain) || seaAndLand
+
+    const weapons = data.weapons.map(w =>
+      this.terrain.getNewWeapon(w.letter, w.ammo)
+    )
+    this.weapons = [standardShot].concat(weapons.filter(w => w))
   }
 
   static loadObj (title) {

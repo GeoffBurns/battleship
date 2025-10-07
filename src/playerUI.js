@@ -1,6 +1,9 @@
 import { gameMaps, gameHost } from './maps.js'
 import { StatusUI } from './StatusUI.js'
 
+let noticeTimerId = null
+let tipsTimerId = null
+
 export const gameStatus = new StatusUI()
 const startCharCode = 65
 export class WatersUI {
@@ -282,6 +285,40 @@ export class WatersUI {
   clearVisuals () {
     for (const el of this.board.children) {
       this.clearCellVisuals(el)
+    }
+  }
+
+  showNotice (notice) {
+    clearInterval(noticeTimerId)
+    noticeTimerId = null
+    gameStatus.info(notice)
+    // turn off tips
+    noticeTimerId = setInterval(() => {
+      // turn on tips
+      clearInterval(noticeTimerId)
+      noticeTimerId = null
+    }, 2000)
+  }
+  showTips () {
+    gameStatus.clear()
+    let index = 0
+
+    gameStatus.info(this.tips[0])
+    tipsTimerId = setInterval(() => {
+      if (tipsTimerId === false) {
+        clearInterval(tipsTimerId)
+        tipsTimerId = null
+      } else {
+        if (noticeTimerId) return
+        gameStatus.info(this.tips[index])
+        index = (index + 1) % this.tips.length
+      }
+    }, 13000)
+  }
+  hideTips () {
+    if (tipsTimerId) {
+      clearInterval(tipsTimerId)
+      tipsTimerId = null
     }
   }
 }
