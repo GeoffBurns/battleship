@@ -7,12 +7,21 @@ export function removeShortcuts () {
   document.removeEventListener('keydown')
 }
 
-export function switchToEdit (mapName) {
+export function switchToEdit (mapName, huntMode) {
   const params = new URLSearchParams()
   params.append('edit', mapName)
 
+  storeShips(params, huntMode)
   const location = `./battlebuild.html?${params.toString()}`
   window.location.href = location
+}
+
+function storeShips (params, huntMode) {
+  if (huntMode === 'build' && custom.noOfPlacedShips() > 0) {
+    custom.store()
+    gameMaps.addCurrentCustomMap(custom.placedShips())
+    params.append('placedShips', '')
+  }
 }
 
 export function switchTo (target, huntMode, mapName) {
@@ -20,11 +29,7 @@ export function switchTo (target, huntMode, mapName) {
   mapName = mapName || gameMaps.current.title
   params.append('mapName', mapName)
 
-  if (huntMode === 'build' && custom.noOfPlacedShips() > 0) {
-    custom.store()
-    gameMaps.addCurrentCustomMap(custom.placedShips())
-    params.append('placedShips', '')
-  }
+  storeShips(params, huntMode)
 
   const location = `./${target}.html?${params.toString()}`
   window.location.href = location

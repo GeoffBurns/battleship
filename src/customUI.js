@@ -11,6 +11,7 @@ export class CustomUI extends PlacementUI {
     this.undoBtn = document.getElementById('undoBtn')
     this.autoBtn = document.getElementById('autoBtn')
     this.publishBtn = document.getElementById('publishBtn')
+    this.saveBtn = document.getElementById('saveBtn')
     this.tips = ['Use shapes create land and sea']
   }
 
@@ -35,6 +36,7 @@ export class CustomUI extends PlacementUI {
     this.undoBtn.classList.add('hidden')
     this.autoBtn.classList.add('hidden')
     this.publishBtn.classList.add('hidden')
+    this.saveBtn.classList.add('hidden')
     this.testBtn.classList.add('hidden')
     this.seekBtn.classList.add('hidden')
     this.score.placed.textContent = 'None Yet'
@@ -81,6 +83,7 @@ export class CustomUI extends PlacementUI {
     this.undoBtn.classList.remove('hidden')
     this.autoBtn.classList.add('hidden')
     this.publishBtn.classList.remove('hidden')
+    this.saveBtn.classList.remove('hidden')
     this.buildTrays(ships)
     this.buildWeaponTray()
     gameStatus.game.classList.remove('hidden')

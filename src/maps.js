@@ -336,15 +336,12 @@ class TerrainMaps {
   }
 
   getCustomMap (mapName) {
-    return this.terrain
-      .getCustomMaps(SavedCustomMap.load)
-      ?.find(m => m?.title === mapName)
+    return SavedCustomMap.load(mapName)
   }
+
   getEditableMap (mapName) {
     if (!mapName) return null
-    return this.terrain
-      .getCustomMaps(EditedCustomMap.load)
-      ?.find(m => m?.title === mapName)
+    return EditedCustomMap.load(mapName)
   }
 
   getMap (mapName) {

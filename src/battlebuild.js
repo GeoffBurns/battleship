@@ -19,6 +19,7 @@ import {
   validateHeight,
   validateWidth,
   switchTo,
+  switchToEdit,
   fetchNavBar
 } from './navbar.js'
 
@@ -84,9 +85,12 @@ function clearShips () {
     customUI.subtraction(custom, ship)
   })
 }
+function playMap () {
+  switchTo('index', 'build')
+}
 
 function saveMap () {
-  switchTo('index', 'build')
+  switchToEdit(gameMaps.current.title, 'build')
 }
 
 function wireupButtons () {
@@ -94,7 +98,8 @@ function wireupButtons () {
   customUI.acceptBtn.addEventListener('click', onClickAccept)
   customUI.reuseBtn.addEventListener('click', onClickDefault)
   customUI.resetBtn.addEventListener('click', clearShips)
-  customUI.publishBtn.addEventListener('click', saveMap)
+  customUI.publishBtn.addEventListener('click', playMap)
+  customUI.saveBtn.addEventListener('click', saveMap)
   customUI.rotateBtn.addEventListener('click', onClickRotate)
   customUI.rotateLeftBtn.addEventListener('click', onClickRotateLeft)
   customUI.flipBtn.addEventListener('click', onClickFlip)
@@ -141,6 +146,14 @@ function setupBuildShortcuts () {
       case 'u':
       case 'U':
         onClickUndo()
+        break
+      case 'p':
+      case 'P':
+        playMap()
+        break
+      case 'v':
+      case 'V':
+        saveMap()
         break
       case 'ArrowUp':
       case 'ArrowDown':

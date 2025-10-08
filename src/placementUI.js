@@ -18,7 +18,6 @@ export class PlacementUI extends WatersUI {
     this.flipBtn = document.getElementById('flipBtn')
     this.testBtn = document.getElementById('testBtn')
     this.seekBtn = document.getElementById('seekBtn')
-    this.saveBtn = document.getElementById('saveBtn')
     this.stopBtn = document.getElementById('stopBtn')
     this.undoBtn = document.getElementById('undoBtn')
     this.autoBtn = document.getElementById('autoBtn')
@@ -773,6 +772,7 @@ export class PlacementUI extends WatersUI {
   displayAddInfo (model) {
     if (!model.ships) return
     this.publishBtn.disabled = model.displacementRatio() < 0.35
+    this.saveBtn.disabled = model.displacementRatio() < 0.15
     this.score.placed.textContent = model.ships.length.toString()
     this.score.weaponsPlaced.textContent = model.loadOut.totalAmmo()
   }
