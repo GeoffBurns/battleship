@@ -25,7 +25,7 @@ export class FriendUI extends PlacementUI {
 
   cellHit (r, c) {
     const cell = this.gridCellAt(r, c)
-    cell.classList.remove('semi', 'semi-miss')
+    cell.classList.remove('semi', 'semi-miss', 'wake')
     cell.classList.add('frd-hit')
     cell.textContent = ''
     gameStatus.info('You where hit!')

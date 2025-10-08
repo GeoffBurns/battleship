@@ -48,6 +48,7 @@
     transition: opacity 0.2s ease-in-out;
 }
 
+.cell.wake::after,
 .cell.semi-miss::after {
     content: '';
     width: 20px;

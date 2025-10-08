@@ -108,7 +108,7 @@ export class Friend extends Waters {
         const r = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
         const c = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
         if (this.score.newShotKey(r, c)) {
-          this.loadOut.aim(r, c)
+          this.loadOut.aim(gameMaps.current, r, c)
           return
         }
       }

@@ -86,6 +86,7 @@ export class WatersUI {
       'frd-sunk',
       'miss',
       'semi',
+      'wake',
       'semi-miss',
       'placed'
     )
@@ -108,7 +109,7 @@ export class WatersUI {
   cellHit (r, c) {
     const cell = this.gridCellAt(r, c)
 
-    cell.classList.remove('semi', 'semi-miss')
+    cell.classList.remove('semi', 'semi-miss', 'wake')
     cell.classList.add('hit')
   }
 
@@ -122,6 +123,7 @@ export class WatersUI {
     )
       return { hit: false, sunk: '', reveal: false }
     cell.classList.add('semi')
+    cell.classList.remove('wake')
     cell.textContent = ''
     return { hit: false, sunk: '', reveal: true }
   }
@@ -130,6 +132,7 @@ export class WatersUI {
 
     if (cell.classList.contains('placed')) return
     cell.classList.add('miss')
+    cell.classList.remove('wake')
   }
   surroundMiss (r, c, cellMiss) {
     if (!cellMiss) return

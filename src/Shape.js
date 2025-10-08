@@ -6,6 +6,7 @@ import {
   Invariant,
   Variant3
 } from './variants.js'
+
 export const terrain = {
   current: null,
   terrains: [],
@@ -190,7 +191,7 @@ export class StandardShot extends Weapon {
     this.hints = ['Click On Square To Fire']
     this.buttonHtml = '<span class="shortcut">S</span>ingle Shot'
   }
-  aoe (coords) {
+  aoe (_map, coords) {
     return [[coords[0][0], coords[0][1], 4]]
   }
   ammoStatus () {
@@ -940,6 +941,8 @@ const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
   [1, 1],
   [0, 2]
 ])
+
+stealthBomber.vulnerable = ['K']
 stealthBomber.hardened = ['W']
 
 const aircraftCarrier = new SeaVessel('Aircraft Carrier', 'A', 'A', [
@@ -1073,7 +1076,7 @@ export class Megabomb extends Weapon {
     return `Bomb Mode (${ammoLeft} left)`
   }
 
-  aoe (coords) {
+  aoe (_map, coords) {
     const r = coords[0][0]
     const c = coords[0][1]
     let result = [[r, c, 2]]
@@ -1123,6 +1126,51 @@ export class Kinetic extends Weapon {
   ammoStatus (ammoLeft) {
     return `Strike Mode (${ammoLeft} left)`
   }
+  getExtendedLinePoints (x1, y1, x2, y2, width, height) {
+    // Direction vector
+    const dx = x2 - x1
+    const dy = y2 - y1
+
+    // Avoid divide by zero
+    if (dx === 0 && dy === 0) return []
+
+    // Compute intersections with each border of the grid
+    const tValues = []
+
+    if (dx !== 0) {
+      tValues.push((0 - x1) / dx)
+      tValues.push((width - 1 - x1) / dx)
+    }
+    if (dy !== 0) {
+      tValues.push((0 - y1) / dy)
+      tValues.push((height - 1 - y1) / dy)
+    }
+
+    // Filter valid intersections (inside the grid)
+    const intersections = tValues
+      .map(t => [x1 + dx * t, y1 + dy * t])
+      .filter(([x, y]) => x >= 0 && x < width && y >= 0 && y < height)
+
+    // If fewer than two intersections, nothing to draw
+    if (intersections.length < 2) return []
+
+    // Pick first and last intersection
+    const [start, end] = [
+      intersections[0],
+      intersections[intersections.length - 1]
+    ]
+
+    // Use Bresenham’s algorithm between those two clipped points
+    const linePoints = this.getLinePoints(
+      Math.round(start[0]),
+      Math.round(start[1]),
+      Math.round(end[0]),
+      Math.round(end[1])
+    )
+
+    return linePoints
+  }
+
   getLinePoints (x1, y1, x2, y2) {
     const points = []
 
@@ -1133,7 +1181,7 @@ export class Kinetic extends Weapon {
     let err = dx - dy
 
     while (true) {
-      points.push([x1, y1])
+      points.push([x1, y1, 2])
 
       if (x1 === x2 && y1 === y2) break
 
@@ -1151,14 +1199,14 @@ export class Kinetic extends Weapon {
     return points
   }
 
-  aoe (coords) {
+  aoe (map, coords) {
     const r = coords[0][0]
     const c = coords[0][1]
 
     const r1 = coords[1][0]
     const c1 = coords[1][1]
 
-    return this.getLinePoints(r, c, r1, c1)
+    return this.getExtendedLinePoints(r, c, r1, c1, map.rows, map.cols)
   }
 }
 seaAndLandWeapons.addWeapons([new Megabomb(1)]) //, new Kinetic(1)])
@@ -1316,12 +1364,12 @@ export class LoadOut {
   cursorIndex () {
     return this.coords.length
   }
-  aim (r, c) {
+  aim (map, r, c) {
     const oldCursor = this.cursor()
     this.onCursorChange(oldCursor, this.cursor())
     this.coords.push([r, c])
     if (this.coords.length >= this.weapon().points) {
-      this.fire(this.coords)
+      this.fire(map, this.coords)
       this.coords = []
     }
 
@@ -1337,9 +1385,9 @@ export class LoadOut {
     this.onCursorChange(oldCursor, this.cursor())
   }
 
-  fire () {
+  fire (map) {
     const weapon = this.weapon()
-    const effected = weapon.aoe(this.coords)
+    const effected = weapon.aoe(map, this.coords)
     this.useAmmo()
     if (weapon.destroys) {
       if (weapon.isOneAndDone) {
