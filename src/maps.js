@@ -336,6 +336,7 @@ class TerrainMaps {
   }
 
   getCustomMap (mapName) {
+    if (!mapName) return
     return SavedCustomMap.load(mapName)
   }
 
@@ -345,6 +346,7 @@ class TerrainMaps {
   }
 
   getMap (mapName) {
+    if (!mapName) return
     let map = this.list.find(m => m.title === mapName)
     if (!map) map = this.getCustomMap(mapName)
     return map
