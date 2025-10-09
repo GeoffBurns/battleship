@@ -147,7 +147,7 @@ export class Waters {
   setMap (map) {
     map = map || gameMaps.current
     this.ships = this.createShips(map)
-    this.armWeapons()
+    this.armWeapons(map)
   }
   getHitCandidates (effect) {
     const candidates = []
