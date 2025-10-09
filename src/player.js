@@ -154,7 +154,13 @@ export class Waters {
     for (const [r, c, power] of effect) {
       if (gameMaps.inBounds(r, c) && this.score.newShotKey(r, c) !== null) {
         const cell = this.UI.gridCellAt(r, c)
-        cell.classList.add('wake')
+        if (
+          !cell.classList.contains('frd-hit') &&
+          !cell.classList.contains('miss') &&
+          !cell.classList.contains('hit')
+        ) {
+          cell.classList.add('wake')
+        }
         if (this.shipCellAt(r, c) !== null) {
           candidates.push([r, c, power])
         }
