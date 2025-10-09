@@ -226,6 +226,7 @@ export class ScoreUI {
   }
 
   buildBombRow (rowList, viewModel, weaponSystem) {
+    if (!weaponSystem.weapon.isLimited) return
     const ammoTotal = weaponSystem.ammoTotal()
     const ammoUsed = weaponSystem.ammoUsed()
     const row = document.createElement('div')
