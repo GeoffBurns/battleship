@@ -944,6 +944,10 @@ const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
 
 stealthBomber.vulnerable = ['K']
 stealthBomber.hardened = ['W']
+stealthBomber.notes = [
+  `The ${stealthBomber.descriptionText} is vulnerable against Kinetic Strikes.`,
+  `The squares of the ${stealthBomber.descriptionText} orthogonally adjacent to the strike will also be destroyed.`
+]
 
 const aircraftCarrier = new SeaVessel('Aircraft Carrier', 'A', 'A', [
   [0, 0],
