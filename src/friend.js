@@ -113,6 +113,31 @@ export class Friend extends Waters {
         }
       }
   }
+
+  destroyOne (weapon, effect) {
+    const candidates = this.getHitCandidates(effect)
+    if (candidates.length < 1) {
+      this.seekBomb(weapon, effect)
+      return
+    }
+    const newEffect = this.getStrikeSplash(candidates)
+    this.seekBomb(weapon, newEffect)
+  }
+
+  randomDestroyOne (seeking) {
+    this.loadOut.destroyOne = this.destroyOne.bind(this)
+
+    if (seeking && (!this.testContinue || this.boardDestroyed)) {
+      clearInterval(seeking)
+      return
+    }
+
+    const r = this.randomLine()
+    this.loadOut.aim(gameMaps.current, r, 0)
+    this.loadOut.aim(gameMaps.current, r, gameMaps.current.cols - 1)
+    return
+  }
+
   randomSeekOld (seeking) {
     const maxAttempts = 130
 
@@ -202,6 +227,28 @@ export class Friend extends Waters {
 
     return locs[idx].split(',').map(x => parseInt(x))
   }
+
+  randomLine () {
+    this.syncUntried()
+    const locs = [...this.untried]
+
+    const tally = locs.reduce((acc, el) => {
+      const [r] = el.split(',').map(x => parseInt(x))
+      acc[r] = 1 + (acc[r] || 0)
+      return acc
+    }, {})
+
+    let line = Object.entries(tally)
+    line.sort((a, b) => b[1] - a[1])
+
+    const idx = line.findIndex(i => i[1] < line[0][1])
+
+    if (idx < 3) {
+      return parseInt(line[0])
+    }
+    return parseInt(line[Math.floor(Math.random() * (idx - 1))])
+  }
+
   seek () {
     this.testContinue = true
     this.boardDestroyed = false
@@ -230,6 +277,8 @@ export class Friend extends Waters {
     } else if (hits.length > 0) {
       this.loadOut.switchToSShot()
       this.chase(hits, seeking)
+    } else if (this.loadOut.switchTo('K')) {
+      this.randomDestroyOne(seeking)
     } else if (this.loadOut.switchTo('M')) {
       this.randomBomb(seeking)
     } else {

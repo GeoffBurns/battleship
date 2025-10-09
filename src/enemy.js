@@ -161,31 +161,13 @@ class Enemy extends Waters {
   }
 
   destroyOne (weapon, effect) {
-    const candidates = []
-    for (const [r, c, power] of effect) {
-      if (gameMaps.inBounds(r, c) && this.score.newShotKey(r, c) !== null) {
-        const cell = this.UI.gridCellAt(r, c)
-        cell.classList.add('wake')
-        if (this.shipCellAt(r, c) !== null) {
-          candidates.push([r, c, power])
-        }
-      }
-    }
+    const candidates = this.getHitCandidates(effect)
 
     if (candidates.length < 1) {
       this.tryFireAt2(weapon, effect)
       return
     }
-    const pick = Math.floor(Math.random() * candidates.length)
-
-    const [r, c] = candidates[pick]
-    const newEffect = [candidates[pick]]
-    if (gameMaps.inBounds(r + 1, c)) newEffect.push([r + 1, c, 0])
-    if (gameMaps.inBounds(r - 1, c)) newEffect.push([r - 1, c, 0])
-
-    if (gameMaps.inBounds(r, c + 1)) newEffect.push([r, c + 1, 0])
-    if (gameMaps.inBounds(r, c - 1)) newEffect.push([r, c - 1, 0])
-
+    const newEffect = this.getStrikeSplash(candidates)
     this.tryFireAt2(weapon, newEffect)
   }
   tryFireAt2 (weapon, effect) {

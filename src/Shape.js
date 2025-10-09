@@ -1209,7 +1209,7 @@ export class Kinetic extends Weapon {
     return this.getExtendedLinePoints(r, c, r1, c1, map.rows, map.cols)
   }
 }
-seaAndLandWeapons.addWeapons([new Megabomb(1)]) //, new Kinetic(1)])
+seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1)])
 
 export class WeaponSystem {
   constructor (weapon) {

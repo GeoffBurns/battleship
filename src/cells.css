@@ -76,6 +76,9 @@
     box-sizing: border-box;
     position: relative;
     overflow: clip;
+    text-align: center;
+
+    z-index: 1;
 }
 
 

@@ -149,6 +149,31 @@ export class Waters {
     this.ships = this.createShips(map)
     this.armWeapons()
   }
+  getHitCandidates (effect) {
+    const candidates = []
+    for (const [r, c, power] of effect) {
+      if (gameMaps.inBounds(r, c) && this.score.newShotKey(r, c) !== null) {
+        const cell = this.UI.gridCellAt(r, c)
+        cell.classList.add('wake')
+        if (this.shipCellAt(r, c) !== null) {
+          candidates.push([r, c, power])
+        }
+      }
+    }
+    return candidates
+  }
+  getStrikeSplash (candidates) {
+    const pick = Math.floor(Math.random() * candidates.length)
+
+    const [r, c] = candidates[pick]
+    const newEffect = [candidates[pick]]
+    if (gameMaps.inBounds(r + 1, c)) newEffect.push([r + 1, c, 0])
+    if (gameMaps.inBounds(r - 1, c)) newEffect.push([r - 1, c, 0])
+
+    if (gameMaps.inBounds(r, c + 1)) newEffect.push([r, c + 1, 0])
+    if (gameMaps.inBounds(r, c - 1)) newEffect.push([r, c - 1, 0])
+    return newEffect
+  }
   shipsSunk () {
     return this.ships.filter(s => s.sunk)
   }
