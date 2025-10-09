@@ -143,22 +143,6 @@ class Enemy extends Waters {
     this.loadOut.destroyOne = this.destroyOne.bind(this)
     this.loadOut.aim(gameMaps.current, r, c)
   }
-  tryFireAt (r, c) {
-    if (!this.score.newShotKey(r, c)) {
-      gameStatus.info('Already Shot Here - Try Again')
-      return false
-    }
-    this.processShot(r, c, false)
-    this.updateUI()
-    if (this?.opponent && !this.opponent.boardDestroyed) {
-      this.timeoutId = setTimeout(() => {
-        this.timeoutId = null
-        this.opponent.seekStep()
-      }, 1000)
-      //
-    }
-    return true
-  }
 
   destroyOne (weapon, effect) {
     const candidates = this.getHitCandidates(effect)
@@ -171,9 +155,16 @@ class Enemy extends Waters {
     this.tryFireAt2(weapon, newEffect)
   }
   tryFireAt2 (weapon, effect) {
-    if (!weapon.isLimited && effect.length === 1) {
-      this.tryFireAt(effect[0][0], effect[0][1])
-      return
+    if (
+      effect.length === 1 &&
+      !this.score.newShotKey(effect[0][0], effect[0][1])
+    ) {
+      gameStatus.info('Already Shot Here - Try Again')
+      return false
+    }
+    if (effect.length === 0) {
+      gameStatus.info('Has no effect - Try Again')
+      return false
     }
     this.fireAt2(weapon, effect)
     this.updateUI()
@@ -222,21 +213,6 @@ class Enemy extends Waters {
       }
     }
     return { hits, sunks, reveals }
-  }
-
-  dropBomb (r, c, hits, sunks) {
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        const nr = r + dr
-        const nc = c + dc
-        if (gameMaps.inBounds(nr, nc)) {
-          const result = this.processShot(nr, nc, true)
-          if (result?.hit) hits++
-          if (result?.sunkLetter) sunks += result.sunkLetter
-        }
-      }
-    }
-    return { hits, sunks }
   }
 
   updateBombStatus () {

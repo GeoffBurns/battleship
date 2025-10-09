@@ -443,20 +443,6 @@ export class Waters {
     this.updateUI(this.ships)
     return result
   }
-  processShot (r, c, bomb) {
-    this.flame(r, c, bomb)
-
-    const key = this.score.createShotKey(r, c)
-    if (key === null) {
-      // if we are here, it is because of carpet bomb, so we can just
-      return { hit: false, sunk: '' }
-    }
-
-    const result = this.fireShot(r, c, key)
-
-    this.updateUI(this.ships)
-    return result
-  }
 
   updateUI (ships) {
     this.updateTally(
