@@ -54,8 +54,13 @@
     inset: 0;
     z-index: -1;
     content: '';
-    width: 20px;
-    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow: clip;
+    width: 25px;
+    height: 25px;
     border-radius: 30%;
     background: rgba(180, 180, 200, 0.3);
     transition: opacity 0.2s ease-in-out;
