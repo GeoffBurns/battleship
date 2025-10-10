@@ -4,7 +4,8 @@ import {
   Blinker,
   Cyclic4,
   Invariant,
-  Variant3
+  Variant3,
+  shuffleArray
 } from './variants.js'
 
 export const terrain = {
@@ -1058,7 +1059,8 @@ export class Megabomb extends Weapon {
     this.cursors = ['bomb']
     this.hints = ['Click On Square To Drop Bomb']
     this.buttonHtml = '<span class="shortcut">M</span>ega Bomb'
-    this.tip = ''
+    this.tip =
+      'drag a megabomb on to the map to increase the number of times you can drop bombs'
     this.hasFlash = true
     this.dragShape = [
       [0, 0, 0],
@@ -1102,6 +1104,79 @@ export class Megabomb extends Weapon {
     return result
   }
 }
+
+function getExtendedLinePoints (x1, y1, x2, y2, width, height) {
+  // Direction vector
+  const dx = x2 - x1
+  const dy = y2 - y1
+
+  // Avoid divide by zero
+  if (dx === 0 && dy === 0) return []
+
+  // Compute intersections with each border of the grid
+  const tValues = []
+
+  if (dx !== 0) {
+    tValues.push((0 - x1) / dx)
+    tValues.push((width - 1 - x1) / dx)
+  }
+  if (dy !== 0) {
+    tValues.push((0 - y1) / dy)
+    tValues.push((height - 1 - y1) / dy)
+  }
+
+  // Filter valid intersections (inside the grid)
+  const intersections = tValues
+    .map(t => [x1 + dx * t, y1 + dy * t])
+    .filter(([x, y]) => x >= 0 && x < width && y >= 0 && y < height)
+
+  // If fewer than two intersections, nothing to draw
+  if (intersections.length < 2) return []
+
+  // Pick first and last intersection
+  const [start, end] = [
+    intersections[0],
+    intersections[intersections.length - 1]
+  ]
+
+  // Use Bresenham’s algorithm between those two clipped points
+  const linePoints = getLinePoints(
+    Math.round(start[0]),
+    Math.round(start[1]),
+    Math.round(end[0]),
+    Math.round(end[1])
+  )
+
+  return linePoints
+}
+
+function getLinePoints (x1, y1, x2, y2) {
+  const points = []
+
+  const dx = Math.abs(x2 - x1)
+  const dy = Math.abs(y2 - y1)
+  const sx = x1 < x2 ? 1 : -1
+  const sy = y1 < y2 ? 1 : -1
+  let err = dx - dy
+
+  while (true) {
+    points.push([x1, y1, 2])
+
+    if (x1 === x2 && y1 === y2) break
+
+    const e2 = 2 * err
+    if (e2 > -dy) {
+      err -= dy
+      x1 += sx
+    }
+    if (e2 < dx) {
+      err += dx
+      y1 += sy
+    }
+  }
+
+  return points
+}
 export class Kinetic extends Weapon {
   constructor (ammo) {
     super('Kinetic Strike', 'K', true, true, 2)
@@ -1112,7 +1187,8 @@ export class Kinetic extends Weapon {
       'Click on square end kinetic strike'
     ]
     this.buttonHtml = '<span class="shortcut">K</span>inetic Strike'
-    this.tip = ''
+    this.tip =
+      'drag a kinetic on to the map to increase the number of times you can strike'
     this.isOneAndDone = true
     this.hasFlash = false
     this.dragShape = [
@@ -1130,77 +1206,141 @@ export class Kinetic extends Weapon {
   ammoStatus (ammoLeft) {
     return `Strike Mode (${ammoLeft} left)`
   }
-  getExtendedLinePoints (x1, y1, x2, y2, width, height) {
-    // Direction vector
-    const dx = x2 - x1
-    const dy = y2 - y1
 
-    // Avoid divide by zero
-    if (dx === 0 && dy === 0) return []
+  aoe (map, coords) {
+    const r = coords[0][0]
+    const c = coords[0][1]
 
-    // Compute intersections with each border of the grid
-    const tValues = []
+    const r1 = coords[1][0]
+    const c1 = coords[1][1]
 
-    if (dx !== 0) {
-      tValues.push((0 - x1) / dx)
-      tValues.push((width - 1 - x1) / dx)
-    }
-    if (dy !== 0) {
-      tValues.push((0 - y1) / dy)
-      tValues.push((height - 1 - y1) / dy)
-    }
+    return getExtendedLinePoints(r, c, r1, c1, map.rows, map.cols)
+  }
+  splash (map, coords) {
+    const [r, c] = coords
+    const newEffect = [coords]
+    if (map.inBounds(r + 1, c)) newEffect.push([r + 1, c, 0])
+    if (map.inBounds(r - 1, c)) newEffect.push([r - 1, c, 0])
 
-    // Filter valid intersections (inside the grid)
-    const intersections = tValues
-      .map(t => [x1 + dx * t, y1 + dy * t])
-      .filter(([x, y]) => x >= 0 && x < width && y >= 0 && y < height)
+    if (map.inBounds(r, c + 1)) newEffect.push([r, c + 1, 0])
+    if (map.inBounds(r, c - 1)) newEffect.push([r, c - 1, 0])
+    return newEffect
+  }
+}
 
-    // If fewer than two intersections, nothing to draw
-    if (intersections.length < 2) return []
-
-    // Pick first and last intersection
-    const [start, end] = [
-      intersections[0],
-      intersections[intersections.length - 1]
+export class Flack extends Weapon {
+  constructor (ammo) {
+    super('Kinetic Strike', 'F', true, true, 2)
+    this.ammo = ammo
+    this.cursors = ['cluster']
+    this.hints = ['Click on square to initiate flack']
+    this.buttonHtml = '<span class="shortcut">F</span>ack'
+    this.tip = ''
+    this.isOneAndDone = false
+    this.hasFlash = false
+    this.dragShape = [
+      [0, 1, 0],
+      [1, 1, 1],
+      [2, 2, 0],
+      [1, 3, 1],
+      [0, 4, 1]
     ]
-
-    // Use Bresenham’s algorithm between those two clipped points
-    const linePoints = this.getLinePoints(
-      Math.round(start[0]),
-      Math.round(start[1]),
-      Math.round(end[0]),
-      Math.round(end[1])
-    )
-
-    return linePoints
+  }
+  clone (ammo) {
+    ammo = ammo || this.ammo
+    return new Flack(ammo)
+  }
+  ammoStatus (ammoLeft) {
+    return `Flack Mode (${ammoLeft} left)`
   }
 
-  getLinePoints (x1, y1, x2, y2) {
-    const points = []
-
-    const dx = Math.abs(x2 - x1)
-    const dy = Math.abs(y2 - y1)
-    const sx = x1 < x2 ? 1 : -1
-    const sy = y1 < y2 ? 1 : -1
-    let err = dx - dy
-
-    while (true) {
-      points.push([x1, y1, 2])
-
-      if (x1 === x2 && y1 === y2) break
-
-      const e2 = 2 * err
-      if (e2 > -dy) {
-        err -= dy
-        x1 += sx
-      }
-      if (e2 < dx) {
-        err += dx
-        y1 += sy
+  aoe (map, coords) {
+    const r = coords[0][0]
+    const c = coords[0][1]
+    let area = [[r, c, 2]]
+    for (let i = -2; i < 3; i++) {
+      for (let j = -2; j < 3; j++) {
+        c
+        result.push([r + i, c + j, 0])
       }
     }
+    const result = shuffleArray(area)
 
-    return points
+    return result
+  }
+}
+
+function getPieSegmentCells (x1, y1, x2, y2, radius = 4, spreadDeg = 22.5) {
+  const cells = []
+
+  // Compute the main direction angle
+  const angle = Math.atan2(y2 - y1, x2 - x1)
+
+  const spread = (spreadDeg * Math.PI) / 180 // convert to radians
+  const halfSpread = spread // ±spreadDeg
+  const narrowSpread = (8 * Math.PI) / 180
+
+  // Bounding box to limit checks
+  const minX = Math.floor(x1 - radius)
+  const maxX = Math.ceil(x1 + radius)
+  const minY = Math.floor(y1 - radius)
+  const maxY = Math.ceil(y1 + radius)
+
+  for (let y = minY; y <= maxY; y++) {
+    for (let x = minX; x <= maxX; x++) {
+      const dx = x - x1
+      const dy = y - y1
+      const dist = Math.sqrt(dx * dx + dy * dy)
+
+      if (dist > radius) continue // outside circle
+
+      const cellAngle = Math.atan2(dy, dx)
+      let delta = cellAngle - angle
+
+      // Normalize to [-PI, PI]
+      delta = Math.abs(((delta + Math.PI) % (2 * Math.PI)) - Math.PI)
+      if (delta <= narrowSpread) {
+        cells.push([x, y, 2])
+      } else if (delta <= halfSpread) {
+        cells.push([x, y, 1])
+      }
+    }
+  }
+
+  return cells
+}
+
+export class Sweep extends Weapon {
+  constructor (ammo) {
+    super('Radar Sweep', 'W', true, false, 2)
+    this.ammo = ammo
+    this.cursors = ['dish', 'sweep']
+    this.hints = [
+      'Click on square to start radar scan',
+      'Click on square end radar scan'
+    ]
+    this.buttonHtml = 's<span class="shortcut">W</span>eep'
+    this.tip = ''
+    this.isOneAndDone = false
+    this.hasFlash = false
+    this.dragShape = [
+      [0, 0, 1],
+      [0, 1, 0],
+      [1, 0, 0],
+      [1, 1, 0],
+      [2, 0, 0],
+      [2, 1, 1],
+      [2, 2, 0],
+      [3, 1, 0],
+      [3, 2, 0]
+    ]
+  }
+  clone (ammo) {
+    ammo = ammo || this.ammo
+    return new Sweep(ammo)
+  }
+  ammoStatus (ammoLeft) {
+    return `Radar Mode (${ammoLeft} left)`
   }
 
   aoe (map, coords) {
@@ -1210,9 +1350,10 @@ export class Kinetic extends Weapon {
     const r1 = coords[1][0]
     const c1 = coords[1][1]
 
-    return this.getExtendedLinePoints(r, c, r1, c1, map.rows, map.cols)
+    return getPieSegmentCells(r, c, r1, c1)
   }
 }
+
 seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1)])
 
 export class WeaponSystem {

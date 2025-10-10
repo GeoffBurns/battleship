@@ -168,17 +168,10 @@ export class Waters {
     }
     return candidates
   }
-  getStrikeSplash (candidates) {
+  getStrikeSplash (weapon, candidates) {
     const pick = Math.floor(Math.random() * candidates.length)
 
-    const [r, c] = candidates[pick]
-    const newEffect = [candidates[pick]]
-    if (gameMaps.inBounds(r + 1, c)) newEffect.push([r + 1, c, 0])
-    if (gameMaps.inBounds(r - 1, c)) newEffect.push([r - 1, c, 0])
-
-    if (gameMaps.inBounds(r, c + 1)) newEffect.push([r, c + 1, 0])
-    if (gameMaps.inBounds(r, c - 1)) newEffect.push([r, c - 1, 0])
-    return newEffect
+    return weapon.splash(gameMaps.current, candidates[pick])
   }
   shipsSunk () {
     return this.ships.filter(s => s.sunk)

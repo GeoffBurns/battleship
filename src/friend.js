@@ -120,7 +120,7 @@ export class Friend extends Waters {
       this.seekBomb(weapon, effect)
       return
     }
-    const newEffect = this.getStrikeSplash(candidates)
+    const newEffect = this.getStrikeSplash(weapon, candidates)
     this.seekBomb(weapon, newEffect)
   }
 

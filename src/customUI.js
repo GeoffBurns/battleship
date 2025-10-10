@@ -98,7 +98,7 @@ export class CustomUI extends PlacementUI {
 
     gameStatus.clear()
     gameStatus.info('drag ships to the map grid to add them to your map')
-    this.tips = [
+    this.s = [
       'drag ships to the map grid to add them to your map',
       'drag weapons on to the map to increase the ammunition available',
       'drag weapons tally-boxes back to the tray to remove a weapon'

@@ -151,7 +151,7 @@ class Enemy extends Waters {
       this.tryFireAt2(weapon, effect)
       return
     }
-    const newEffect = this.getStrikeSplash(candidates)
+    const newEffect = this.getStrikeSplash(weapon, candidates)
     this.tryFireAt2(weapon, newEffect)
   }
   tryFireAt2 (weapon, effect) {
