@@ -919,6 +919,7 @@ const jetFighterCraft = new Plane('Jet Fighter', 'J', 'H', [
 ])
 
 jetFighterCraft.vulnerable = ['F']
+jetFighterCraft.immune = ['+']
 const helicopter = new Plane('Helicopter', 'H', 'S', [
   [0, 1],
   [1, 0],
@@ -927,6 +928,7 @@ const helicopter = new Plane('Helicopter', 'H', 'S', [
   [2, 1]
 ])
 helicopter.vulnerable = ['W', 'F']
+helicopter.immune = ['+']
 const airplane = new Plane('Airplane', 'P', 'H', [
   [0, 1],
   [1, 0],
@@ -934,6 +936,7 @@ const airplane = new Plane('Airplane', 'P', 'H', [
   [1, 2]
 ])
 airplane.vulnerable = ['W', 'F']
+airplane.immune = ['+']
 const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
   [0, 0],
   [1, 0],
@@ -945,6 +948,7 @@ const stealthBomber = new Plane('Stealth Bomber', 'Q', 'H', [
 
 stealthBomber.vulnerable = ['K']
 stealthBomber.hardened = ['W']
+stealthBomber.immune = ['+']
 stealthBomber.notes = [
   `The ${stealthBomber.descriptionText} is vulnerable against Kinetic Strikes.`,
   `The squares of the ${stealthBomber.descriptionText} orthogonally adjacent to the strike will also be destroyed.`
@@ -1420,7 +1424,13 @@ export class Sweep extends Weapon {
   }
 }
 
-seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1), new Flack(1)])
+seaAndLandWeapons.addWeapons([
+  new Megabomb(1),
+  new Kinetic(1),
+  new Flack(1),
+  new Torpedo(1),
+  new Sweep(1)
+])
 
 export class WeaponSystem {
   constructor (weapon) {

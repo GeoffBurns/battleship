@@ -20,7 +20,8 @@ import {
   validateWidth,
   switchTo,
   switchToEdit,
-  fetchNavBar
+  fetchNavBar,
+  trackLevelEnd
 } from './navbar.js'
 
 customUI.resetBoardSize()
@@ -86,10 +87,12 @@ function clearShips () {
   })
 }
 function playMap () {
+  trackLevelEnd(gameMaps.current, true)
   switchTo('index', 'build')
 }
 
 function saveMap () {
+  trackLevelEnd(gameMaps.current, false)
   switchToEdit(gameMaps.current.title, 'build')
 }
 

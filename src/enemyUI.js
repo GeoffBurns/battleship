@@ -1,7 +1,7 @@
 import { gameMaps } from './maps.js'
 import { gameStatus, WatersUI } from './playerUI.js'
 import { ScoreUI } from './ScoreUI.js'
-
+import { trackLevelEnd } from './navbar.js'
 class EnemyUI extends WatersUI {
   constructor () {
     super()
@@ -13,7 +13,9 @@ class EnemyUI extends WatersUI {
   displayFleetSunk () {
     gameStatus.display('Fleet Destroyed', 'All  - Well Done!')
     this.board.classList.add('destroyed')
+    trackLevelEnd(gameMaps.current, true)
   }
+
   revealAll (ships) {
     for (const ship of ships) {
       this.revealShip(ship)

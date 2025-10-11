@@ -316,18 +316,40 @@ export function fetchNavBar (tab, title, callback) {
     })
 }
 
-;(function () {
-  const gaScript = document.createElement('script')
-  gaScript.async = true
-  gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-J2METC1TPT'
-  document.head.appendChild(gaScript)
+const GA_ID = 'G-G-J2METC1TPT'
 
-  // 2. Initialize Google Analytics
-  window.dataLayer = window.dataLayer || []
+if (!window.dataLayer) {
+  window.dataLayer = []
   function gtag () {
     window.dataLayer.push(arguments)
   }
   window.gtag = gtag
   gtag('js', new Date())
-  gtag('config', 'G-J2METC1TPT')
-})()
+  gtag('config', GA_ID)
+
+  const script = document.createElement('script')
+  script.async = true
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`
+  document.head.appendChild(script)
+}
+
+export const gtag = window.gtag
+
+export function trackLevelEnd (map, success) {
+  if (typeof window.gtag !== 'function') {
+    console.warn('GA not initialized')
+    return
+  }
+  map = map || gameMaps.current
+
+  const params = {
+    level_name: map.title || 'unknown',
+    terrain: map.terrain || 'unknown',
+    height: map.rows || 0,
+    width: map.cols || 0,
+    mode: document.title,
+    success: !!success
+  }
+
+  gtag('event', 'level_end', params)
+}

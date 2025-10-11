@@ -135,7 +135,6 @@ export class Friend extends Waters {
     const r = this.randomLine()
     this.loadOut.aim(gameMaps.current, r, 0)
     this.loadOut.aim(gameMaps.current, r, gameMaps.current.cols - 1)
-    return
   }
 
   randomSeekOld (seeking) {
@@ -269,6 +268,32 @@ export class Friend extends Waters {
       }
     }, 270)
   }
+  scan (weapon, effect) {
+    this.updateUI()
+
+    for (const position of effect) {
+      const [r, c, power] = position
+
+      if (gameMaps.inBounds(r, c)) {
+        /// reveal  what is in this position
+      }
+    }
+    /// reveal
+  }
+  randomScan (seeking) {
+    this.loadOut.reveal = this.scan.bind(this)
+    if (seeking && (!this.testContinue || this.boardDestroyed)) {
+      clearInterval(seeking)
+      return
+    }
+    const r = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
+    const c = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
+    const r1 = Math.floor(Math.random() * (gameMaps.current.rows - 2)) + 1
+    const c1 = Math.floor(Math.random() * (gameMaps.current.cols - 2)) + 1
+
+    this.loadOut.aim(gameMaps.current, r, c)
+    this.loadOut.aim(gameMaps.current, r1, c1)
+  }
   selectShot (semis, hits, seeking) {
     if (semis.length > 0) {
       this.loadOut.switchToSShot()
@@ -283,6 +308,10 @@ export class Friend extends Waters {
       this.randomBomb(seeking)
     } else if (this.loadOut.switchTo('M')) {
       this.randomBomb(seeking)
+    } else if (this.loadOut.switchTo('+')) {
+      this.randomDestroyOne(seeking)
+    } else if (this.loadOut.switchTo('W')) {
+      this.randomScan(seeking)
     } else {
       this.loadOut.switchToSShot()
       this.randomSeek(seeking)

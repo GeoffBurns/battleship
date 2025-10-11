@@ -1,6 +1,7 @@
 import { gameStatus } from './playerUI.js'
 import { PlacementUI } from './placementUI.js'
 import { setupDragHandlers } from './dragndrop.js'
+import { trackLevelEnd } from './navbar.js'
 
 export class FriendUI extends PlacementUI {
   constructor () {
@@ -21,6 +22,7 @@ export class FriendUI extends PlacementUI {
   displayFleetSunk () {
     gameStatus.display('Your Fleet is Destroyed', '')
     this.board.classList.add('destroyed')
+    trackLevelEnd(gameMaps.current, false)
   }
 
   cellHit (r, c) {
