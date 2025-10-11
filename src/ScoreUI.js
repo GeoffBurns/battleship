@@ -305,21 +305,42 @@ export class ScoreUI {
     const air = shipLetters('A')
     const special = shipLetters('X')
 
+    const count = { s: 0, g: 0 }
+    const incSea = () => count.s++
+    const incLand = () => count.g++
     for (const letter of sea) {
       this.buildTallyRow(ships, letter, seaColumn, boxer, 'S')
+      incSea()
     }
-    for (const letter of special) {
-      this.buildTallyRow(ships, letter, seaColumn, boxer, 'X')
-    }
-    for (const letter of air) {
-      this.buildTallyRow(ships, letter, landColumn, boxer, 'A')
-    }
+
     for (const letter of land) {
       this.buildTallyRow(ships, letter, landColumn, boxer, 'G')
+      incLand()
+    }
+    const airTrack =
+      count.s < count.g
+        ? { col: seaColumn, inc: incSea }
+        : { col: landColumn, inc: incLand }
+
+    for (const letter of air) {
+      this.buildTallyRow(ships, letter, airTrack.col, boxer, 'A')
+      airTrack.inc()
+    }
+    const specialTrack =
+      count.s < count.g
+        ? { col: seaColumn, inc: incSea }
+        : { col: landColumn, inc: incLand }
+    for (const letter of special) {
+      this.buildTallyRow(ships, letter, specialTrack.col, boxer, 'X')
+      specialTrack.inc()
     }
     if (withWeapons && viewModel) {
+      const weaponTrack =
+        count.s < count.g
+          ? { col: seaColumn, inc: incSea }
+          : { col: landColumn, inc: incLand }
       for (const wps of weaponSystems) {
-        this.buildBombRow(landColumn, viewModel, wps)
+        this.buildBombRow(weaponTrack.col, viewModel, wps)
       }
     }
     surfaceContainer.appendChild(seaColumn)
