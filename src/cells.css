@@ -55,6 +55,10 @@
     cursor: var(--satelite-cursor-image) 10 20, pointer;
 }
 
+.board.cluster {
+    cursor: var(--cluster-cursor-image) 10 20, pointer;
+}
+
 /* destroyed (desaturated) board   */
 .board.destroyed .land.light,
 .board.destroyed .sea.light {

@@ -279,6 +279,8 @@ export class Friend extends Waters {
       this.chase(hits, seeking)
     } else if (this.loadOut.switchTo('K')) {
       this.randomDestroyOne(seeking)
+    } else if (this.loadOut.switchTo('F')) {
+      this.randomBomb(seeking)
     } else if (this.loadOut.switchTo('M')) {
       this.randomBomb(seeking)
     } else {

@@ -1230,11 +1230,11 @@ export class Kinetic extends Weapon {
 
 export class Flack extends Weapon {
   constructor (ammo) {
-    super('Kinetic Strike', 'F', true, true, 2)
+    super('Flack', 'F', true, true, 2)
     this.ammo = ammo
     this.cursors = ['cluster']
     this.hints = ['Click on square to initiate flack']
-    this.buttonHtml = '<span class="shortcut">F</span>ack'
+    this.buttonHtml = '<span class="shortcut">F</span>lack'
     this.tip = ''
     this.isOneAndDone = false
     this.hasFlash = false
@@ -1260,7 +1260,6 @@ export class Flack extends Weapon {
     let area = [[r, c, 2]]
     for (let i = -2; i < 3; i++) {
       for (let j = -2; j < 3; j++) {
-        c
         result.push([r + i, c + j, 0])
       }
     }
