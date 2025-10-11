@@ -315,3 +315,19 @@ export function fetchNavBar (tab, title, callback) {
       if (typeof callback === 'function') callback(err)
     })
 }
+
+;(function () {
+  const gaScript = document.createElement('script')
+  gaScript.async = true
+  gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-J2METC1TPT'
+  document.head.appendChild(gaScript)
+
+  // 2. Initialize Google Analytics
+  window.dataLayer = window.dataLayer || []
+  function gtag () {
+    window.dataLayer.push(arguments)
+  }
+  window.gtag = gtag
+  gtag('js', new Date())
+  gtag('config', 'G-J2METC1TPT')
+})()
