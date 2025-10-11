@@ -1230,7 +1230,7 @@ export class Kinetic extends Weapon {
 
 export class Flack extends Weapon {
   constructor (ammo) {
-    super('Flack', 'F', true, true, 2)
+    super('Flack', 'F', true, true, 1)
     this.ammo = ammo
     this.cursors = ['cluster']
     this.hints = ['Click on square to initiate flack']
@@ -1239,11 +1239,13 @@ export class Flack extends Weapon {
     this.isOneAndDone = false
     this.hasFlash = false
     this.dragShape = [
-      [0, 1, 0],
+      [0, 0, 0],
       [1, 1, 1],
+      [0, 2, 0],
+      [2, 0, 0],
       [2, 2, 0],
       [1, 3, 1],
-      [0, 4, 1]
+      [0, 4, 0]
     ]
   }
   clone (ammo) {
@@ -1260,7 +1262,7 @@ export class Flack extends Weapon {
     let area = [[r, c, 2]]
     for (let i = -2; i < 3; i++) {
       for (let j = -2; j < 3; j++) {
-        result.push([r + i, c + j, 0])
+        area.push([r + i, c + j, 0])
       }
     }
     const result = shuffleArray(area)
@@ -1353,7 +1355,7 @@ export class Sweep extends Weapon {
   }
 }
 
-seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1)])
+seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1)]) //, new Flack(1)])
 
 export class WeaponSystem {
   constructor (weapon) {
