@@ -8,6 +8,10 @@
     --strike-cursor-image: url('./strike32.png');
     --satelite-cursor-image: url('./sat32.png');
     --cluster-cursor-image: url('./cluster32.png');
+    --dish-cursor-image: url('./dish32.png');
+    --sweep-cursor-image: url('./sweep32.png');
+    --torpedo-cursor-image: url('./torpedo32.png');
+    --periscope-cursor-image: url('./periscope32.png');
     --cross-cursor-image: url('./cross32.png');
     --background-image: url('./fleet.png');
     --logo-image: url('./logo2.png');

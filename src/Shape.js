@@ -1228,6 +1228,64 @@ export class Kinetic extends Weapon {
   }
 }
 
+export class Torpedo extends Weapon {
+  constructor (ammo) {
+    super('Torpedo', '+', true, true, 2)
+    this.ammo = ammo
+    this.cursors = ['torpedo', 'periscope']
+    this.hints = [
+      'Click on square to start torpedo',
+      'Click on square aim torpedo'
+    ]
+    this.buttonHtml = '<span class="shortcut">T</span>orpedo'
+    this.tip =
+      'drag a torpedo on to the map to increase the number of times you can strike'
+    this.isOneAndDone = true
+    this.hasFlash = false
+    this.dragShape = [
+      [1, 0, 1],
+      [1, 1, 0],
+      [1, 2, 0],
+      [0, 3, 0],
+      [2, 3, 0]
+    ]
+  }
+  clone (ammo) {
+    ammo = ammo || this.ammo
+    return new Torpedo(ammo)
+  }
+  ammoStatus (ammoLeft) {
+    return `Torpedo Mode (${ammoLeft} left)`
+  }
+
+  aoe (map, coords) {
+    const r = coords[0][0]
+    const c = coords[0][1]
+
+    const r1 = coords[1][0]
+    const c1 = coords[1][1]
+
+    return getLinePoints(r, c, r1, c1).filter(([r, c]) => !map.isLand(r, c))
+  }
+  addSplash (map, r, c, power, newEffect) {
+    if (map.inBounds(r, c) && !map.isLand(r, c)) newEffect.push([r, c, power])
+  }
+  splash (map, coords) {
+    const [r, c] = coords
+    const newEffect = [coords]
+
+    this.addSplash(map, r + 1, c, 1, newEffect)
+    this.addSplash(map, r - 1, c, 1, newEffect)
+    this.addSplash(map, r + 1, c + 1, 0, newEffect)
+    this.addSplash(map, r - 1, c + 1, 0, newEffect)
+    this.addSplash(map, r + 1, c - 1, 0, newEffect)
+    this.addSplash(map, r - 1, c - 1, 0, newEffect)
+    this.addSplash(map, r, c + 1, 1, newEffect)
+    this.addSplash(map, r, c - 1, 1, newEffect)
+    return newEffect
+  }
+}
+
 export class Flack extends Weapon {
   constructor (ammo) {
     super('Flack', 'F', true, true, 1)

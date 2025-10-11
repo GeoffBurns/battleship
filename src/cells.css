@@ -59,6 +59,24 @@
     cursor: var(--cluster-cursor-image) 10 20, pointer;
 }
 
+.board.torpedo {
+    cursor: var(--torpedo-cursor-image) 8 16, pointer;
+}
+
+
+.board.periscope {
+    cursor: var(--periscope-cursor-image) 20 16, pointer;
+}
+
+
+.board.dish {
+    cursor: var(--dish-cursor-image) 16 16, pointer;
+}
+
+.board.sweep {
+    cursor: var(--sweep-cursor-image) 16 16, pointer;
+}
+
 /* destroyed (desaturated) board   */
 .board.destroyed .land.light,
 .board.destroyed .sea.light {
