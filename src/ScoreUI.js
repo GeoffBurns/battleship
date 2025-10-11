@@ -285,11 +285,7 @@ export class ScoreUI {
 
     const tallyTitle = document.getElementById('tally-title')
     if (tallyTitle) {
-      if (ships.length > 0) {
-        tallyTitle.classList.remove('hidden')
-      } else {
-        tallyTitle.classList.add('hidden')
-      }
+      tallyTitle.classList.toggle('hidden', ships.length === 0)
     }
 
     const surfaceContainer = document.createElement('div')
