@@ -325,7 +325,7 @@ if (!window.dataLayer) {
   }
   window.gtag = gtag
   gtag('js', new Date())
-  gtag('config', GA_ID)
+  gtag('config', GA_ID, { debug_mode: true })
 
   const script = document.createElement('script')
   script.async = true
