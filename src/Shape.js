@@ -1259,15 +1259,22 @@ export class Flack extends Weapon {
   aoe (map, coords) {
     const r = coords[0][0]
     const c = coords[0][1]
-    let area = [[r, c, 2]]
+    let area = [[r, c, 0]]
     for (let i = -2; i < 3; i++) {
       for (let j = -2; j < 3; j++) {
         area.push([r + i, c + j, 0])
       }
     }
     const result = shuffleArray(area)
-
-    return result
+    for (let i = 0; i < 6; i++) {
+      if (i < 2) {
+        result[i][2] = 2
+      } else {
+        result[i][2] = 1
+      }
+    }
+    result.length = 14
+    return result.filter(([r, c]) => map.inBounds(r, c))
   }
 }
 
@@ -1355,7 +1362,7 @@ export class Sweep extends Weapon {
   }
 }
 
-seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1)]) //, new Flack(1)])
+seaAndLandWeapons.addWeapons([new Megabomb(1), new Kinetic(1), new Flack(1)])
 
 export class WeaponSystem {
   constructor (weapon) {
