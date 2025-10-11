@@ -1427,9 +1427,9 @@ export class Sweep extends Weapon {
 seaAndLandWeapons.addWeapons([
   new Megabomb(1),
   new Kinetic(1),
-  new Flack(1),
-  new Torpedo(1),
-  new Sweep(1)
+  new Flack(1)
+  // new Torpedo(1),
+  // new Sweep(1)
 ])
 
 export class WeaponSystem {
